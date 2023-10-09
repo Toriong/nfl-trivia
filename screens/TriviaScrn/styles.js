@@ -1,16 +1,15 @@
 import { StyleSheet } from "react-native";
+import { SEAHAWKS_COLORS } from "../../styles/globalStylesVars";
 
-const MAIN_COLOR = "#002244";
 const mainViewStyleSheet = StyleSheet.create({
     mainView: {
-        backgroundColor: MAIN_COLOR,
+        backgroundColor: SEAHAWKS_COLORS.home["1st"],
         height: "100%",
         width: "100%"
     }
 })
 
 export {
-    MAIN_COLOR,
     mainViewStyleSheet
 };
 
