@@ -6,7 +6,7 @@ export const TriviaBusinessDataProvider = ({ children }) => {
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = useState([]);
     const globalTriviaStates = [
         {
-            name: 'triviaQuestionsToDisplayOntoUI',
+            name: 'questionsToDisplayOntoUI',
             state: [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI]
         }
     ]
@@ -25,6 +25,7 @@ export const TriviaBusinessDataProvider = ({ children }) => {
             const [, setState] = _state;
 
             if (updateStateHandler) {
+                console.log('using a handler to update target state...')
                 updateStateHandler(setState)
                 return;
             }

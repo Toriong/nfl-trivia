@@ -14,15 +14,21 @@ const TESTING_QUESTION_CHOOSE_PICS = [
 const TEST_QUESTIONS = [
     {
         pictures: TESTING_QUESTION_CHOOSE_PICS,
+        isPictureSelectionQ: true,
         txt: "All except for ONE of these NFL veterans never played for the Seahawks. Click on the correct picture.",
         indexOfCorrectAns: 1
     }
 ]
 
 function TriviaScrnMainContainer() {
-    const { updateSpecificGlobalTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
+    const { updateSpecificGlobalTriviaContextBusinessState, getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const [questionsToDisplayOntoUI, ] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI')
     const [, setIsGettingTriviaQuestions] = getTargetTriviaViewState("isGettingTriviaQuestions");
+
+    useEffect(() => {
+        console.log('questionsToDisplayOntoUI: ', questionsToDisplayOntoUI)
+    })
 
     function getQuerriedSetQuestionsFn(questions) {
         return setQuestions => {
@@ -36,7 +42,7 @@ function TriviaScrnMainContainer() {
             try {
                 const questions = IS_TESTING ? TEST_QUESTIONS : await axios.get("");
 
-                updateSpecificGlobalTriviaContextBusinessState('triviaQuestionsToDisplayOntoUI', null, getQuerriedSetQuestionsFn(questions), getQuerriedSetQuestionsFn(questions));
+                updateSpecificGlobalTriviaContextBusinessState('questionsToDisplayOntoUI', null, getQuerriedSetQuestionsFn(questions));
             } catch (error) {
                 console.error("Failed to get the questions to trivia questions to display onto the DOM. Error message: ", error)
             }
