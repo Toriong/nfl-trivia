@@ -1,15 +1,18 @@
-import { StyleSheet } from 'react-native';
-import TriviaScreen from './screens/TriviaScrn/MainContainer.js';
-import { TriviaBusinessProvider } from './providers/TriviaBusinessDataProvider.js';
+import { StyleSheet, View, Text } from 'react-native';
+import TriviaScreen from './screens/TriviaScrn/MainContainer';
+import { TriviaBusinessDataProvider } from './providers/TriviaBusinessDataProvider.js';
+import { TriviaViewDataProvider } from './providers/TriviaViewDataProvider';
 
 export default function App() {
 
-  // return (
-  //   <TriviaBusinessProvider>
-  //     <TriviaScreen />
-  //   </TriviaBusinessProvider>
-  // );
-  return null;
+  return (
+    <TriviaViewDataProvider>
+      <TriviaBusinessDataProvider>
+        <TriviaScreen />
+      </TriviaBusinessDataProvider>
+    </TriviaViewDataProvider>
+  );
+
 }
 
 const styles = StyleSheet.create({

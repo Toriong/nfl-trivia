@@ -1,25 +1,23 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import CustomText from '../../../../styles/globalStyleComps';
-import { TriviaContext } from '../../../../providers/TriviaBusinessDataProvider';
+import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
+import { IS_TESTING } from '../../../../globalVars';
 
 const QuestionCompPresentation = () => {
-    const { getTargetTriviaContextBusinessState } = useContext(TriviaContext);
-    const [triviaQuestionToDisplayOntoUI, ]  = getTargetTriviaContextBusinessState('triviaQuestionToDisplayOntoUI').state;
-    const { pictures, txt } = triviaQuestionToDisplayOntoUI;
-
+    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
+    // const [triviaQuestionsToDisplayOntoUI, ] = getTargetTriviaContextBusinessState('triviaQuestionsToDisplayOntoUI')?.state;
+    
     return (
         <View style={styles.container}>
-            {pictures &&
+            {/* {pictures?.length &&
                 (pictures.length === 1) ?
                 <Image src={pictures[0]} />
                 :
-                pictures.map(picUrl => {
-                    <Image src={picUrl} />
-                })
-            }
+                pictures.map(picUrl => <Image src={IS_TESTING ? require(picUrl) : picUrl} />)
+            } */}
             <CustomText dynamicStyles={styles.questionText}>
-                {question}
+                {/* {txt} */}
             </CustomText>
         </View>
     );

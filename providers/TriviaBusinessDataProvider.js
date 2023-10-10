@@ -3,29 +3,29 @@ import React, { createContext, useState } from 'react';
 export const TriviaBusinessDataContext = createContext();
 
 export const TriviaBusinessDataProvider = ({ children }) => {
-    const [questionToDisplayOntoUI, setQuestionToDisplayOntoUI] = useState([]);
+    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = useState([]);
     const globalTriviaStates = [
         {
-            name: 'triviaQuestionToDisplayOntoUI',
-            state: [questionToDisplayOntoUI, setQuestionToDisplayOntoUI]
+            name: 'triviaQuestionsToDisplayOntoUI',
+            state: [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI]
         }
     ]
 
     function getTargetTriviaContextBusinessState(stateName) {
-        return globalTriviaStates.find(({ name }) => name === stateName)
+        return globalTriviaStates.find(({ name }) => name === stateName)?.state
     }
 
-    function updateSpecificGlobalTriviaContextBusinessState(targetStateName, newState, updateState) {
+    function updateSpecificGlobalTriviaContextBusinessState(targetStateName, newState, updateStateHandler) {
         try {
-            if (!updateState && !newState) {
+            if (!updateStateHandler && !newState) {
                 throw new Error("Must provide a 'updateState' function or a 'newState' variable.")
             }
 
-            const _state = globalTriviaStates.find(({ name }) => name === targetStateName)
+            const _state = getTargetTriviaContextBusinessState(targetStateName)
             const [, setState] = _state;
 
-            if (updateState) {
-                setState(prevState => updateState(prevState))
+            if (updateStateHandler) {
+                updateStateHandler(setState)
                 return;
             }
 

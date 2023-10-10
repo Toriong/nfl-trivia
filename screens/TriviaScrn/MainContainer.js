@@ -2,10 +2,8 @@ import { useContext, useEffect } from "react";
 import TriviaScrnMainPresentation from "./MainPresentation";
 import { IS_TESTING } from "../../globalVars";
 import axios from "axios";
-import { TriviaContext } from "../../providers/TriviaBusinessDataProvider";
-
-// have the question that was selected to display to the user resides in this 
-// comp
+import { TriviaBusinessDataContext } from "../../providers/TriviaBusinessDataProvider";
+import { TriviaViewDataContext } from "../../providers/TriviaViewDataProvider";
 
 const TESTING_QUESTION_CHOOSE_PICS = [
     '../../../assets/testingImgs/marshall.jpg',
@@ -22,18 +20,26 @@ const TEST_QUESTIONS = [
 ]
 
 function TriviaScrnMainContainer() {
-    const { updateSpecificGlobalTriviaContextState } = useContext(TriviaContext)
-    // brain dump notes:
-    // select which question to display in this container
-    // the selected question will be a global state using Context
+    const { updateSpecificGlobalTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
+    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const [, setIsGettingTriviaQuestions] = getTargetTriviaViewState("isGettingTriviaQuestions");
 
-    // within a useEffect, get the questions from the database to display to the target user: 
+    function getQuerriedSetQuestionsFn(questions) {
+        return setQuestions => {
+            setQuestions(questions)
+            setIsGettingTriviaQuestions(false);
+        }
+    }
 
     useEffect(() => {
         (async () => {
-            const questions = IS_TESTING ? TEST_QUESTIONS : await axios.get("API_GET_QUESTIONS");
+            try {
+                const questions = IS_TESTING ? TEST_QUESTIONS : await axios.get("");
 
-            updateSpecificGlobalTriviaContextState('triviaQuestionToDisplayOntoUI', questions)
+                updateSpecificGlobalTriviaContextBusinessState('triviaQuestionsToDisplayOntoUI', null, getQuerriedSetQuestionsFn(questions), getQuerriedSetQuestionsFn(questions));
+            } catch (error) {
+                console.error("Failed to get the questions to trivia questions to display onto the DOM. Error message: ", error)
+            }
         })();
     }, []);
 
