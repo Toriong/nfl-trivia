@@ -2,7 +2,7 @@ import { useContext, useEffect } from "react";
 import TriviaScrnMainPresentation from "./MainPresentation";
 import { IS_TESTING } from "../../globalVars";
 import axios from "axios";
-import { TriviaContext } from "../../providers/TriviaProvider";
+import { TriviaContext } from "../../providers/TriviaBusinessDataProvider";
 
 // have the question that was selected to display to the user resides in this 
 // comp
@@ -32,7 +32,7 @@ function TriviaScrnMainContainer() {
     useEffect(() => {
         (async () => {
             const questions = IS_TESTING ? TEST_QUESTIONS : await axios.get("API_GET_QUESTIONS");
-            
+
             updateSpecificGlobalTriviaContextState('triviaQuestionToDisplayOntoUI', questions)
         })();
     }, []);

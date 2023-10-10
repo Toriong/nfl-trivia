@@ -1,8 +1,8 @@
 import React, { createContext, useState } from 'react';
 
-export const TriviaContext = createContext();
+export const TriviaBusinessDataContext = createContext();
 
-export const TriviaProvider = ({ children }) => {
+export const TriviaBusinessDataProvider = ({ children }) => {
     const [questionToDisplayOntoUI, setQuestionToDisplayOntoUI] = useState([]);
     const globalTriviaStates = [
         {
@@ -10,32 +10,39 @@ export const TriviaProvider = ({ children }) => {
             state: [questionToDisplayOntoUI, setQuestionToDisplayOntoUI]
         }
     ]
-    
-    function updateSpecificGlobalTriviaContextState(targetStateName, newState, updateState){
+
+    function getTargetTriviaContextBusinessState(stateName) {
+        return globalTriviaStates.find(({ name }) => name === stateName)
+    }
+
+    function updateSpecificGlobalTriviaContextBusinessState(targetStateName, newState, updateState) {
         try {
-            if(!updateState && !newState){
+            if (!updateState && !newState) {
                 throw new Error("Must provide a 'updateState' function or a 'newState' variable.")
             }
 
-            const _state = globalTriviaStates.find(({ name }) => name === targetStateName) 
+            const _state = globalTriviaStates.find(({ name }) => name === targetStateName)
             const [, setState] = _state;
-            
-            if(updateState){
+
+            if (updateState) {
                 setState(prevState => updateState(prevState))
                 return;
             }
 
             setState(newState)
-        } catch(error){
+        } catch (error) {
             console.error(`An error has occurred in updating the state of '${targetStateName}.' Error message: ${error}.`)
         }
     };
 
-    
+
 
     return (
-        <TriviaContext.Provider value={{ updateSpecificGlobalTriviaContextState }}>
+        <TriviaBusinessDataContext.Provider value={{
+            updateSpecificGlobalTriviaContextBusinessState,
+            getTargetTriviaContextBusinessState
+        }}>
             {children}
-        </TriviaContext.Provider>
+        </TriviaBusinessDataContext.Provider>
     );
 };

@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import CustomText from '../../../../styles/globalStyleComps';
+import { TriviaContext } from '../../../../providers/TriviaBusinessDataProvider';
 
-const QuestionCompPresentation = ({ question }) => {
-    const { txt, pictures } = question
+const QuestionCompPresentation = () => {
+    const { getTargetTriviaContextBusinessState } = useContext(TriviaContext);
+    const [triviaQuestionToDisplayOntoUI, ]  = getTargetTriviaContextBusinessState('triviaQuestionToDisplayOntoUI').state;
+    const { pictures, txt } = triviaQuestionToDisplayOntoUI;
 
     return (
         <View style={styles.container}>

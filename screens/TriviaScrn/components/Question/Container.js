@@ -5,11 +5,8 @@ import QuestionCompPresentation from './Presentation'
 // terrell owens
 // AP 
 // brandom marshall 
-import React from 'react';
-import QuestionCompPresentation from './Presentation'
-
 function QuestionCompContainer() {
-    return <QuestionCompPresentation question />;
+    return <QuestionCompPresentation />;
 };
 
 export default QuestionCompContainer;
