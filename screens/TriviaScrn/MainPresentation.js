@@ -42,8 +42,8 @@ import QuestionCompContainer from './components/Question/Container';
 // Brandon Marshall 
 // Randy Moss
 
-function TriviaScrnMainPresentation(){
-    
+function TriviaScrnMainPresentation() {
+
 
     return (
         <View style={{ ...mainViewStyleSheet.mainView }}>

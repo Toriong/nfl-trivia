@@ -26,10 +26,6 @@ function TriviaScrnMainContainer() {
     const [questionsToDisplayOntoUI, ] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI')
     const [, setIsGettingTriviaQuestions] = getTargetTriviaViewState("isGettingTriviaQuestions");
 
-    useEffect(() => {
-        console.log('questionsToDisplayOntoUI: ', questionsToDisplayOntoUI)
-    })
-
     function getQuerriedSetQuestionsFn(questions) {
         return setQuestions => {
             setQuestions(questions)
@@ -38,15 +34,15 @@ function TriviaScrnMainContainer() {
     }
 
     useEffect(() => {
-        (async () => {
-            try {
-                const questions = IS_TESTING ? TEST_QUESTIONS : await axios.get("");
+        // (async () => {
+        //     try {
+        //         const questions = IS_TESTING ? TEST_QUESTIONS : await axios.get("");
 
-                updateSpecificGlobalTriviaContextBusinessState('questionsToDisplayOntoUI', null, getQuerriedSetQuestionsFn(questions));
-            } catch (error) {
-                console.error("Failed to get the questions to trivia questions to display onto the DOM. Error message: ", error)
-            }
-        })();
+        //         updateSpecificGlobalTriviaContextBusinessState('questionsToDisplayOntoUI', null, getQuerriedSetQuestionsFn(questions));
+        //     } catch (error) {
+        //         console.error("Failed to get the questions to trivia questions to display onto the DOM. Error message: ", error)
+        //     }
+        // })();
     }, []);
 
 
