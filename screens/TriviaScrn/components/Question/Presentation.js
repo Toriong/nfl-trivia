@@ -16,21 +16,17 @@ import { HeadingTxt, PTxt } from '../../../../globalComponents/customTxts';
 import FadeUpAndOut from '../../../../animations/FadeUpAndOut';
 import { SEAHAWKS_COLORS, GLOBAL_ELEMENT_SHADOW_STYLES, CENTER_DEFAULT } from '../../../../styles/globalStylesVars';
 import { Button } from '../../../../globalComponents/buttons';
+
 const BrandonMarshall = require('../../../../assets/testingImgs/marshall.jpg')
 const RandyMoss = require('../../../../assets/testingImgs/randymoss.jpg')
 const AdrianPeterson = require('../../../../assets/testingImgs/ap.jpg')
 const TerrellOwens = require('../../../../assets/testingImgs/owens.jpg')
-// brain dump notes: 
-// create the question section for the display of the question, choices, and answer
-// wrap the above in a suspense component
-
 const TESTING_QUESTION_CHOOSE_PICS = [
     { picUrl: BrandonMarshall, name: 'Brandom Marshall' },
     { picUrl: RandyMoss, name: 'Randy Moss' },
     { picUrl: AdrianPeterson, name: 'Adrian Peterson' },
     { picUrl: TerrellOwens, name: 'Terrell Owens' },
 ]
-
 const TEST_QUESTIONS = [
     {
         pictures: TESTING_QUESTION_CHOOSE_PICS,
@@ -181,6 +177,10 @@ function QuestionChoicesAndAnswerUI({ question }) {
         setSelectedAnswer(answer);
     }
 
+    function handleOnSubmitBtnPress(){
+
+    }
+
     return (
         <FadeUpAndOut
             dynamicStyles={{ height: "100%", top: 20 }}
@@ -199,7 +199,13 @@ function QuestionChoicesAndAnswerUI({ question }) {
                 }}
             >
                 <FadeUpAndOut
-                    dynamicStyles={{ heigth: "100%", width: "100%" }}
+                    dynamicStyles={{
+                        heigth: "100%",
+                        width: "100%",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
                     _willFadeIn={[true, () => { }]}
                     willFadeOut={willFadeOutPictures}
                 >
@@ -228,7 +234,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                     const props = IS_TESTING ? { source: pic.picUrl } : { src: pic.picUrl };
 
                                     return (
-                                        <Button handleOnClick={() => handleOnPress(pic.name)}>
+                                        <Button handleOnPress={() => handleOnPress(pic.name)}>
                                             <Image
                                                 style={{
                                                     height: 165,
@@ -252,7 +258,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                 <View
                     style={{
                         width: "100%",
-                        height: "30%",
+                        height: "26%",
                         ...CENTER_DEFAULT.center
                     }}
                 >
@@ -268,6 +274,21 @@ function QuestionChoicesAndAnswerUI({ question }) {
                 </View>
                 <View style={{ borderBottomWidth: .5, borderColor: 'white', minWidth: 200, minHeight: 30 }}>
                     <PTxt style={{ fontStyle: 'italic', textAlign: 'center', marginTop: 5 }}>{selectedAnswer}</PTxt>
+                </View>
+                <View style={{ width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+
+                    <Button
+                        dynamicStyles={{
+                            top: 20,
+                            backgroundColor: '#69BE28',
+                            padding: 10,
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }}
+                        handleOnClick={handleOnSubmitBtnPress}
+                    >
+                        <PTxt>Submit</PTxt>
+                    </Button>
                 </View>
             </View>
         </FadeUpAndOut>
