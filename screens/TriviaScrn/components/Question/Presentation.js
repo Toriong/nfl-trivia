@@ -1,5 +1,5 @@
 import React, { Suspense, useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import CustomText from '../../../../styles/globalStyleComps';
 import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
 import { IS_TESTING } from '../../../../globalVars';
@@ -15,23 +15,28 @@ import { ActivityIndicator } from 'react-native';
 import { HeadingTxt, PTxt } from '../../../../globalComponents/customTxts';
 import FadeUpAndOut from '../../../../animations/FadeUpAndOut';
 import { SEAHAWKS_COLORS, GLOBAL_ELEMENT_SHADOW_STYLES, CENTER_DEFAULT } from '../../../../styles/globalStylesVars';
-
+import { Button } from '../../../../globalComponents/buttons';
+const BrandonMarshall = require('../../../../assets/testingImgs/marshall.jpg')
+const RandyMoss = require('../../../../assets/testingImgs/randymoss.jpg')
+const AdrianPeterson = require('../../../../assets/testingImgs/ap.jpg')
+const TerrellOwens = require('../../../../assets/testingImgs/owens.jpg')
 // brain dump notes: 
 // create the question section for the display of the question, choices, and answer
 // wrap the above in a suspense component
 
 const TESTING_QUESTION_CHOOSE_PICS = [
-    '../../../assets/testingImgs/marshall.jpg',
-    '../../../assets/testingImgs/randymoss.jpg',
-    '../../../assets/testingImgs/ap.jpg',
-    '../../../assets/testingImgs/owens.jpg',
+    { picUrl: BrandonMarshall, name: 'Brandom Marshall' },
+    { picUrl: RandyMoss, name: 'Randy Moss' },
+    { picUrl: AdrianPeterson, name: 'Adrian Peterson' },
+    { picUrl: TerrellOwens, name: 'Terrell Owens' },
 ]
+
 const TEST_QUESTIONS = [
     {
         pictures: TESTING_QUESTION_CHOOSE_PICS,
-        isPictureSelectionQ: true,
-        txt: "All except for ONE of these NFL veterans never played for the Seahawks. Click on the correct picture.",
-        indexOfCorrectAns: 1
+        txt: "All except for ONE of these NFL veterans NEVER played for the Seahawks. Select the correct picture.",
+        answer: 'Randy Moss',
+        explanation: 'Randy Moss played for the Vikings, Patriots, Oakland Raiders, Titans, and the 49ers.'
     }
 ]
 
@@ -61,7 +66,7 @@ async function getQuestions(apiUrl) {
 }
 
 function QuestionsChoicesAndAnswerContainer({ currentIndex = 0 }) {
-    const { data: questions, isFetching } = useQuery({ queryFn: () => getQuestions(), queryKey: ['questionsQueryKey'] })
+    const { data: questions } = useQuery({ queryFn: () => getQuestions(), queryKey: ['questionsQueryKey'] })
     const [willFadePresentationIn, setWillFadePresentationIn] = useState(true);
     const [willShowLoadingUI, setWillShowLoadingUI] = useState(true);
     const [willFadePresentationOut, setWillFadePresentationOut] = useState(false);
@@ -94,7 +99,6 @@ function QuestionsChoicesAndAnswerContainer({ currentIndex = 0 }) {
                     }}
                 >
                     <View style={{
-                        // ...GLOBAL_ELEMENT_SHADOW_STYLES.main,
                         height: "50%",
                         borderRadius: 20,
                         width: "100%",
@@ -152,21 +156,121 @@ function QuestionsChoicesAndAnswerContainer({ currentIndex = 0 }) {
         )
     }
 
-    const { txt, pictures } = questions[currentIndex] ?? {};
+    const currentQuestion = questions[currentIndex] ?? {};
 
-    if (!txt || !pictures) {
+    if (!currentQuestion) {
         console.log('what is up')
         // tell the user that the program is unable to show the pictures to the user
         return <PTxt>An error has occurred in displaying the question. Please refresh the app and try again.</PTxt>;
     }
 
-    console.log('txt: ', txt)
 
+
+
+    return <QuestionChoicesAndAnswerUI question={currentQuestion} />
+}
+
+function QuestionChoicesAndAnswerUI({ question }) {
+    const { txt, answer, choice, pictures } = question;
+    const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
+    const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = useState(false);
+    const [selectedAnswer, setSelectedAnswer] = useState("");
+    const [willFadeOutPictures, setWillFadeOutPictures] = useState(false)
+
+    function handleOnPress(answer) {
+        setSelectedAnswer(answer);
+    }
 
     return (
-        <View>
-            <Text>Questions will be displayed here</Text>
-        </View>
+        <FadeUpAndOut
+            dynamicStyles={{ height: "100%", top: 20 }}
+            _willFadeIn={[willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI]}
+            willFadeOut={willFadeOutQuestionChoicesAndAnsUI}
+        >
+            <View
+                style={{
+                    display: 'flex',
+                    paddingTop: 20,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingBottom: 20,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <FadeUpAndOut
+                    dynamicStyles={{ heigth: "100%", width: "100%" }}
+                    _willFadeIn={[true, () => { }]}
+                    willFadeOut={willFadeOutPictures}
+                >
+                    <View style={{
+                        height: "50%",
+                        borderRadius: 20,
+                        width: "100%",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                    >
+                        <View
+                            style={{
+                                width: "100%",
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                gap: 10,
+                                flexDirection: 'row',
+                                flexWrap: 'wrap'
+                            }}
+                        >
+                            {(pictures.length > 1) ?
+                                pictures.map(pic => {
+                                    const props = IS_TESTING ? { source: pic.picUrl } : { src: pic.picUrl };
+
+                                    return (
+                                        <Button handleOnClick={() => handleOnPress(pic.name)}>
+                                            <Image
+                                                style={{
+                                                    height: 165,
+                                                    width: 165,
+                                                    borderRadius: 20
+                                                }}
+                                                {...props}
+                                            />
+                                        </Button>
+                                    )
+                                })
+                                :
+                                <Image
+                                    style={{ height: 165, width: 165, borderRadius: 20 }}
+                                    src={pictures[0].picUrl}
+                                />
+                            }
+                        </View>
+                    </View>
+                </FadeUpAndOut>
+                <View
+                    style={{
+                        width: "100%",
+                        height: "30%",
+                        ...CENTER_DEFAULT.center
+                    }}
+                >
+                    <PTxt style={{ color: 'white', textAlign: 'center' }} >{txt}</PTxt>
+                </View>
+                {pictures.length > 1 && (
+                    <View>
+                        {/* conditional render this view only if the question is multiple choice. */}
+                    </View>
+                )}
+                <View style={{ width: "100%", height: 'fit-content', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <PTxt>Answer: </PTxt>
+                </View>
+                <View style={{ borderBottomWidth: .5, borderColor: 'white', minWidth: 200, minHeight: 30 }}>
+                    <PTxt style={{ fontStyle: 'italic', textAlign: 'center', marginTop: 5 }}>{selectedAnswer}</PTxt>
+                </View>
+            </View>
+        </FadeUpAndOut>
     )
 }
 
@@ -175,8 +279,7 @@ function QuestionCompPresentation() {
 
     return (
         <View>
-            {/* use suspense here, if still getting the questions, then present the loading ui state */}
-            {/* wrap using suspense */}
+            {/* put the timer here */}
             <QuestionsChoicesAndAnswerContainer />
 
 

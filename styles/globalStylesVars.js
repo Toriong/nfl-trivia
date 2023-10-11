@@ -4,7 +4,7 @@ export const CENTER_DEFAULT = StyleSheet.create({
     center: {
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     }
 });
 
