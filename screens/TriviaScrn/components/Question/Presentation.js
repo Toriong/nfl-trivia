@@ -12,8 +12,9 @@ import {
 import { delay } from '../../../../globalTestingFns/globalTestingFns';
 import styles from './styles';
 import { ActivityIndicator } from 'react-native';
-import { HeadingTxt } from '../../../../globalComponents/customTxts';
+import { HeadingTxt, PTxt } from '../../../../globalComponents/customTxts';
 import FadeUpAndOut from '../../../../animations/FadeUpAndOut';
+import { SEAHAWKS_COLORS, GLOBAL_ELEMENT_SHADOW_STYLES, CENTER_DEFAULT } from '../../../../styles/globalStylesVars';
 
 // brain dump notes: 
 // create the question section for the display of the question, choices, and answer
@@ -40,14 +41,7 @@ async function getQuestions(apiUrl) {
         const response = IS_TESTING ? { status: 200, data: TEST_QUESTIONS } : await axios.get(apiUrl);
 
         if (IS_TESTING) {
-            const timeBeforeLoop = new Date().getTime();
-            let loopTimeMs = 0;
-            while (loopTimeMs <= 20) {
-                console.log('looping...')
-                console.log('loopTimeMs: ', loopTimeMs)
-                loopTimeMs = new Date().getTime() - timeBeforeLoop;
-            }
-            console.log('will execute loop...')
+
         }
 
         if (response.status !== 200) {
@@ -67,7 +61,7 @@ async function getQuestions(apiUrl) {
 }
 
 function QuestionsChoicesAndAnswerContainer({ currentIndex = 0 }) {
-    const { data: questions } = useQuery({ queryFn: () => getQuestions(), queryKey: ['questionsQueryKey'] })
+    const { data: questions, isFetching } = useQuery({ queryFn: () => getQuestions(), queryKey: ['questionsQueryKey'] })
     const [willFadePresentationIn, setWillFadePresentationIn] = useState(true);
     const [willShowLoadingUI, setWillShowLoadingUI] = useState(true);
     const [willFadePresentationOut, setWillFadePresentationOut] = useState(false);
@@ -84,18 +78,74 @@ function QuestionsChoicesAndAnswerContainer({ currentIndex = 0 }) {
     if (willShowLoadingUI) {
         return (
             <FadeUpAndOut
-                dynamicStyles={{ top: 20 }}
+                dynamicStyles={{ height: "100%" }}
                 _willFadeIn={[willFadePresentationIn, setWillFadePresentationIn]}
                 willFadeOut={willFadePresentationOut}
             >
-                <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', }}>
-                    <View style={{ height: "85%", backgroundColor: 'pink', width: "100%", display: 'flex',  }}>
-                        <View style={{ width: "100%" }}>
-                            <HeadingTxt fontSize={35} style={{ color: 'white', width: "100%", textAlign: 'center' }}>Loading...</HeadingTxt>
+                <View
+                    style={{
+                        display: 'flex',
+                        paddingTop: 20,
+                        paddingLeft: 20,
+                        paddingRight: 20,
+                        paddingBottom: 20,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                >
+                    <View style={{
+                        // ...GLOBAL_ELEMENT_SHADOW_STYLES.main,
+                        height: "50%",
+                        borderRadius: 20,
+                        width: "100%",
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}
+                    >
+                        <View
+                            style={{ width: "100%", paddingBottom: "25%" }}
+                        >
+                            <HeadingTxt
+                                fontSize={35}
+                                style={{
+                                    color: 'white',
+                                    width: "100%",
+                                    textAlign: 'center'
+                                }}
+                            >
+                                Loading...
+                            </HeadingTxt>
+                            <View
+                                style={{
+                                    top: 50,
+                                    width: "100%"
+                                }}
+                            >
+                                <ActivityIndicator
+                                    size='large'
+                                    color="#A1B0FD"
+                                    style={{
+                                        transform: [{ scaleX: 2 }, { scaleY: 2 }]
+                                    }}
+                                />
+                            </View>
                         </View>
-                        <View style={{ top: 50, width: "100%" }}>
-                            <ActivityIndicator size='large' color="#A1B0FD" style={{ transform: [{ scaleX: 2 }, { scaleY: 2 }] }} />
-                        </View>
+                    </View>
+                    <View
+                        style={{
+                            width: "100%",
+                            height: "45%",
+                            ...CENTER_DEFAULT.center
+                        }}
+                    >
+                        <ActivityIndicator
+                            size='large'
+                            color="#A1B0FD"
+                            style={{
+                                transform: [{ scaleX: 2 }, { scaleY: 2 }]
+                            }}
+                        />
                     </View>
                 </View>
             </FadeUpAndOut>
@@ -104,10 +154,13 @@ function QuestionsChoicesAndAnswerContainer({ currentIndex = 0 }) {
 
     const { txt, pictures } = questions[currentIndex] ?? {};
 
-    if(!txt || !pictures){
+    if (!txt || !pictures) {
+        console.log('what is up')
         // tell the user that the program is unable to show the pictures to the user
-        return null;
+        return <PTxt>An error has occurred in displaying the question. Please refresh the app and try again.</PTxt>;
     }
+
+    console.log('txt: ', txt)
 
 
     return (
