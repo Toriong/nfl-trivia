@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+multiple-choice-example.json
+true-or-false-example.json
+
 # Expo
 .expo/
 dist/

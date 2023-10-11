@@ -8,6 +8,20 @@ export const CENTER_DEFAULT = StyleSheet.create({
     }
 });
 
+export const TEXT_SIZE = Object.freeze({
+    SMALL: 12,
+    MEDIUM: 16,
+    DEFAULTPTXT: 18,
+    LARGE: 20,
+    XLARGE: 24,
+    XXLARGE: 28,
+    XXXLARGE: 32,
+    XXXXLARGE: 36,
+    XXXXXLARGE: 40,
+    XXXXXXLARGE: 44,
+    XXXXXXXLARGE: 48,
+})
+
 export const SEAHAWKS_COLORS = {
     home: {
         "1st": "#002244",

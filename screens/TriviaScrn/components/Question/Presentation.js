@@ -1,4 +1,4 @@
-import React, { Suspense, useContext } from 'react';
+import React, { Suspense, useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import CustomText from '../../../../styles/globalStyleComps';
 import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
@@ -10,6 +10,10 @@ import {
     useQueryClient,
 } from '@tanstack/react-query'
 import { delay } from '../../../../globalTestingFns/globalTestingFns';
+import styles from './styles';
+import { ActivityIndicator } from 'react-native';
+import { HeadingTxt } from '../../../../globalComponents/customTxts';
+import FadeUpAndOut from '../../../../animations/FadeUpAndOut';
 
 // brain dump notes: 
 // create the question section for the display of the question, choices, and answer
@@ -35,10 +39,10 @@ async function getQuestions(apiUrl) {
     try {
         const response = IS_TESTING ? { status: 200, data: TEST_QUESTIONS } : await axios.get(apiUrl);
 
-        if(IS_TESTING){
+        if (IS_TESTING) {
             const timeBeforeLoop = new Date().getTime();
             let loopTimeMs = 0;
-            while(loopTimeMs <= 20){
+            while (loopTimeMs <= 20) {
                 console.log('looping...')
                 console.log('loopTimeMs: ', loopTimeMs)
                 loopTimeMs = new Date().getTime() - timeBeforeLoop;
@@ -63,19 +67,52 @@ async function getQuestions(apiUrl) {
 }
 
 function QuestionsChoicesAndAnswerContainer({ currentIndex = 0 }) {
-    const { isFetching } = useQuery({ queryFn: getQuestions, queryKey: ['questionsQueryKey'] })
+    const { data: questions } = useQuery({ queryFn: () => getQuestions(), queryKey: ['questionsQueryKey'] })
+    const [willFadePresentationIn, setWillFadePresentationIn] = useState(true);
+    const [willShowLoadingUI, setWillShowLoadingUI] = useState(true);
+    const [willFadePresentationOut, setWillFadePresentationOut] = useState(false);
 
-    if (isFetching) {
+    useEffect(() => {
+        setTimeout(() => {
+            setWillFadePresentationOut(true);
+            setTimeout(() => {
+                setWillShowLoadingUI(false);
+            }, 400)
+        }, 1000)
+    }, [])
+
+    if (willShowLoadingUI) {
         return (
-            <View>
-                <Text>Loading...</Text>
-            </View>
+            <FadeUpAndOut
+                dynamicStyles={{ top: 20 }}
+                _willFadeIn={[willFadePresentationIn, setWillFadePresentationIn]}
+                willFadeOut={willFadePresentationOut}
+            >
+                <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', }}>
+                    <View style={{ height: "85%", backgroundColor: 'pink', width: "100%", display: 'flex',  }}>
+                        <View style={{ width: "100%" }}>
+                            <HeadingTxt fontSize={35} style={{ color: 'white', width: "100%", textAlign: 'center' }}>Loading...</HeadingTxt>
+                        </View>
+                        <View style={{ top: 50, width: "100%" }}>
+                            <ActivityIndicator size='large' color="#A1B0FD" style={{ transform: [{ scaleX: 2 }, { scaleY: 2 }] }} />
+                        </View>
+                    </View>
+                </View>
+            </FadeUpAndOut>
         )
     }
 
+    const { txt, pictures } = questions[currentIndex] ?? {};
+
+    if(!txt || !pictures){
+        // tell the user that the program is unable to show the pictures to the user
+        return null;
+    }
+
+
     return (
         <View>
-            <Text>hey there</Text>
+            <Text>Questions will be displayed here</Text>
         </View>
     )
 }
@@ -84,29 +121,15 @@ function QuestionCompPresentation() {
     const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
 
     return (
-        <View style={styles.container}>
+        <View>
             {/* use suspense here, if still getting the questions, then present the loading ui state */}
             {/* wrap using suspense */}
-            <Suspense fallback={<Text>Loading...</Text>}>
-                <QuestionsChoicesAndAnswerContainer />
-            </Suspense>
+            <QuestionsChoicesAndAnswerContainer />
 
 
         </View>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    questionText: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-});
 
 export default QuestionCompPresentation;
