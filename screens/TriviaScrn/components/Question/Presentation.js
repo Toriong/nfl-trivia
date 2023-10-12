@@ -187,19 +187,47 @@ function QuestionChoicesAndAnswerUI({ question }) {
     const [willFadeOutPictures, setWillFadeOutPictures] = useState(false)
     const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = useState(false);
     const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);
-    const isBelow375PxViewPortWidth = useMediaQuery({ query: "(min-width: 376px)" })
-    let multipleImgsStyle = {
-        width: 165,
-        height: 165
+    const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
+    // make this into a custom hook, BELOW
+    const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
+    const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
+    const isBelow575PxViewPortWidth = useMediaQuery({ query: "(max-width: 575px)" });
+    // MAKE the above into a custom hook
+    let multipleImgsStyle = { width: 165, height: 165 }
+    let btnContainerStyle = { marginTop: 20 }
+    let questionContainerTxtLayout = { padding: 20 }
+    let imageContainerStyle = { gap: 20 }
+    let selectedAnswerContainerStyle = { top: 30 }
+    let buttonStyle = { marginTop: 40 }
+    let selectedAnsContainer = { marginTop: 20 }
+
+    if (isBelow575PxViewPortWidth) {
+        questionContainerTxtLayout = {}
+        btnContainerStyle = {};
+        selectedAnswerContainerStyle = {   };
+        selectedAnsContainer = { marginTop: 5 }
+        buttonStyle = { marginTop: 10 };
+        multipleImgsStyle = {
+            width: 160,
+            height: 160
+        }
     }
 
     if (isBelow375PxViewPortWidth) {
         multipleImgsStyle = {
             width: 145,
             height: 145
+            // 125
         }
     }
 
+    if (isBelow300PxViewPortWidth) {
+        multipleImgsStyle = {
+            width: 115,
+            height: 115
+        }
+        imageContainerStyle = { gap: 10 }
+    }
 
     function handleOnImgPress(answer) {
         setSelectedAnswer(answer);
@@ -270,19 +298,19 @@ function QuestionChoicesAndAnswerUI({ question }) {
 
 
     function handleOnLayout(event) {
-        setResponsiveStyleObjs({ height: event?.nativeEvent?.layout?.height })
+        setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
     }
 
     return (
         <FadeUpAndOut
-            dynamicStyles={{ height: "100%", top: 20 }}
+            dynamicStyles={{ height: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}
             _willFadeIn={[willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI]}
             willFadeOut={willFadeOutQuestionChoicesAndAnsUI}
         >
             <View
                 style={{
+                    ...questionContainerTxtLayout,
                     display: 'flex',
-                    padding: 20,
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: "80%"
@@ -294,6 +322,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
+                        ...stylePropForQuestionAndPicLayout
                     }}
                     onLayout={handleOnLayout}
                 >
@@ -312,7 +341,6 @@ function QuestionChoicesAndAnswerUI({ question }) {
                             >
                                 <View
                                     style={{
-                                        borderWidth: 1,
                                         width: "100%",
                                         display: 'flex',
                                         justifyContent: 'center',
@@ -321,11 +349,11 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                 >
                                     <View
                                         style={{
+                                            ...imageContainerStyle,
                                             width: "100%",
                                             display: 'flex',
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            gap: 10,
                                             flexDirection: 'row',
                                             flexWrap: 'wrap'
                                         }}
@@ -341,8 +369,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                                     >
                                                         <Image
                                                             style={{
-                                                                height: 165,
-                                                                width: 165,
+                                                                ...multipleImgsStyle,
                                                                 borderRadius: 20
                                                             }}
                                                             {...props}
@@ -352,7 +379,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                             })
                                             :
                                             <Image
-                                                style={{ height: 165, width: 165, borderRadius: 20 }}
+                                                style={{ ...multipleImgsStyle, borderRadius: 20 }}
                                                 src={pictures[0].picUrl}
                                             />
                                         }
@@ -364,7 +391,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                 dynamicStyles={{
                                     width: "100%",
                                     height: "26%",
-                                    ...CENTER_DEFAULT.center,
+                                    marginTop: "3%"
                                 }}
                                 willFadeOut={willFadeOutQuestionTxt}
                             >
@@ -372,10 +399,9 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                     style={{
                                         width: "100%",
                                         height: "100%",
-                                        ...CENTER_DEFAULT.center
                                     }}
                                 >
-                                    <PTxt style={{ color: 'white', textAlign: 'center' }} >{txt}</PTxt>
+                                    <PTxt style={{ paddingStart: 5, paddingEnd: 5, color: 'white', textAlign: 'center' }} >{txt}</PTxt>
                                 </View>
                             </FadeUpAndOut>
                         </>
@@ -427,7 +453,6 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                 dynamicStyles={{
                                     width: "100%",
                                     height: "26%",
-                                    ...CENTER_DEFAULT.center,
                                 }}
                                 willFadeOut={willFadeOutQuestionTxt}
                             >
@@ -435,7 +460,6 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                     style={{
                                         width: "100%",
                                         height: "100%",
-                                        ...CENTER_DEFAULT.center
                                     }}
                                 >
                                     <PTxt style={{ color: 'white', textAlign: 'center' }} >{txt}</PTxt>
@@ -444,35 +468,33 @@ function QuestionChoicesAndAnswerUI({ question }) {
                         </>
                     }
                 </View>
-                {pictures.length > 1 && (
-                    <View>
-                        {/* conditional render this view only if the question is multiple choice. */}
-                    </View>
-                )}
                 <View
                     style={{
                         width: "100%",
                         height: 'fit-content',
                         display: 'flex',
                         justifyContent: 'center',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        ...selectedAnswerContainerStyle,
                     }}
                 >
-                    <PTxt>Answer: </PTxt>
+                    <View>
+                        <PTxt>Answer: </PTxt>
+                    </View>
+                    {/* marginTop: 20 */}
+                    <View style={{ ...selectedAnsContainer, borderBottomWidth: .5, borderColor: 'white', minWidth: 200, minHeight: 30 }}>
+                        <PTxt style={{ fontStyle: 'italic', textAlign: 'center', top: 5 }}>{selectedAnswer}</PTxt>
+                    </View>
                 </View>
-                <View style={{ borderBottomWidth: .5, borderColor: 'white', minWidth: 200, minHeight: 30 }}>
-                    <PTxt style={{ fontStyle: 'italic', textAlign: 'center', marginTop: 5 }}>{selectedAnswer}</PTxt>
-                </View>
-                <View style={{ width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-
+                <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Button
                         isDisabled={selectedAnswer === ""}
                         dynamicStyles={{
-                            top: 20,
                             opacity: selectedAnswer === "" ? .3 : 1,
                             backgroundColor: '#69BE28',
                             padding: 10,
-                            borderRadius: 5
+                            borderRadius: 5,
+                            ...buttonStyle
                         }}
                         handleOnPress={handleOnSubmitBtnPress}
                     >
@@ -480,7 +502,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                     </Button>
                 </View>
             </View>
-        </FadeUpAndOut>
+        </FadeUpAndOut >
     )
 }
 
