@@ -17,6 +17,7 @@ import FadeUpAndOut from '../../../../animations/FadeUpAndOut';
 import { SEAHAWKS_COLORS, GLOBAL_ELEMENT_SHADOW_STYLES, CENTER_DEFAULT } from '../../../../styles/globalStylesVars';
 import { Button } from '../../../../globalComponents/buttons';
 import { DimensionsContext } from '../../../../providers/DimensionsProvider';
+import MediaQuery, { useMediaQuery } from "react-responsive";
 
 const BrandonMarshall = require('../../../../assets/testingImgs/marshall.jpg')
 const RandyMoss = require('../../../../assets/testingImgs/randymoss.jpg')
@@ -178,7 +179,6 @@ const MUTIPLE_IMGS_DIMENSIONS_MED = {
 }
 
 function QuestionChoicesAndAnswerUI({ question }) {
-    const { dimensionsObj } = useContext(DimensionsContext);
     const { txt, answer, choice, pictures, explanation } = question;
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
     const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = useState(false);
@@ -187,97 +187,90 @@ function QuestionChoicesAndAnswerUI({ question }) {
     const [willFadeOutPictures, setWillFadeOutPictures] = useState(false)
     const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = useState(false);
     const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);
-    const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
+    const isBelow375PxViewPortWidth = useMediaQuery({ query: "(min-width: 376px)" })
+    let multipleImgsStyle = {
+        width: 165,
+        height: 165
+    }
+
+    if (isBelow375PxViewPortWidth) {
+        multipleImgsStyle = {
+            width: 145,
+            height: 145
+        }
+    }
+
 
     function handleOnImgPress(answer) {
         setSelectedAnswer(answer);
     }
 
-    // BRAIN DUMP: 
-    // create a function
-    // create an array that will hold objects, these objects will be the values that will be inserted for the style prop of a container
-    // when the dimensions changes, execute the function, it will update each of the objects only if it meets a specific length of the viewport width
-    // each object will have the following form: { name: the name of the container, style: the object that contains the styles }
-    let styleObjs = [{ name: 'multipleImgs', style: { ...MULTIPLE_IMGS_DIMENSIONS_DEFAULT } }]
 
-    function updateStylesObjs(viewPortWidth, name) {
-        if ((viewPortWidth <= 375) && (name === 'multipleImgs')) {
-            styleObjs[0].style = { ...MUTIPLE_IMGS_DIMENSIONS_MED }
-        }
-    }
 
     // styles will hold the following: 
     // all of the styles that will be dynamic due to the viewport change in its width
     // have it be a object that is returned
 
 
-    useMemo(() => { 
-        styleObjs.forEach(styleObj => {
-            updateStylesObjs(dimensionsObj.width, styleObj.name)
-        })
-     }, [dimensionsObj.width]);
 
-     useEffect(() => {
-        console.log("styleObjs: ", styleObjs);
-     })
+    // BRAIN DUMP: 
+    // change the gap between the images as the viewport decrease pertaining to the width of the screen
 
-        // BRAIN DUMP: 
-        // change the gap between the images as the viewport decrease pertaining to the width of the screen
+    // GOAL: change the height of the image to prevent it from breaking onto the next line
 
-        // GOAL: change the height of the image to prevent it from breaking onto the next line
+    function handleOnSubmitBtnPress() {
 
-        function handleOnSubmitBtnPress() {
+        // GOAL: when the user clicks on the submit button, have the following to occur: 
 
-            // GOAL: when the user clicks on the submit button, have the following to occur: 
+        // GOAL #1: SHOW THE CORRECT IMAGE
+        // fade out the answer ui
+        // fade in the correct image ui
 
-            // GOAL #1: SHOW THE CORRECT IMAGE
-            // fade out the answer ui
-            // fade in the correct image ui
+        // GOAL #2: Fade in the answer UI. Have the explanation text be faded onto the DOM. 
 
-            // GOAL #2: Fade in the answer UI. Have the explanation text be faded onto the DOM. 
+        // CASE: the answer which the user selected was incorrect. 
+        // HAVE THE FOLLOWING TO OCCUR: 
+        // fade out question text 
+        // fade out the pictures
 
-            // CASE: the answer which the user selected was incorrect. 
-            // HAVE THE FOLLOWING TO OCCUR: 
-            // fade out question text 
-            // fade out the pictures
+        // fade in the correct picture 
+        // fade in explanation
+        // change the answer text to red
 
-            // fade in the correct picture 
-            // fade in explanation
-            // change the answer text to red
+        if (answer !== selectedAnswer) {
 
-            if (answer !== selectedAnswer) {
-
-            }
-
-            setWillFadeOutPictures(true);
-            setWillFadeOutuestionTxt(true);
-
-            setTimeout(() => {
-                setWillRenderQuestionUI(false);
-                setTimeout(() => {
-                    setWillRenderCorrectAnsUI(true);
-                }, 250)
-            }, 450)
-
-            // within a setTimeout, after a quarter of a second, take off of the DOM the pictures and question
-            // text ui
-
-            // within a setTimeout, after a half of a second, show the following: 
-            // the correct answer ui
-            // the explanation for the correct answer
-
-
-
-            // GOAL #3: check if what the user selected is correct
-            // CASE: what the user selected was incorrect, return false 
-            // compare what the user selected with the correct answer
-            // get the correct answer
-            // get the choice which the user selected
-            // FOR THE END GOAL ABOVE, return TRUE
         }
 
+        setWillFadeOutPictures(true);
+        setWillFadeOutuestionTxt(true);
+
+        setTimeout(() => {
+            setWillRenderQuestionUI(false);
+            setTimeout(() => {
+                setWillRenderCorrectAnsUI(true);
+            }, 250)
+        }, 450)
+
+        // within a setTimeout, after a quarter of a second, take off of the DOM the pictures and question
+        // text ui
+
+        // within a setTimeout, after a half of a second, show the following: 
+        // the correct answer ui
+        // the explanation for the correct answer
+
+
+
+        // GOAL #3: check if what the user selected is correct
+        // CASE: what the user selected was incorrect, return false 
+        // compare what the user selected with the correct answer
+        // get the correct answer
+        // get the choice which the user selected
+        // FOR THE END GOAL ABOVE, return TRUE
+    }
+
+
     function handleOnLayout(event) {
-        setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
+        setResponsiveStyleObjs({ height: event?.nativeEvent?.layout?.height })
     }
 
     return (
@@ -301,7 +294,6 @@ function QuestionChoicesAndAnswerUI({ question }) {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        ...stylePropForQuestionAndPicLayout,
                     }}
                     onLayout={handleOnLayout}
                 >
@@ -420,9 +412,11 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                             flexWrap: 'wrap'
                                         }}
                                     >
-                                        {/* GOAL: show the correct image here. */}
                                         <Image
-                                            style={{ height: 165, width: 165, borderRadius: 20 }}
+                                            style={{
+                                                ...multipleImgsStyle,
+                                                borderRadius: 20
+                                            }}
                                             src={pictures[0].picUrl}
                                         />
                                     </View>
