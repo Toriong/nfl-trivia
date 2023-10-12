@@ -22,7 +22,7 @@ const RandyMoss = require('../../../../assets/testingImgs/randymoss.jpg')
 const AdrianPeterson = require('../../../../assets/testingImgs/ap.jpg')
 const TerrellOwens = require('../../../../assets/testingImgs/owens.jpg')
 const TESTING_QUESTION_CHOOSE_PICS = [
-    { picUrl: BrandonMarshall, name: 'Brandom Marshall' },
+    { picUrl: BrandonMarshall, name: 'Brandon Marshall' },
     { picUrl: RandyMoss, name: 'Randy Moss' },
     { picUrl: AdrianPeterson, name: 'Adrian Peterson' },
     { picUrl: TerrellOwens, name: 'Terrell Owens' },
@@ -171,14 +171,66 @@ function QuestionChoicesAndAnswerUI({ question }) {
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
     const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState("");
+    const [willFadeOutQuestionTxt, setWillFadeOutuestionTxt] = useState(false);
     const [willFadeOutPictures, setWillFadeOutPictures] = useState(false)
+    const [areQuestionPicsOnUI, setAreQuestionPicsOnUI] = useState(false);
+    const [areQuestionTxtsOnUI, setAreQuestionTxtOnUI] = useState(false);
+    const [willRenderInCorrectAnsUI, setWillRenderInCorrectAnsUI] = useState(false);
 
-    function handleOnPress(answer) {
+    function handleOnImgPress(answer) {
         setSelectedAnswer(answer);
     }
 
-    function handleOnSubmitBtnPress(){
+    function handleOnSubmitBtnPress() {
 
+        // GOAL: when the user clicks on the submit button, have the following to occur: 
+
+        // GOAL #1: SHOW THE CORRECT IMAGE
+        // fade out the answer ui
+        // fade in the correct image ui
+
+        // GOAL #2: Fade in the answer UI. Have the explanation text be faded onto the DOM. 
+
+        // CASE: the answer which the user selected was incorrect. 
+        // HAVE THE FOLLOWING TO OCCUR: 
+        // fade out question text 
+        // fade out the pictures
+
+        // fade in the correct picture 
+        // fade in explanation
+        // change the answer text to red
+
+        if (answer !== selectedAnswer) {
+
+        }
+
+        setWillFadeOutPictures(true);
+        setWillFadeOutuestionTxt(true);
+
+        setTimeout(() => {
+            setAreQuestionPicsOnUI(false);
+            setAreQuestionTxtOnUI(false);
+
+            setTimeout(() => {
+                setWillRenderInCorrectAnsUI(true);
+            }, 250)
+        }, 250)
+
+        // within a setTimeout, after a quarter of a second, take off of the DOM the pictures and question
+        // text ui
+
+        // within a setTimeout, after a half of a second, show the following: 
+        // the correct answer ui
+        // the explanation for the correct answer
+
+
+
+        // GOAL #3: check if what the user selected is correct
+        // CASE: what the user selected was incorrect, return false 
+        // compare what the user selected with the correct answer
+        // get the correct answer
+        // get the choice which the user selected
+        // FOR THE END GOAL ABOVE, return TRUE
     }
 
     return (
@@ -234,7 +286,9 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                     const props = IS_TESTING ? { source: pic.picUrl } : { src: pic.picUrl };
 
                                     return (
-                                        <Button handleOnPress={() => handleOnPress(pic.name)}>
+                                        <Button
+                                            handleOnPress={() => handleOnImgPress(pic.name)}
+                                        >
                                             <Image
                                                 style={{
                                                     height: 165,
@@ -255,15 +309,21 @@ function QuestionChoicesAndAnswerUI({ question }) {
                         </View>
                     </View>
                 </FadeUpAndOut>
-                <View
-                    style={{
-                        width: "100%",
-                        height: "26%",
-                        ...CENTER_DEFAULT.center
-                    }}
+                <FadeUpAndOut
+                    _willFadeIn={[true, () => { }]}
+                    dynamicStyles={{ width: "100%", height: "26%" }}
+                    willFadeOut={willFadeOutQuestionTxt}
                 >
-                    <PTxt style={{ color: 'white', textAlign: 'center' }} >{txt}</PTxt>
-                </View>
+                    <View
+                        style={{
+                            width: "100%",
+                            height: "100%",
+                            ...CENTER_DEFAULT.center
+                        }}
+                    >
+                        <PTxt style={{ color: 'white', textAlign: 'center' }} >{txt}</PTxt>
+                    </View>
+                </FadeUpAndOut>
                 {pictures.length > 1 && (
                     <View>
                         {/* conditional render this view only if the question is multiple choice. */}
@@ -278,14 +338,16 @@ function QuestionChoicesAndAnswerUI({ question }) {
                 <View style={{ width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 
                     <Button
+                        isDisabled={selectedAnswer === ""}
                         dynamicStyles={{
                             top: 20,
+                            opacity: selectedAnswer === "" ? .3 : 1,
                             backgroundColor: '#69BE28',
                             padding: 10,
                             borderWidth: 1,
                             borderRadius: 5
                         }}
-                        handleOnClick={handleOnSubmitBtnPress}
+                        handleOnPress={handleOnSubmitBtnPress}
                     >
                         <PTxt>Submit</PTxt>
                     </Button>
