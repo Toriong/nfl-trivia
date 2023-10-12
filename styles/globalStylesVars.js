@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export const CENTER_DEFAULT = StyleSheet.create({
     center: {

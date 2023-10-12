@@ -6,6 +6,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
+import DimensionsProvider from './providers/DimensionsProvider';
 
 const queryClient = new QueryClient()
 
@@ -13,11 +14,13 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TriviaViewDataProvider>
-        <TriviaBusinessDataProvider>
-          <TriviaScreen />
-        </TriviaBusinessDataProvider>
-      </TriviaViewDataProvider>
+      <DimensionsProvider>
+        <TriviaViewDataProvider>
+          <TriviaBusinessDataProvider>
+            <TriviaScreen />
+          </TriviaBusinessDataProvider>
+        </TriviaViewDataProvider>
+      </DimensionsProvider>
     </QueryClientProvider>
   );
 
