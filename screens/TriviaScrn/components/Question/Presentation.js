@@ -189,7 +189,10 @@ function QuestionChoicesAndAnswerUI({ question }) {
     const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = useState(false);
     const [willFadeOutCorrectAnsPicture, setWillFadeOutCorrectAnsPicture] = useState(false);
     const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);
+    const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = useState(false);
+    const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = useState(false);
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
+    const [resultTxt, setResultTxt] = useState("")
     // make this into a custom hook, BELOW
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
     const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
@@ -248,70 +251,27 @@ function QuestionChoicesAndAnswerUI({ question }) {
 
     // GOAL: change the height of the image to prevent it from breaking onto the next line
 
-    const [willShowAnswerUI, setWillShowAnswerUI] = useState(false);
-
-    useEffect(() => {
-        if(willShowAnswerUI){
-            setWillRenderCorrectAnsUI(true);
-            setWillShowAnswerUI(false);
-        }
-    }, [willShowAnswerUI])
 
     function handleOnSubmitBtnPress() {
-
-        // GOAL: when the user clicks on the submit button, have the following to occur: 
-
-        // GOAL #1: SHOW THE CORRECT IMAGE
-        // fade out the answer ui
-        // fade in the correct image ui
-
-        // GOAL #2: Fade in the answer UI. Have the explanation text be faded onto the DOM. 
-
-        // CASE: the answer which the user selected was incorrect. 
-        // HAVE THE FOLLOWING TO OCCUR: 
-        // fade out question text 
-        // fade out the pictures
-
-        // fade in the correct picture 
-        // fade in explanation
-        // change the answer text to red
-
-        if (answer !== selectedAnswer) {
-
-        }
-
+        setWasSubmitBtnPressed(true);
+        setWasSelectedAnswerCorrect(answer === selectedAnswer)
         setWillFadeOutQuestionPromptPictures(true);
         setWillFadeOutQuestionTxt(true);
 
         setTimeout(() => {
             setWillRenderQuestionUI(false);
-            setWillShowAnswerUI(true);
-            // setTimeout(() => {
-            //     setWillRenderCorrectAnsUI(true);
-            // }, 250)
+            setTimeout(() => {
+                setWillRenderCorrectAnsUI(true);
+            }, 250)
         }, 450)
-
-        // within a setTimeout, after a quarter of a second, take off of the DOM the pictures and question
-        // text ui
-
-        // within a setTimeout, after a half of a second, show the following: 
-        // the correct answer ui
-        // the explanation for the correct answer
-
-
-
-        // GOAL #3: check if what the user selected is correct
-        // CASE: what the user selected was incorrect, return false 
-        // compare what the user selected with the correct answer
-        // get the correct answer
-        // get the choice which the user selected
-        // FOR THE END GOAL ABOVE, return TRUE
     }
 
 
     function handleOnLayout(event) {
         setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
     }
+
+    const colorForAnswerShownTxts = wasSubmitBtnPressed ? (wasSelectedAnswerCorrect ? 'green' : 'red') : 'white';
 
     return (
         <FadeUpAndOut
@@ -422,11 +382,26 @@ function QuestionChoicesAndAnswerUI({ question }) {
                         <>
                             <FadeUpAndOut
                                 dynamicStyles={{
-                                    heigth: "100%",
+                                    heigth: 20,
+                                    width: "100%",
                                     width: "100%",
                                     display: 'flex',
                                     justifyContent: 'center',
                                     alignItems: 'center',
+                                    bottom: 10
+                                }}
+                                _willFadeIn={[true, () => { }]}
+                                willFadeOut={willFadeOutCorrectAnsPicture}
+                            >
+                                <PTxt txtColor='green'>Correct Answer: </PTxt>
+                                <PTxt txtColor='green'>{answer}</PTxt>
+                            </FadeUpAndOut>
+                            <FadeUpAndOut
+                                dynamicStyles={{
+                                    heigth: "100%",
+                                    width: "100%",
+                                    display: 'flex',
+                                    justifyContent: 'center',
                                 }}
                                 _willFadeIn={[true, () => { }]}
                                 willFadeOut={willFadeOutCorrectAnsPicture}
@@ -456,6 +431,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                 dynamicStyles={{
                                     width: "100%",
                                     height: "26%",
+                                    marginBottom: "10%"
                                 }}
                                 willFadeOut={willFadeOutExplanationTxt}
                             >
@@ -466,7 +442,30 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                         marginTop: "5%"
                                     }}
                                 >
-                                    <PTxt style={{ color: 'white', textAlign: 'center' }} >{explanation}</PTxt>
+                                    <PTxt style={{ color: 'white', textAlign: 'center', paddingStart: 5, paddingEnd: 5 }} >{explanation}</PTxt>
+                                </View>
+                            </FadeUpAndOut>
+                            <FadeUpAndOut
+                                _willFadeIn={[true, () => { }]}
+                                dynamicStyles={{
+                                    width: "100%",
+                                    marginBottom: "15%"
+                                }}
+                                willFadeOut={willFadeOutExplanationTxt}
+                            >
+                                <View
+                                    style={{
+                                        width: "100%",
+                                        height: 80,
+                                    }}
+                                >
+
+                                    <PTxt
+                                        txtColor={colorForAnswerShownTxts}
+                                        style={{ color: 'white', textAlign: 'center', paddingStart: 5, paddingEnd: 5 }}
+                                    >
+                                        {wasSelectedAnswerCorrect ? "Correct 👍" : "Incorrect 👎"}
+                                    </PTxt>
                                 </View>
                             </FadeUpAndOut>
                         </>
@@ -483,11 +482,10 @@ function QuestionChoicesAndAnswerUI({ question }) {
                     }}
                 >
                     <View>
-                        <PTxt>Answer: </PTxt>
+                        <PTxt txtColor={colorForAnswerShownTxts}>Answer: </PTxt>
                     </View>
-                    {/* marginTop: 20 */}
-                    <View style={{ ...selectedAnsContainer, borderBottomWidth: .5, borderColor: 'white', minWidth: 200, minHeight: 30 }}>
-                        <PTxt style={{ fontStyle: 'italic', textAlign: 'center', top: 5 }}>{selectedAnswer}</PTxt>
+                    <View style={{ ...selectedAnsContainer, borderBottomWidth: .5, borderColor: colorForAnswerShownTxts, minWidth: 200, minHeight: 30 }}>
+                        <PTxt style={{ fontStyle: 'italic', textAlign: 'center', top: 5 }} txtColor={colorForAnswerShownTxts}>{selectedAnswer}</PTxt>
                     </View>
                 </View>
                 <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

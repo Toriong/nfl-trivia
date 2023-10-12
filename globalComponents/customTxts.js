@@ -10,12 +10,12 @@ function getGlobalStyles(fontSize) {
     })
 }
 
-export function PTxt({ children: txt, fontSize = 21, style, _testID = "", willAddQuotes }) {
+export function PTxt({ children: txt, fontSize = 21, style, _testID = "", txtColor = 'white', willAddQuotes }) {
     const globalStyles = getGlobalStyles(fontSize);
     const _style = style ? { ...globalStyles.main, ...style } : globalStyles.main
 
     return (
-        <Text testID={_testID} style={{ ..._style, color: 'white' }}>
+        <Text testID={_testID} style={{ ..._style, color: txtColor }}>
             {willAddQuotes ? `"${txt}"` : txt}
         </Text>
     )
