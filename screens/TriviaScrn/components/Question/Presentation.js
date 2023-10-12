@@ -24,10 +24,10 @@ const RandyMoss = require('../../../../assets/testingImgs/randymoss.jpg')
 const AdrianPeterson = require('../../../../assets/testingImgs/ap.jpg')
 const TerrellOwens = require('../../../../assets/testingImgs/owens.jpg')
 const TESTING_QUESTION_CHOOSE_PICS = [
-    { picUrl: BrandonMarshall, name: 'Brandon Marshall' },
-    { picUrl: RandyMoss, name: 'Randy Moss' },
-    { picUrl: AdrianPeterson, name: 'Adrian Peterson' },
-    { picUrl: TerrellOwens, name: 'Terrell Owens' },
+    { picUrl: BrandonMarshall, choice: 'Brandon Marshall' },
+    { picUrl: RandyMoss, choice: 'Randy Moss' },
+    { picUrl: AdrianPeterson, choice: 'Adrian Peterson' },
+    { picUrl: TerrellOwens, choice: 'Terrell Owens' },
 ]
 const TEST_QUESTIONS = [
     {
@@ -183,9 +183,11 @@ function QuestionChoicesAndAnswerUI({ question }) {
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
     const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState("");
-    const [willFadeOutQuestionTxt, setWillFadeOutuestionTxt] = useState(false);
-    const [willFadeOutPictures, setWillFadeOutPictures] = useState(false)
+    const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = useState(false);
+    const [willFadeOutExplanationTxt, setWillFadeOutExplanationTxt] = useState(false);
+    const [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures] = useState(false)
     const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = useState(false);
+    const [willFadeOutCorrectAnsPicture, setWillFadeOutCorrectAnsPicture] = useState(false);
     const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
     // make this into a custom hook, BELOW
@@ -204,7 +206,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
     if (isBelow575PxViewPortWidth) {
         questionContainerTxtLayout = {}
         btnContainerStyle = {};
-        selectedAnswerContainerStyle = {   };
+        selectedAnswerContainerStyle = {};
         selectedAnsContainer = { marginTop: 5 }
         buttonStyle = { marginTop: 10 };
         multipleImgsStyle = {
@@ -246,6 +248,15 @@ function QuestionChoicesAndAnswerUI({ question }) {
 
     // GOAL: change the height of the image to prevent it from breaking onto the next line
 
+    const [willShowAnswerUI, setWillShowAnswerUI] = useState(false);
+
+    useEffect(() => {
+        if(willShowAnswerUI){
+            setWillRenderCorrectAnsUI(true);
+            setWillShowAnswerUI(false);
+        }
+    }, [willShowAnswerUI])
+
     function handleOnSubmitBtnPress() {
 
         // GOAL: when the user clicks on the submit button, have the following to occur: 
@@ -269,14 +280,15 @@ function QuestionChoicesAndAnswerUI({ question }) {
 
         }
 
-        setWillFadeOutPictures(true);
-        setWillFadeOutuestionTxt(true);
+        setWillFadeOutQuestionPromptPictures(true);
+        setWillFadeOutQuestionTxt(true);
 
         setTimeout(() => {
             setWillRenderQuestionUI(false);
-            setTimeout(() => {
-                setWillRenderCorrectAnsUI(true);
-            }, 250)
+            setWillShowAnswerUI(true);
+            // setTimeout(() => {
+            //     setWillRenderCorrectAnsUI(true);
+            // }, 250)
         }, 450)
 
         // within a setTimeout, after a quarter of a second, take off of the DOM the pictures and question
@@ -337,7 +349,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                     alignItems: 'center',
                                 }}
                                 _willFadeIn={[true, () => { }]}
-                                willFadeOut={willFadeOutPictures}
+                                willFadeOut={willFadeOutQuestionPromptPictures}
                             >
                                 <View
                                     style={{
@@ -365,7 +377,7 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                                 return (
                                                     <Button
                                                         key={index}
-                                                        handleOnPress={() => handleOnImgPress(pic.name)}
+                                                        handleOnPress={() => handleOnImgPress(pic.choice)}
                                                     >
                                                         <Image
                                                             style={{
@@ -417,35 +429,26 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                     alignItems: 'center',
                                 }}
                                 _willFadeIn={[true, () => { }]}
-                                willFadeOut={willFadeOutPictures}
+                                willFadeOut={willFadeOutCorrectAnsPicture}
                             >
-                                <View style={{
-                                    borderRadius: 20,
-                                    width: "100%",
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
+                                <View
+                                    style={{
+                                        borderRadius: 20,
+                                        width: "100%",
+                                        height: "100%",
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
                                 >
-                                    <View
+                                    <Image
                                         style={{
-                                            width: "100%",
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            gap: 10,
-                                            flexDirection: 'row',
-                                            flexWrap: 'wrap'
+                                            width: 185,
+                                            height: 185,
+                                            borderRadius: 20
                                         }}
-                                    >
-                                        <Image
-                                            style={{
-                                                ...multipleImgsStyle,
-                                                borderRadius: 20
-                                            }}
-                                            src={pictures[0].picUrl}
-                                        />
-                                    </View>
+                                        source={RandyMoss}
+                                    />
                                 </View>
                             </FadeUpAndOut>
                             <FadeUpAndOut
@@ -454,15 +457,16 @@ function QuestionChoicesAndAnswerUI({ question }) {
                                     width: "100%",
                                     height: "26%",
                                 }}
-                                willFadeOut={willFadeOutQuestionTxt}
+                                willFadeOut={willFadeOutExplanationTxt}
                             >
                                 <View
                                     style={{
                                         width: "100%",
                                         height: "100%",
+                                        marginTop: "5%"
                                     }}
                                 >
-                                    <PTxt style={{ color: 'white', textAlign: 'center' }} >{txt}</PTxt>
+                                    <PTxt style={{ color: 'white', textAlign: 'center' }} >{explanation}</PTxt>
                                 </View>
                             </FadeUpAndOut>
                         </>
