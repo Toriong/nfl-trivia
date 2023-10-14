@@ -1,26 +1,31 @@
 import { StyleSheet, View, Text } from 'react-native';
-import TriviaScreen from './screens/TriviaScrn/MainContainer';
 import { TriviaBusinessDataProvider } from './providers/TriviaBusinessDataProvider.js';
 import { TriviaViewDataProvider } from './providers/TriviaViewDataProvider';
 import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
-import DimensionsProvider from './providers/DimensionsProvider';
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from '@react-navigation/native-stack';;
+import TriviaScreen from './screens/TriviaScrn/MainContainer';
+import ResultScreen from './screens/ResultsScrn/MainContainer'
 
 const queryClient = new QueryClient()
+const Stack = createNativeStackNavigator();
 
 export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DimensionsProvider>
-        <TriviaViewDataProvider>
-          <TriviaBusinessDataProvider>
-            <TriviaScreen />
-          </TriviaBusinessDataProvider>
-        </TriviaViewDataProvider>
-      </DimensionsProvider>
+      <TriviaViewDataProvider>
+        <TriviaBusinessDataProvider>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="TriviaScreen" component={TriviaScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </TriviaBusinessDataProvider>
+      </TriviaViewDataProvider>
     </QueryClientProvider>
   );
 

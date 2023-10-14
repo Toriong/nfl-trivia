@@ -6,6 +6,9 @@ node_modules/
 multiple-choice-example.json
 true-or-false-example.json
 
+questions.json
+questions2.json
+
 # Expo
 .expo/
 dist/
