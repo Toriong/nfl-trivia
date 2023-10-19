@@ -14,7 +14,7 @@ function QuestionCompContainer() {
     function handleFinallyBlockofGetTriviaQuestionsFn() {
         setTimeout(() => {
             setWillShowLoadingUI(false);
-        }, 1000)
+        }, 1_000)
     }
 
     let { data: questions } = useQuery({ queryFn: () => getTriviaQuestions('', handleFinallyBlockofGetTriviaQuestionsFn, handleGetTriviaQuestionsError), queryKey: ['questionsQueryKey'] })

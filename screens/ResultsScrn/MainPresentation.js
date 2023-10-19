@@ -10,7 +10,9 @@ import Background from "../../globalComponents/Background";
 
 const seahawksLogo = require('../../assets/seahawks-icon.png')
 
-function MainPresentation() {
+function MainPresentation({
+    handleReviewQsBtnPress
+}) {
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
     const [willFadeOutResultsUi, setWillFadeOutResultsUi] = useState(false);
     const [triviaScore,] = getTargetTriviaViewState("triviaScore")
@@ -72,13 +74,7 @@ function MainPresentation() {
                     >
                         Your score:
                     </HeadingTxt>
-                    {/* <PTxt>{triviaScoreFraction}</PTxt> */}
-                    <PTxt
-                        txtColor="white"
-                        fontSize={24}
-                    >
-                        8/10
-                    </PTxt>
+                    <PTxt>{triviaScoreFraction.n}/{triviaScoreFraction.d}</PTxt>
                 </View>
                 <View style={{ ...CENTER_DEFAULT.center, flexDirection: 'row', marginTop: 25 }}>
                     <Button
@@ -90,6 +86,7 @@ function MainPresentation() {
                             marginRight: 15
                         }}
                         backgroundColor={SEAHAWKS_COLORS.home["3rd"]}
+                        handleOnPress={handleReviewQsBtnPress}
                     >
                         <PTxt
                             style={{ textAlign: 'center' }}

@@ -1,13 +1,6 @@
 import React, { Suspense, useContext, useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
-import CustomText from '../../../../styles/globalStyleComps';
-import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
+import { View, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { IS_TESTING, MULTIPLE_CHOICE_LETTERS } from '../../../../globalVars';
-import axios from 'axios';
-import {
-    useQuery,
-} from '@tanstack/react-query'
-import styles from './styles';
 import { ActivityIndicator } from 'react-native';
 import { HeadingTxt, PTxt } from '../../../../globalComponents/customTxts';
 import FadeUpAndOut from '../../../../animations/FadeUpAndOut';
@@ -16,7 +9,6 @@ import { Button } from '../../../../globalComponents/buttons';
 import { useMediaQuery } from "react-responsive";
 import { useNavigation } from '@react-navigation/native';
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
-
 
 function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFadeOutLoadingQuestionsLayout }) {
     const [willFadeLoadingQuestionsIn, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
@@ -107,16 +99,17 @@ function QuestionsChoicesAndAnswerContainer({
     const [willFadePresentationIn, setWillFadePresentationIn] = useState(false);
     const [willFadeOutLoadingQuestionsLayout, setWillFadeOutLoadingQuestionLayout] = useState(false);
 
-    useEffect(() => {
-        setTimeout(() => {
-            setWillFadeOutLoadingQuestionLayout(true);
-            setTimeout(() => {
-                setWillShowLoadingUI(false);
-            }, 400);
-        }, 1000);
-    }, []);
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         setWillFadeOutLoadingQuestionLayout(true);
+    //         setTimeout(() => {
+    //             setWillShowLoadingUI(false);
+    //         }, 400);
+    //     }, 1000);
+    // }, []);
 
     if (willShowLoadingUI) {
+        console.log('loading screen is displayed...')
         return <TriviaScreenLoadingPresentation
             _willFadeLoadingQuestionsIn={[willFadePresentationIn, setWillFadePresentationIn]}
             willFadeOutLoadingQuestionsLayout={willFadeOutLoadingQuestionsLayout}
