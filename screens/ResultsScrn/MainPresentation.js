@@ -16,19 +16,6 @@ function MainPresentation() {
     const [triviaScore,] = getTargetTriviaViewState("triviaScore")
     let triviaScoreFraction = new Fraction(triviaScore);
 
-    // show the following: 
-    // RESULT
-    // Seahawks emoji
-    // if the user gets everything right, then show the tropy emoji 
-    // user's score
-
-    // show the following the buttons: 
-    // Review answers  
-    // Take another quiz! 
-
-    // if the user gets everything right
-
-
     return (
         <Background>
             <FadeUpAndOut
