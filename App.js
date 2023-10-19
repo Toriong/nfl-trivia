@@ -7,12 +7,12 @@ import {
 } from '@tanstack/react-query'
 import NavigationContainer from './NavigationContainer.js';
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 export default function App() {
 
   return (
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
       <TriviaViewDataProvider>
         <TriviaBusinessDataProvider>
           <NavigationContainer />

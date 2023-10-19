@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import QuestionCompPresentation from './Presentation'
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getTriviaQuestions } from '../../../../services/questions/get';
 
 function QuestionCompContainer() {
     const [willShowLoadingUI, setWillShowLoadingUI] = useState(true);
     const [willPresentErrorUI, setWillPresentErrorUI] = useState(false);
-    // useQueryClient();
 
     function handleGetTriviaQuestionsError() {
         setWillPresentErrorUI(true);

@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import TriviaScreen from './screens/TriviaScrn/MainContainer';
-import ResultScreen from './screens/ResultsScrn/MainContainer'
+import ResultScreen from './screens/ResultsScrn/MainContainer';
 
 const Stack = createNativeStackNavigator()
 

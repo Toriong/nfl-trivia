@@ -102,7 +102,6 @@ function QuestionsChoicesAndAnswerContainer({
     _willShowLoadingUI,
     _willPresentErrorUI
 }) {
-    // put the following useQuery hook in a Container component
     const [willPresentErrorUI, setWillPresentErrorUI] = _willPresentErrorUI;
     const [willShowLoadingUI, setWillShowLoadingUI] = _willShowLoadingUI;
     const [willFadePresentationIn, setWillFadePresentationIn] = useState(false);
@@ -125,9 +124,8 @@ function QuestionsChoicesAndAnswerContainer({
     }
 
     if (!questions?.length) {
-        return <PTxt>An error has occurred in displaying the question. Please restart the app and try again.</PTxt>;
+        return <PTxt style={{ textAlign: 'center', paddingLeft: 10, paddingRight: 10 }}>An error has occurred in displaying the question. Please restart the app and try again.</PTxt>;
     }
-
 
     const _questions = questions.map((question, index) => ({
         ...question,
