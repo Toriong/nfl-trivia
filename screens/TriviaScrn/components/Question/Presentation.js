@@ -13,7 +13,9 @@ import { HeadingTxt, PTxt } from '../../../../globalComponents/customTxts';
 import FadeUpAndOut from '../../../../animations/FadeUpAndOut';
 import { SEAHAWKS_COLORS, GLOBAL_ELEMENT_SHADOW_STYLES, CENTER_DEFAULT } from '../../../../styles/globalStylesVars';
 import { Button } from '../../../../globalComponents/buttons';
-import MediaQuery, { useMediaQuery } from "react-responsive";
+import { useMediaQuery } from "react-responsive";
+import { useNavigation } from '@react-navigation/native';
+import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
 
 const BrandonMarshall = require('../../../../assets/testingImgs/marshall.jpg')
 const RandyMoss = require('../../../../assets/testingImgs/randymoss.jpg')
@@ -66,116 +68,129 @@ async function getQuestions(apiUrl) {
     }
 }
 
+function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFadeOutLoadingQuestionsLayout }) {
+    const [willFadeLoadingQuestionsIn, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
+
+    return (
+        <FadeUpAndOut
+            dynamicStyles={{ height: "100%" }}
+            _willFadeIn={[willFadeLoadingQuestionsIn, setWillFadeLoadingQuestionsIn]}
+            willFadeOut={willFadeOutLoadingQuestionsLayout}
+        >
+            <View
+                style={{
+                    display: 'flex',
+                    paddingTop: 20,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingBottom: 20,
+                    height: "100%",
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <View style={{
+                    height: "50%",
+                    borderRadius: 20,
+                    width: "100%",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+                >
+                    <View
+                        style={{ width: "100%", paddingBottom: "25%" }}
+                    >
+                        <HeadingTxt
+                            fontSize={35}
+                            style={{
+                                color: 'white',
+                                width: "100%",
+                                textAlign: 'center'
+                            }}
+                        >
+                            Loading...
+                        </HeadingTxt>
+                        <View
+                            style={{
+                                top: 50,
+                                width: "100%"
+                            }}
+                        >
+                            <ActivityIndicator
+                                size='large'
+                                color="#A1B0FD"
+                                style={{
+                                    transform: [{ scaleX: 2 }, { scaleY: 2 }]
+                                }}
+                            />
+                        </View>
+                    </View>
+                </View>
+                <View
+                    style={{
+                        width: "100%",
+                        height: "45%",
+                        ...CENTER_DEFAULT.center
+                    }}
+                >
+                    <ActivityIndicator
+                        size='large'
+                        color="#A1B0FD"
+                        style={{
+                            transform: [{ scaleX: 2 }, { scaleY: 2 }]
+                        }}
+                    />
+                </View>
+            </View>
+        </FadeUpAndOut>
+    )
+}
+
 function QuestionsChoicesAndAnswerContainer() {
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const { data: questions } = useQuery({ queryFn: () => getQuestions(), queryKey: ['questionsQueryKey'] })
-    const [willFadePresentationIn, setWillFadePresentationIn] = useState(true);
+    let { data: questions } = useQuery({ queryFn: () => getQuestions(), queryKey: ['questionsQueryKey'] })
     const [willShowLoadingUI, setWillShowLoadingUI] = useState(true);
-    const [willFadePresentationOut, setWillFadePresentationOut] = useState(false);
+    const [willFadePresentationIn, setWillFadePresentationIn] = useState(false);
+    const [willFadeOutLoadingQuestionsLayout, setWillFadeOutLoadingQuestionLayout] = useState(false);
 
     useEffect(() => {
         setTimeout(() => {
-            setWillFadePresentationOut(true);
+            setWillFadeOutLoadingQuestionLayout(true);
             setTimeout(() => {
                 setWillShowLoadingUI(false);
-            }, 400)
-        }, 1000)
-    }, [])
+            }, 400);
+        }, 1000);
+    }, []);
 
     if (willShowLoadingUI) {
-        return (
-            <FadeUpAndOut
-                dynamicStyles={{ height: "100%" }}
-                _willFadeIn={[willFadePresentationIn, setWillFadePresentationIn]}
-                willFadeOut={willFadePresentationOut}
-            >
-                <View
-                    style={{
-                        display: 'flex',
-                        paddingTop: 20,
-                        paddingLeft: 20,
-                        paddingRight: 20,
-                        paddingBottom: 20,
-                        height: "100%",
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}
-                >
-                    <View style={{
-                        height: "50%",
-                        borderRadius: 20,
-                        width: "100%",
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}
-                    >
-                        <View
-                            style={{ width: "100%", paddingBottom: "25%" }}
-                        >
-                            <HeadingTxt
-                                fontSize={35}
-                                style={{
-                                    color: 'white',
-                                    width: "100%",
-                                    textAlign: 'center'
-                                }}
-                            >
-                                Loading...
-                            </HeadingTxt>
-                            <View
-                                style={{
-                                    top: 50,
-                                    width: "100%"
-                                }}
-                            >
-                                <ActivityIndicator
-                                    size='large'
-                                    color="#A1B0FD"
-                                    style={{
-                                        transform: [{ scaleX: 2 }, { scaleY: 2 }]
-                                    }}
-                                />
-                            </View>
-                        </View>
-                    </View>
-                    <View
-                        style={{
-                            width: "100%",
-                            height: "45%",
-                            ...CENTER_DEFAULT.center
-                        }}
-                    >
-                        <ActivityIndicator
-                            size='large'
-                            color="#A1B0FD"
-                            style={{
-                                transform: [{ scaleX: 2 }, { scaleY: 2 }]
-                            }}
-                        />
-                    </View>
-                </View>
-            </FadeUpAndOut>
-        )
+        return <TriviaScreenLoadingPresentation
+            _willFadeLoadingQuestionsIn={[willFadePresentationIn, setWillFadePresentationIn]}
+            willFadeOutLoadingQuestionsLayout={willFadeOutLoadingQuestionsLayout}
+        />
     }
 
-    const currentQuestion = questions[currentQuestionIndex] ?? {};
-
-    if (!currentQuestion) {
+    if (!questions?.length) {
         return <PTxt>An error has occurred in displaying the question. Please restart the app and try again.</PTxt>;
     }
 
 
+    questions = questions.map((question, index) => ({
+        ...question,
+        isCurrentQDisplayed: index === 0,
+        wasSelectedAnswerCorrect: null
+    }))
 
-
-    return <QuestionChoicesAndAnswerUI _currentQuestionIndex={[currentQuestionIndex, setCurrentQuestionIndex]} question={currentQuestion} lastQuestionIndexNum={questions.length - 1} />
+    return <QuestionChoicesAndAnswerUI _questions={questions} />
 }
 
 
-function QuestionChoicesAndAnswerUI({ question, _currentQuestionIndex, lastQuestionIndexNum }) {
-    const { text, answer, choices, pictures, explanation } = question;
-    const [currentQuestionIndex, setCurrentQuestionIndex] = _currentQuestionIndex;
-    const correctImgUrl = pictures?.length > 1 ? pictures.find(({ choice }) => choice === answer).picUrl : null;
+function QuestionChoicesAndAnswerUI({ _questions }) {
+    const navigationObj = useNavigation();
+    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const [, setTriviaScore] = getTargetTriviaViewState("triviaScore")
+    const [questions, setQuestions] = useState(_questions);
+    const { text, answer, choices, pictures, explanation } = questions.find(({ isCurrentQDisplayed }) => isCurrentQDisplayed) ?? questions[0];
+    const correctImgUrl = (pictures?.length > 1) ? pictures.find(({ choice }) => choice === answer).picUrl : null;
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
     const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = useState(false);
     const [selectedAnswer, setSelectedAnswer] = useState({ answer: "", letter: "" });
@@ -188,11 +203,9 @@ function QuestionChoicesAndAnswerUI({ question, _currentQuestionIndex, lastQuest
     const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = useState(false);
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = useState(false);
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
-    // make this into a custom hook, BELOW
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
     const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
     const isBelow575PxViewPortWidth = useMediaQuery({ query: "(max-width: 575px)" });
-    // MAKE the above into a custom hook
     let multipleImgsStyle = { width: 165, height: 165 }
     let btnContainerStyle = { marginTop: 20 }
     let questionContainerTxtLayout = { padding: 20 }
@@ -241,29 +254,38 @@ function QuestionChoicesAndAnswerUI({ question, _currentQuestionIndex, lastQuest
         setWasSelectedAnswerCorrect(answer === selectedAnswer.answer)
         setWillFadeOutQuestionPromptPictures(true);
         setWillFadeOutQuestionTxt(true);
+        setQuestions(questions => questions.map(question => {
+            if (question.isCurrentQDisplayed) {
+                return {
+                    ...question,
+                    wasSelectedAnswerCorrect: answer === selectedAnswer.answer
+                };
+            };
+
+            return question;
+        }));
 
         setTimeout(() => {
             setWillRenderQuestionUI(false);
             setTimeout(() => {
                 setWillRenderCorrectAnsUI(true);
             }, 250)
-        }, 450)
+        }, 450);
     }
 
-    function handleOnPressNextBtn() {
-
-    }
 
     function handleOnLayout(event) {
         setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
     }
 
     function handleNextQuestionBtnPress() {
-        if ((currentQuestionIndex + 1) > lastQuestionIndexNum) {
-            // GOAL #1: DISPLAY THE RESULTS SCREEN
+        let currentQuestionIndex = questions.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
+        currentQuestionIndex = (currentQuestionIndex === -1) ? 0 : currentQuestionIndex
 
-            // GOAL #2: display how many questions that the user got wrong and how many right.
-
+        if ((currentQuestionIndex + 1) > (questions.length - 1)) {
+            const correctQuestionsNum = questions.filter(question => question.wasSelectedAnswerCorrect).length;
+            setTriviaScore(correctQuestionsNum / questions.length)
+            navigationObj.navigate('Results')
             return;
         };
 
@@ -275,17 +297,29 @@ function QuestionChoicesAndAnswerUI({ question, _currentQuestionIndex, lastQuest
         setWasSelectedAnswerCorrect(false);
         setSelectedAnswer({ answer: "", letter: "" })
         setTimeout(() => {
-            setCurrentQuestionIndex(currentState => currentState + 1);
+            const nextQuestionToDisplayIndex = currentQuestionIndex + 1;
+            setQuestions(questions => questions.map((question, index) => {
+                if (currentQuestionIndex === index) {
+                    return {
+                        ...question,
+                        isCurrentQDisplayed: false
+                    }
+                }
+
+                if (nextQuestionToDisplayIndex === index) {
+                    return {
+                        ...question,
+                        isCurrentQDisplayed: true
+                    }
+                }
+
+                return question;
+            }))
             setTimeout(() => {
                 setWillRenderQuestionUI(true);
             }, 500)
-        }, 500) 
+        }, 500)
     }
-
-    useEffect(() => {
-        console.log("selectedAnswer: ", selectedAnswer)
-        console.log('wasSelectedAnswerCorrect: ', wasSelectedAnswerCorrect)
-    })
 
     const colorForAnswerShownTxts = wasSubmitBtnPressed ? (wasSelectedAnswerCorrect ? 'green' : 'red') : 'white';
 
@@ -643,9 +677,6 @@ function QuestionChoicesAndAnswerUI({ question, _currentQuestionIndex, lastQuest
 }
 
 function QuestionCompPresentation() {
-
-
-
     return (
         <View style={{ height: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
             <QuestionsChoicesAndAnswerContainer />

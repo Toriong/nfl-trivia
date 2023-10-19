@@ -4,6 +4,7 @@ export const TriviaBusinessDataContext = createContext();
 
 export const TriviaBusinessDataProvider = ({ children }) => {
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = useState([]);
+
     const globalTriviaStates = [
         {
             name: 'questionsToDisplayOntoUI',
@@ -17,11 +18,16 @@ export const TriviaBusinessDataProvider = ({ children }) => {
 
     function updateSpecificGlobalTriviaContextBusinessState(targetStateName, newState, updateStateHandler) {
         try {
+            const _state = getTargetTriviaContextBusinessState(targetStateName);
+
+            if(!_state){
+                throw new Error("Couldn't find the target state.");
+            }
+
             if (!updateStateHandler && !newState) {
                 throw new Error("Must provide a 'updateState' function or a 'newState' variable.")
             }
 
-            const _state = getTargetTriviaContextBusinessState(targetStateName)
             const [, setState] = _state;
 
             if (updateStateHandler) {

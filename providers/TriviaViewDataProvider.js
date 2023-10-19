@@ -4,20 +4,36 @@ export const TriviaViewDataContext = createContext();
 
 export const TriviaViewDataProvider = ({ children }) => {
     const [isGettingTriviaQuestions, setIsGettingTriviaQuestions] = useState(true);
-    const [indexOfQuestionToDisplayOntoTheUi, setIndexOfQuestionToDisplayOntoTheUi] = useState(0);
+    const [triviaScore, setTriviaScore] = useState(0)
     const triviaViewDataArr = [
         {
             name: "isGettingTriviaQuestions",
             state: [isGettingTriviaQuestions, setIsGettingTriviaQuestions]
         },
         {
-            name: "indexOfQuestionToDisplayOntoTheUi",
-            state: [indexOfQuestionToDisplayOntoTheUi, setIndexOfQuestionToDisplayOntoTheUi]
+            name: "triviaScore",
+            state: [triviaScore, setTriviaScore]
         }
     ]
 
     function getTargetTriviaViewState(stateName) {
-        return triviaViewDataArr.find(({ name }) =>  name === stateName)?.state;
+        try {
+            if(!stateName){
+                throw new Error("Did not provide the 'stateName.'")
+            }
+            
+            const stateAndSetter = triviaViewDataArr.find(({ name }) => name === stateName)?.state;
+
+            if(!stateAndSetter?.length){
+                throw new Error("Unable to get the target state. The `stateName` is invalid.")
+            }
+
+            return stateAndSetter; 
+        } catch(error){
+            console.error('An error has occurred in getting the target state: ', error);
+
+            return [];
+        }
     }
 
     function updateTargetTriviaViewState(setterName) {
@@ -26,7 +42,7 @@ export const TriviaViewDataProvider = ({ children }) => {
                 throw new Error('Must provide the name of the setter.')
             };
 
-            const state = triviaViewDataArr.find(([, setter]) => setter.name === setterName);
+            const state = triviaViewDataArr.find(({ name }) => name === setterName);
 
             if (!state) {
                 throw new Error('The target state does not exist.')

@@ -22,12 +22,19 @@ export function PTxt({ children: txt, fontSize = 21, style, _testID = "", txtCol
 }
 
 
-export function HeadingTxt({ children: txt, fontSize = TEXT_SIZE.LARGE, style, willAddQuotes, _testID = "" }) {
+export function HeadingTxt({
+    children: txt,
+    style,
+    willAddQuotes,
+    fontSize = TEXT_SIZE.LARGE,
+    txtColor = 'white',
+    _testID = ""
+}) {
     const globalStyles = getGlobalStyles(fontSize);
     const _style = style ? { ...globalStyles.main, ...style } : globalStyles.main
 
     return (
-        <Text testID={_testID} style={_style}>
+        <Text testID={_testID} style={{ ..._style, color: txtColor }}>
             {willAddQuotes ? `"${txt}"` : txt}
         </Text>
     )

@@ -22,7 +22,7 @@ export const TEXT_SIZE = Object.freeze({
     XXXXXXXLARGE: 48,
 })
 
-export const GLOBAL_ELEMENT_SHADOW_STYLES = StyleSheet.create({
+let globalElementShadowStylesObj = {
     main: {
         shadowColor: "#000",
         shadowOffset: {
@@ -46,7 +46,22 @@ export const GLOBAL_ELEMENT_SHADOW_STYLES = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 10,
     },
-});
+}
+
+export const GLOBAL_ELEMENT_SHADOW_STYLES = StyleSheet.create(globalElementShadowStylesObj);
+
+export function getCustomShadowStyles(field, shadowColor){
+    let shadowStylesObj = JSON.parse(JSON.stringify(globalElementShadowStylesObj));
+    shadowStylesObj[field].shadowColor = shadowColor;
+    shadowStylesObj[field].shadowRadius = 8;
+    shadowStylesObj[field].shadowOffset.width = 8;
+    shadowStylesObj[field].shadowOffset.height = 20;
+
+
+    
+
+    return StyleSheet.create(shadowStylesObj);
+}
 
 export const SEAHAWKS_COLORS = {
     home: {

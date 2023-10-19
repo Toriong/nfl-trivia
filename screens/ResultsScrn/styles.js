@@ -1,31 +1,18 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
+import { SEAHAWKS_COLORS } from "../../styles/globalStylesVars";
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#fff',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    score: {
-        fontSize: 18,
-        marginBottom: 10,
-    },
-    button: {
-        backgroundColor: '#007aff',
-        padding: 10,
-        borderRadius: 5,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-});
+const mainViewStyleSheet = StyleSheet.create({
+    mainView: {
+        backgroundColor: SEAHAWKS_COLORS.home["1st"],
+        height: "100%",
+        width: "100%"
+    }
+})
+
+export {
+    mainViewStyleSheet
+};
+
+
 
 export default styles;
