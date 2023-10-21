@@ -9,34 +9,38 @@ import FadeUpAndOut from "../../animations/FadeUpAndOut";
 import Background from "../../globalComponents/Background";
 import { TriviaBusinessDataContext } from "../../providers/TriviaBusinessDataProvider";
 import { useNavigation } from "@react-navigation/native";
+import CustomLocalStorage from "../../globalHelperFns/localStorage";
 
 const seahawksLogo = require('../../assets/seahawks-icon.png');
-
-// BUGS: 
-
-
-// CASE: the user clicks on the review questions button, the following is occurring: 
-// the layout no longer has a height (save the height into local storage)
+const storage = new CustomLocalStorage();
 
 function MainPresentation() {
     const navigationObj = useNavigation();
     const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
+    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const [, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout')
     const [willFadeOutResultsUi, setWillFadeOutResultsUi] = useState(false);
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
-    console.log("questionsToDisplayOntoUI: ", questionsToDisplayOntoUI);
     const triviaScore = questionsToDisplayOntoUI.filter(question => {
         return question.answer === question.selectedAnswer
     }).length; 
     let triviaScoreFraction = new Fraction(triviaScore / questionsToDisplayOntoUI.length);
 
-    function handleReviewQsBtnPress(){
-        setQuestionsToDisplayOntoUI(questions => questions.map((question, index, arrBeingMapped) => {
-            return {
-                ...question,
-                isCurrentQDisplayed: index === (arrBeingMapped.length - 1)
-            }
-        }));
-        navigationObj.navigate('Trivia');
+    async function handleReviewQsBtnPress(){
+        try {
+            const _stylePropForQuestionAndPicLayout = await storage.getData('triviaScrnHeight');
+            console.log("_stylePropForQuestionAndPicLayout: ", _stylePropForQuestionAndPicLayout)
+            setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout)
+            setQuestionsToDisplayOntoUI(questions => questions.map((question, index, arrBeingMapped) => {
+                return {
+                    ...question,
+                    isCurrentQDisplayed: index === (arrBeingMapped.length - 1)
+                }
+            }));
+            navigationObj.navigate('Trivia');
+        } catch(error){
+            console.error("Something went wrong. Can't bring up your previous questions for review.");
+        }
     };
 
     return (

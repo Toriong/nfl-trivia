@@ -6,15 +6,15 @@ export const TriviaViewDataProvider = ({ children }) => {
     const [isGettingTriviaQuestions, setIsGettingTriviaQuestions] = useState(true);
     const [isReviewingTriviaQuestions, setIsReviewingTriviaQuestions] = useState(false);
     const [triviaScore, setTriviaScore] = useState(0);
-    const [triviaScrnHeight, setTriviaScrnHeight] = useState(0)
+    const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
     const triviaViewDataArr = [
         {
             name: "isGettingTriviaQuestions",
             state: [isGettingTriviaQuestions, setIsGettingTriviaQuestions]
         },
         {
-            name: 'triviaScrnHeight',
-            state: [triviaScrnHeight, setTriviaScrnHeight]
+            name: 'stylePropForQuestionAndPicLayout',
+            state: [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout]
         },
         {
             name: "triviaScore",

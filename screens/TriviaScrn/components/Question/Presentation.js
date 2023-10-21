@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
 import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
 import SelectedUserAnswer from '../UserAnswer/SelectedUserAnswer';
+import CustomLocalStorage from '../../../../globalHelperFns/localStorage';
 
 function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFadeOutLoadingQuestionsLayout }) {
     const [willFadeLoadingQuestionsIn, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
@@ -102,19 +103,6 @@ function QuestionsChoicesAndAnswerContainer({
     const [willFadePresentationIn, setWillFadePresentationIn] = useState(false);
     const [willFadeOutLoadingQuestionsLayout, setWillFadeOutLoadingQuestionLayout] = useState(false);
 
-    useEffect(() => {
-        console.log("questionsToDisplayOntoUI: ", questionsToDisplayOntoUI)
-    })
-
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         setWillFadeOutLoadingQuestionLayout(true);
-    //         setTimeout(() => {
-    //             setWillShowLoadingUI(false);
-    //         }, 400);
-    //     }, 1000);
-    // }, []);
-
     if (willShowLoadingUI) {
         console.log('loading screen is displayed...')
         return <TriviaScreenLoadingPresentation
@@ -135,13 +123,16 @@ function QuestionsChoicesAndAnswerContainer({
 // isReviewing is true, then for the answer field it must be the selected answer from the last question of the state that holds all of the questions 
 // and its corresponding letter
 
+const storage = new CustomLocalStorage();
+
 function QuestionChoicesAndAnswerUI() {
     const navigationObj = useNavigation();
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
     const [, setTriviaScore] = getTargetTriviaViewState("triviaScore")
     const [isReviewingTriviaQuestions,] = getTargetTriviaViewState('isReviewingTriviaQuestions')
-    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
-    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI')
+    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
+    const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout');
     const { text, answer, choices, pictures, explanation } = questionsToDisplayOntoUI.find(({ isCurrentQDisplayed }) => isCurrentQDisplayed) ?? questionsToDisplayOntoUI[0];
     const correctImgUrl = (pictures?.length > 1) ? pictures.find(({ choice }) => choice === answer).picUrl : null;
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
@@ -155,7 +146,6 @@ function QuestionChoicesAndAnswerUI() {
     const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);
     const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = useState(false);
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = useState(false);
-    const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
     const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
     const isBelow575PxViewPortWidth = useMediaQuery({ query: "(max-width: 575px)" });
@@ -237,6 +227,7 @@ function QuestionChoicesAndAnswerUI() {
         if ((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) {
             const correctQuestionsNum = questionsToDisplayOntoUI.filter(question => question.wasSelectedAnswerCorrect).length;
             setTriviaScore(correctQuestionsNum / questionsToDisplayOntoUI.length)
+            storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
             navigationObj.navigate('Results');
             return;
         };
