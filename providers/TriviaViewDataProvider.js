@@ -4,15 +4,25 @@ export const TriviaViewDataContext = createContext();
 
 export const TriviaViewDataProvider = ({ children }) => {
     const [isGettingTriviaQuestions, setIsGettingTriviaQuestions] = useState(true);
-    const [triviaScore, setTriviaScore] = useState(0)
+    const [isReviewingTriviaQuestions, setIsReviewingTriviaQuestions] = useState(false);
+    const [triviaScore, setTriviaScore] = useState(0);
+    const [triviaScrnHeight, setTriviaScrnHeight] = useState(0)
     const triviaViewDataArr = [
         {
             name: "isGettingTriviaQuestions",
             state: [isGettingTriviaQuestions, setIsGettingTriviaQuestions]
         },
         {
+            name: 'triviaScrnHeight',
+            state: [triviaScrnHeight, setTriviaScrnHeight]
+        },
+        {
             name: "triviaScore",
             state: [triviaScore, setTriviaScore]
+        },
+        {
+            name: 'isReviewingTriviaQuestions',
+            state: [isReviewingTriviaQuestions, setIsReviewingTriviaQuestions]
         }
     ]
 

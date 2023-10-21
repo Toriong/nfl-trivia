@@ -7,16 +7,37 @@ import { useContext, useState } from "react";
 import Fraction from "fraction.js"
 import FadeUpAndOut from "../../animations/FadeUpAndOut";
 import Background from "../../globalComponents/Background";
+import { TriviaBusinessDataContext } from "../../providers/TriviaBusinessDataProvider";
+import { useNavigation } from "@react-navigation/native";
 
-const seahawksLogo = require('../../assets/seahawks-icon.png')
+const seahawksLogo = require('../../assets/seahawks-icon.png');
 
-function MainPresentation({
-    handleReviewQsBtnPress
-}) {
-    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+// BUGS: 
+
+
+// CASE: the user clicks on the review questions button, the following is occurring: 
+// the layout no longer has a height (save the height into local storage)
+
+function MainPresentation() {
+    const navigationObj = useNavigation();
+    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
     const [willFadeOutResultsUi, setWillFadeOutResultsUi] = useState(false);
-    const [triviaScore,] = getTargetTriviaViewState("triviaScore")
-    let triviaScoreFraction = new Fraction(triviaScore);
+    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
+    console.log("questionsToDisplayOntoUI: ", questionsToDisplayOntoUI);
+    const triviaScore = questionsToDisplayOntoUI.filter(question => {
+        return question.answer === question.selectedAnswer
+    }).length; 
+    let triviaScoreFraction = new Fraction(triviaScore / questionsToDisplayOntoUI.length);
+
+    function handleReviewQsBtnPress(){
+        setQuestionsToDisplayOntoUI(questions => questions.map((question, index, arrBeingMapped) => {
+            return {
+                ...question,
+                isCurrentQDisplayed: index === (arrBeingMapped.length - 1)
+            }
+        }));
+        navigationObj.navigate('Trivia');
+    };
 
     return (
         <Background>

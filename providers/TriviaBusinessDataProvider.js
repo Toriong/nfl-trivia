@@ -4,7 +4,6 @@ export const TriviaBusinessDataContext = createContext();
 
 export const TriviaBusinessDataProvider = ({ children }) => {
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = useState([]);
-
     const globalTriviaStates = [
         {
             name: 'questionsToDisplayOntoUI',

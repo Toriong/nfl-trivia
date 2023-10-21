@@ -13,7 +13,7 @@ const AppNavigationContainer = () => {
                 initialRouteName='Trivia'
             >
                 <Stack.Screen
-                    name="Triva"
+                    name="Trivia"
                     component={TriviaScreen}
                     options={{ headerShown: false }}
                 />

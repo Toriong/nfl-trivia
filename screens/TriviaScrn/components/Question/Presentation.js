@@ -9,6 +9,8 @@ import { Button } from '../../../../globalComponents/buttons';
 import { useMediaQuery } from "react-responsive";
 import { useNavigation } from '@react-navigation/native';
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
+import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
+import SelectedUserAnswer from '../UserAnswer/SelectedUserAnswer';
 
 function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFadeOutLoadingQuestionsLayout }) {
     const [willFadeLoadingQuestionsIn, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
@@ -90,14 +92,19 @@ function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFade
 }
 
 function QuestionsChoicesAndAnswerContainer({
-    questions,
     _willShowLoadingUI,
     _willPresentErrorUI
 }) {
+    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
+    const [questionsToDisplayOntoUI,] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI')
     const [willPresentErrorUI, setWillPresentErrorUI] = _willPresentErrorUI;
     const [willShowLoadingUI, setWillShowLoadingUI] = _willShowLoadingUI;
     const [willFadePresentationIn, setWillFadePresentationIn] = useState(false);
     const [willFadeOutLoadingQuestionsLayout, setWillFadeOutLoadingQuestionLayout] = useState(false);
+
+    useEffect(() => {
+        console.log("questionsToDisplayOntoUI: ", questionsToDisplayOntoUI)
+    })
 
     // useEffect(() => {
     //     setTimeout(() => {
@@ -116,26 +123,26 @@ function QuestionsChoicesAndAnswerContainer({
         />
     }
 
-    if (!questions?.length) {
+    if (!questionsToDisplayOntoUI?.length && !willShowLoadingUI) {
         return <PTxt style={{ textAlign: 'center', paddingLeft: 10, paddingRight: 10 }}>An error has occurred in displaying the question. Please restart the app and try again.</PTxt>;
     }
 
-    const _questions = questions.map((question, index) => ({
-        ...question,
-        isCurrentQDisplayed: index === 0,
-        wasSelectedAnswerCorrect: null
-    }))
-
-    return <QuestionChoicesAndAnswerUI _questions={_questions} />
+    return <QuestionChoicesAndAnswerUI />
 }
 
+// using the selectedAnswer locally: 
+// when the user goes back to the trivia screen from the results screen, you must show the correct answer of the use
+// isReviewing is true, then for the answer field it must be the selected answer from the last question of the state that holds all of the questions 
+// and its corresponding letter
 
-function QuestionChoicesAndAnswerUI({ _questions }) {
+function QuestionChoicesAndAnswerUI() {
     const navigationObj = useNavigation();
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
     const [, setTriviaScore] = getTargetTriviaViewState("triviaScore")
-    const [questions, setQuestions] = useState(_questions);
-    const { text, answer, choices, pictures, explanation } = questions.find(({ isCurrentQDisplayed }) => isCurrentQDisplayed) ?? questions[0];
+    const [isReviewingTriviaQuestions,] = getTargetTriviaViewState('isReviewingTriviaQuestions')
+    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
+    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI')
+    const { text, answer, choices, pictures, explanation } = questionsToDisplayOntoUI.find(({ isCurrentQDisplayed }) => isCurrentQDisplayed) ?? questionsToDisplayOntoUI[0];
     const correctImgUrl = (pictures?.length > 1) ? pictures.find(({ choice }) => choice === answer).picUrl : null;
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
     const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = useState(false);
@@ -158,13 +165,13 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
     let imageContainerStyle = { gap: 20 }
     let selectedAnswerContainerStyle = { top: 30 }
     let buttonStyle = { marginTop: 40 }
-    let selectedAnsContainer = { marginTop: 20 }
+    let selectedAnsContainerStyles = { marginTop: 20 }
 
     if (isBelow575PxViewPortWidth) {
         questionContainerTxtLayout = {}
         btnContainerStyle = {};
         selectedAnswerContainerStyle = {};
-        selectedAnsContainer = { marginTop: 5 }
+        selectedAnsContainerStyles = { marginTop: 5 }
         buttonStyle = { marginTop: 10 };
         multipleImgsStyle = {
             width: 160,
@@ -200,7 +207,7 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
         setWasSelectedAnswerCorrect(answer === selectedAnswer.answer)
         setWillFadeOutQuestionPromptPictures(true);
         setWillFadeOutQuestionTxt(true);
-        setQuestions(questions => questions.map(question => {
+        setQuestionsToDisplayOntoUI(questions => questions.map(question => {
             if (question.isCurrentQDisplayed) {
                 return {
                     ...question,
@@ -219,19 +226,18 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
         }, 450);
     }
 
-
     function handleOnLayout(event) {
         setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
     }
 
     function handleNextQuestionBtnPress() {
-        let currentQuestionIndex = questions.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
+        let currentQuestionIndex = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
         currentQuestionIndex = (currentQuestionIndex === -1) ? 0 : currentQuestionIndex
 
-        if ((currentQuestionIndex + 1) > (questions.length - 1)) {
-            const correctQuestionsNum = questions.filter(question => question.wasSelectedAnswerCorrect).length;
-            setTriviaScore(correctQuestionsNum / questions.length)
-            navigationObj.navigate('Results')
+        if ((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) {
+            const correctQuestionsNum = questionsToDisplayOntoUI.filter(question => question.wasSelectedAnswerCorrect).length;
+            setTriviaScore(correctQuestionsNum / questionsToDisplayOntoUI.length)
+            navigationObj.navigate('Results');
             return;
         };
 
@@ -241,15 +247,22 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
         setWillFadeOutQuestionTxt(false);
         setWasSubmitBtnPressed(false);
         setWasSelectedAnswerCorrect(false);
-        setSelectedAnswer({ answer: "", letter: "" })
+        const selectedAnswerClone = structuredClone(selectedAnswer);
+        setSelectedAnswer({ answer: "", letter: "" });
         setTimeout(() => {
             const nextQuestionToDisplayIndex = currentQuestionIndex + 1;
-            setQuestions(questions => questions.map((question, index) => {
+            setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
                 if (currentQuestionIndex === index) {
-                    return {
+                    console.log('hey there yo: ')
+                    const _updatedQuestion = {
                         ...question,
-                        isCurrentQDisplayed: false
+                        isCurrentQDisplayed: false,
+                        selectedAnswer: selectedAnswerClone.answer
                     }
+
+                    console.log("_updatedQuestion: ", _updatedQuestion)
+
+                    return _updatedQuestion;
                 }
 
                 if (nextQuestionToDisplayIndex === index) {
@@ -406,6 +419,7 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
                                                                 borderRadius: 10,
                                                                 display: 'flex',
                                                                 justifyContent: 'center',
+                                                                alignItems: 'center',
                                                                 paddingLeft: 10,
                                                                 paddingRight: 10
                                                             }}
@@ -473,13 +487,13 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
                                                 borderRadius: 10,
                                                 display: 'flex',
                                                 justifyContent: 'center',
+                                                alignItems: 'center',
                                                 paddingLeft: 10,
                                                 paddingRight: 10,
                                                 top: 15
                                             }}
                                         >
-                                            <PTxt>
-
+                                            <PTxt style={{ textAlign: 'center' }}>
                                                 {`${MULTIPLE_CHOICE_LETTERS[choices.findIndex(choiceTxt => choiceTxt === answer)]}. ${answer}`}
                                             </PTxt>
                                         </View>
@@ -522,7 +536,7 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
                                     dynamicStyles={{
                                         width: "100%",
                                         height: "26%",
-                                        marginBottom: "10%"
+                                        marginBottom: "3%"
                                     }}
                                     willFadeOut={willFadeOutExplanationTxt}
                                 >
@@ -540,22 +554,29 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
                                     _willFadeIn={[true, () => { }]}
                                     dynamicStyles={{
                                         width: "100%",
-                                        marginBottom: "15%"
                                     }}
                                     willFadeOut={willFadeOutExplanationTxt}
                                 >
                                     <View
                                         style={{
                                             width: "100%",
-                                            height: 80,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center'
                                         }}
                                     >
 
                                         <PTxt
                                             txtColor={colorForAnswerShownTxts}
-                                            style={{ color: 'white', textAlign: 'center', paddingStart: 5, paddingEnd: 5 }}
+                                            style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
                                         >
-                                            {wasSelectedAnswerCorrect ? "Correct 👍" : "Incorrect 👎"}
+                                            {wasSelectedAnswerCorrect ? "Correct" : "Incorrect"}
+                                        </PTxt>
+                                        <PTxt
+                                            txtColor={colorForAnswerShownTxts}
+                                            style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
+                                        >
+                                            {wasSelectedAnswerCorrect ? "👍" : "👎"}
                                         </PTxt>
                                     </View>
                                 </FadeUpAndOut>
@@ -573,11 +594,15 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
                         }}
                     >
                         <View>
-                            <PTxt txtColor={colorForAnswerShownTxts}>Answer: </PTxt>
+                            <PTxt txtColor={colorForAnswerShownTxts}>Your answer: </PTxt>
                         </View>
-                        <View style={{ ...selectedAnsContainer, borderBottomWidth: .5, borderColor: colorForAnswerShownTxts, minWidth: 200, minHeight: 30 }}>
-                            <PTxt style={{ fontStyle: 'italic', textAlign: 'center', top: 5 }} txtColor={colorForAnswerShownTxts}>{pictures ? selectedAnswer.answer : selectedAnswer.letter}</PTxt>
-                        </View>
+                        <SelectedUserAnswer
+                            viewStyles={selectedAnsContainerStyles}
+                            colorForAnswerShownTxts={colorForAnswerShownTxts}
+                        >
+                            {pictures && selectedAnswer.answer}
+                            {!pictures && ((selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : '')}
+                        </SelectedUserAnswer>
                     </View>
                     <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <Button
@@ -622,11 +647,10 @@ function QuestionChoicesAndAnswerUI({ _questions }) {
     )
 }
 
-function QuestionCompPresentation({ questions, _willPresentErrorUI, _willShowLoadingUI }) {
+function QuestionCompPresentation({ _willPresentErrorUI, _willShowLoadingUI }) {
     return (
         <View style={{ height: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
             <QuestionsChoicesAndAnswerContainer
-                questions={questions}
                 _willPresentErrorUI={_willPresentErrorUI}
                 _willShowLoadingUI={_willShowLoadingUI}
             />
