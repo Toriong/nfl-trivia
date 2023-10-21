@@ -5,6 +5,7 @@ export const TriviaViewDataContext = createContext();
 export const TriviaViewDataProvider = ({ children }) => {
     const [isGettingTriviaQuestions, setIsGettingTriviaQuestions] = useState(true);
     const [isReviewingTriviaQuestions, setIsReviewingTriviaQuestions] = useState(false);
+    const [] = useState(false);
     const [triviaScore, setTriviaScore] = useState(0);
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
     const triviaViewDataArr = [
