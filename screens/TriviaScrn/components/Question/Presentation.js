@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { IS_TESTING, MULTIPLE_CHOICE_LETTERS } from '../../../../globalVars';
 import { ActivityIndicator } from 'react-native';
@@ -132,23 +132,25 @@ function QuestionChoicesAndAnswerUI() {
     const navigationObj = useNavigation();
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
     const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
-    const [, setTriviaScore] = getTargetTriviaViewState("triviaScore")
+    const [, setTriviaScore] = getTargetTriviaViewState("triviaScore");
+    const [selectedAnswer, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout');
     const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn')
-    const { text, answer, choices, pictures, explanation } = questionsToDisplayOntoUI.find(({ isCurrentQDisplayed }) => isCurrentQDisplayed) ?? questionsToDisplayOntoUI[0];
+    const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
+    const { text, answer, choices, pictures, explanation } = questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed] ?? questionsToDisplayOntoUI[0];
     const correctImgUrl = (pictures?.length > 1) ? pictures.find(({ choice }) => choice === answer).picUrl : null;
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
     const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = useState(false);
-    const [selectedAnswer, setSelectedAnswer] = useState({ answer: "", letter: "" });
-    const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = useState(false);
     const [willFadeOutExplanationTxt, setWillFadeOutExplanationTxt] = useState(false);
-    const [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures] = useState(false)
-    const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = useState(false);
-    const [willFadeOutCorrectAnsPicture, setWillFadeOutCorrectAnsPicture] = useState(false);
-    const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);
+    const [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures] = getTargetTriviaViewState('willFadeOutQuestionPromptPictures');
+    const [willFadeOutCorrectAnsPicture, setWillFadeOutCorrectAnsPicture] = getTargetTriviaViewState('willFadeOutCorrectAnsPicture');
+    const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = getTargetTriviaViewState('willFadeOutQuestionTxt');
+    const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = getTargetTriviaViewState('willRenderCorrectAnsUI');
+    const [willRenderQuestionUI, setWillRenderQuestionUI] = getTargetTriviaViewState('willRenderQuestionUI');
+    const [isReviewingQs, setIsReviewingQs] = getTargetTriviaViewState('isReviewingQs');
+    const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = getTargetTriviaViewState('wasSubmitBtnPressed');
     const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = useState(false);
-    const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = useState(false);
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
     const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
     const isBelow575PxViewPortWidth = useMediaQuery({ query: "(max-width: 575px)" });
@@ -195,16 +197,19 @@ function QuestionChoicesAndAnswerUI() {
         setSelectedAnswer({ answer: answer, letter: letter });
     }
 
+
+
     function handleOnSubmitBtnPress() {
         setWasSubmitBtnPressed(true);
         setWasSelectedAnswerCorrect(answer === selectedAnswer.answer)
         setWillFadeOutQuestionPromptPictures(true);
         setWillFadeOutQuestionTxt(true);
+        console.log("selectedAnswer.answer: ", selectedAnswer.answer)
         setQuestionsToDisplayOntoUI(questions => questions.map(question => {
             if (question.isCurrentQDisplayed) {
                 return {
                     ...question,
-                    wasSelectedAnswerCorrect: answer === selectedAnswer.answer
+                    selectedAnswer: selectedAnswer.answer
                 };
             };
 
@@ -221,6 +226,109 @@ function QuestionChoicesAndAnswerUI() {
 
     function handleOnLayout(event) {
         setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
+    }
+
+
+    function showQuestionToDisplay(indexOfQuestionToDisplay, willDelay, wasSubmitBtnPressed, delayMs = 150) {
+        setWillFadeOutQuestionPromptPictures(false);
+        setWillFadeOutCorrectAnsPicture(false);
+        setWillFadeOutQuestionTxt(false);
+        const { selectedAnswer, choices, pictures } = questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed]
+        console.log("questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed]: ", questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed])
+
+        if (wasSubmitBtnPressed) {
+            setWillRenderCorrectAnsUI(false);
+            setWasSubmitBtnPressed(false);
+            setSelectedAnswer({ answer: "", letter: "" });
+            setWasSelectedAnswerCorrect(false);
+        }
+
+        if (!wasSubmitBtnPressed && choices) {
+            console.log('multiple choice question with no pictures')
+            const indexOfSelectedAnswer = choices.findIndex(txt => txt === selectedAnswer);
+            const letterForSelectedAnswer = MULTIPLE_CHOICE_LETTERS[indexOfSelectedAnswer];
+            setSelectedAnswer({ answer: selectedAnswer, letter: letterForSelectedAnswer });
+        }
+
+        if (!wasSubmitBtnPressed && pictures) {
+            console.log('multiple choice question with pictures')
+            setSelectedAnswer({ answer: selectedAnswer });
+        }
+
+        if (willDelay) {
+            setTimeout(() => {
+                setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
+                    if (indexOfCurrentQuestionDisplayed === index) {
+                        const _updatedQuestion = {
+                            ...question,
+                            isCurrentQDisplayed: false,
+                            selectedAnswer: selectedAnswer
+                        }
+
+                        return _updatedQuestion;
+                    }
+
+                    if (indexOfQuestionToDisplay === index) {
+                        return {
+                            ...question,
+                            isCurrentQDisplayed: true
+                        }
+                    }
+
+                    return question;
+                }))
+
+                if (wasSubmitBtnPressed) {
+                    setTimeout(() => {
+                        setWillRenderQuestionUI(true);
+                    }, delayMs)
+                }
+            }, delayMs);
+            return;
+        }
+
+        console.log("questionsToDisplayOntoUI: ", questionsToDisplayOntoUI)
+        setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
+            if (indexOfCurrentQuestionDisplayed === index) {
+                return {
+                    ...question,
+                    isCurrentQDisplayed: false,
+                };
+            }
+
+            if (indexOfQuestionToDisplay === index) {
+                return {
+                    ...question,
+                    isCurrentQDisplayed: true
+                }
+            }
+
+            return question;
+        }));
+
+        if (wasSubmitBtnPressed) {
+            setWillRenderQuestionUI(true);
+            return;
+        }
+
+        setWillRenderCorrectAnsUI(true);
+    }
+
+
+    // GOAL: display the text of the question onto the UI when the user is reviewing their questions
+
+    function handleArrowBtnPress(numToIncreaseOrDecreaseIndexOfCurrentQ) {
+        try {
+            const indexOfNewQuestion = indexOfCurrentQuestionDisplayed + (numToIncreaseOrDecreaseIndexOfCurrentQ);
+
+            if (!questionsToDisplayOntoUI[indexOfNewQuestion]) {
+                throw new Error('The question does not exist.')
+            }
+
+            
+        } catch (error) {
+            console.error('An errror has occurred in pressing the arrow button: ', error);
+        }
     }
 
     function handleNextQuestionBtnPress() {
@@ -254,8 +362,6 @@ function QuestionChoicesAndAnswerUI() {
                         selectedAnswer: selectedAnswerClone.answer
                     }
 
-                    console.log("_updatedQuestion: ", _updatedQuestion)
-
                     return _updatedQuestion;
                 }
 
@@ -270,11 +376,15 @@ function QuestionChoicesAndAnswerUI() {
             }))
             setTimeout(() => {
                 setWillRenderQuestionUI(true);
-            }, 500)
-        }, 500)
+            }, 150)
+        }, 150)
     }
 
-    const colorForAnswerShownTxts = wasSubmitBtnPressed ? (wasSelectedAnswerCorrect ? 'green' : 'red') : 'white';
+    let colorForAnswerShownTxts = wasSubmitBtnPressed ? (wasSelectedAnswerCorrect ? 'green' : 'red') : 'white';
+
+    if(isReviewingQs && !wasSubmitBtnPressed){
+        colorForAnswerShownTxts = 'white';
+    }
 
     return (
         <>
@@ -395,11 +505,11 @@ function QuestionChoicesAndAnswerUI() {
                                                     const letter = MULTIPLE_CHOICE_LETTERS[index];
                                                     let answerBackgroundColor = SEAHAWKS_COLORS.home["3rd"]
 
-                                                    if ((selectedAnswer.letter === letter) && !wasSubmitBtnPressed) {
+                                                    if (isTriviaModeOn && ((selectedAnswer.letter === letter) && !wasSubmitBtnPressed)) {
                                                         answerBackgroundColor = SEAHAWKS_COLORS.home["2nd"]
-                                                    } else if (wasSubmitBtnPressed && wasSelectedAnswerCorrect && (letter === selectedAnswer.letter)) {
+                                                    } else if (isTriviaModeOn && (wasSubmitBtnPressed && wasSelectedAnswerCorrect && (letter === selectedAnswer.letter))) {
                                                         answerBackgroundColor = 'green';
-                                                    } else if (wasSubmitBtnPressed && (letter === selectedAnswer.letter)) {
+                                                    } else if (isTriviaModeOn && (wasSubmitBtnPressed && (letter === selectedAnswer.letter))) {
                                                         answerBackgroundColor = 'red';
                                                     }
 
@@ -469,6 +579,7 @@ function QuestionChoicesAndAnswerUI() {
                                     <PTxt txtColor='green'>Correct Answer: </PTxt>
                                     {pictures?.length
                                         ?
+                                        // if the reviewing, and the answer has not been revealed, then have the text be white
                                         <PTxt txtColor='green'>
                                             {answer}
                                         </PTxt>
@@ -598,26 +709,26 @@ function QuestionChoicesAndAnswerUI() {
                             {!pictures && ((selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : '')}
                         </SelectedUserAnswer>
                     </View>
-                    <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    {isTriviaModeOn && <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         <Button
                             isDisabled={selectedAnswer.answer === ""}
                             dynamicStyles={{
                                 opacity: selectedAnswer.answer === "" ? .3 : 1,
                                 backgroundColor: '#69BE28',
                                 padding: 10,
-                                borderRadius: 5,
+                                borderRadius: 10,
                                 ...buttonStyle
                             }}
                             handleOnPress={handleOnSubmitBtnPress}
                         >
                             <PTxt>Submit</PTxt>
                         </Button>
-                    </View>
+                    </View>}
+
                     <View style={{
                         ...CENTER_DEFAULT.center,
-                        borderWidth: 1,
                         width: "100%",
-                        bottom: "5%"
+                        top: "3%"
                     }}>
                         {isTriviaModeOn ?
                             <NextQuestion
@@ -632,14 +743,32 @@ function QuestionChoicesAndAnswerUI() {
                                     gap: 10,
                                     ...CENTER_DEFAULT.center
                                 }}>
-                                    <Button dynamicStyles={{ ...CENTER_DEFAULT.center, borderRadius: 15, padding: 13, backgroundColor: SEAHAWKS_COLORS.home['3rd'] }}>
+                                    <Button
+                                        handleOnPress={() => handleArrowBtnPress(-1)}
+                                        dynamicStyles={{
+                                            ...CENTER_DEFAULT.center,
+                                            borderRadius: 15,
+                                            padding: 13,
+                                            backgroundColor: SEAHAWKS_COLORS.home['3rd']
+                                        }}
+                                        isDisabled={indexOfCurrentQuestionDisplayed === 0}
+                                    >
                                         <FontAwesomeIcon
                                             icon={faArrowLeft}
                                             color="white"
                                             size={27}
                                         />
                                     </Button>
-                                    <Button dynamicStyles={{ ...CENTER_DEFAULT.center, borderRadius: 15, padding: 13, backgroundColor: SEAHAWKS_COLORS.home['3rd'] }}>
+                                    <Button
+                                        handleOnPress={() => handleArrowBtnPress(1)}
+                                        dynamicStyles={{
+                                            ...CENTER_DEFAULT.center,
+                                            borderRadius: 15,
+                                            padding: 13,
+                                            backgroundColor: SEAHAWKS_COLORS.home['3rd']
+                                        }}
+                                        isDisabled={indexOfCurrentQuestionDisplayed === (questionsToDisplayOntoUI.length - 1)}
+                                    >
                                         <FontAwesomeIcon
                                             icon={faArrowRight}
                                             color="white"

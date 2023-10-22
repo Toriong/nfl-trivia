@@ -14,7 +14,7 @@ function NextQuestion({ wasSubmitBtnPressed, handleNextQuestionBtnPress }) {
                 opacity: !wasSubmitBtnPressed ? .3 : 1
             }}
         >
-            <PTxt style={{ textAlign: 'center', fontSize: 18 }}>
+            <PTxt style={{ textAlign: 'center' }}>
                 Next Q
             </PTxt>
         </Button>

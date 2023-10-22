@@ -10,6 +10,7 @@ import Background from "../../globalComponents/Background";
 import { TriviaBusinessDataContext } from "../../providers/TriviaBusinessDataProvider";
 import { useNavigation } from "@react-navigation/native";
 import CustomLocalStorage from "../../globalHelperFns/localStorage";
+import { MULTIPLE_CHOICE_LETTERS } from "../../globalVars";
 
 const seahawksLogo = require('../../assets/seahawks-icon.png');
 const storage = new CustomLocalStorage();
@@ -18,18 +19,34 @@ function MainPresentation() {
     const navigationObj = useNavigation();
     const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const [, setIsTriviaModeOn] = getTargetTriviaViewState('isTriviaModeOn');
+    const [, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');;
     const [, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout')
-    const [willFadeOutResultsUi, setWillFadeOutResultsUi] = useState(false);
+    const [, setWillRenderQuestionUI] = getTargetTriviaViewState('willRenderQuestionUI')
+    const [, setWillRenderCorrectAnsUI] = getTargetTriviaViewState('willRenderCorrectAnsUI')
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
+    const [, setWillFadeOutQuestionPromptPictures] = getTargetTriviaViewState('willFadeOutQuestionPromptPictures');
+    const [, setWillFadeOutCorrectAnsPicture] = getTargetTriviaViewState('willFadeOutCorrectAnsPicture');
+    const [, setWillFadeOutQuestionTxt] = getTargetTriviaViewState('willFadeOutQuestionTxt');
+    const [, setIsReviewingQs] = getTargetTriviaViewState('isReviewingQs');
+    const [,setWasSubmitBtnPressed] = getTargetTriviaViewState('wasSubmitBtnPressed');
+    const [willFadeOutResultsUi, setWillFadeOutResultsUi] = useState(false);
     const triviaScore = questionsToDisplayOntoUI.filter(question => {
         return question.answer === question.selectedAnswer
-    }).length; 
+    }).length;
     let triviaScoreFraction = new Fraction(triviaScore / questionsToDisplayOntoUI.length);
 
-    async function handleReviewQsBtnPress(){
+    async function handleReviewQsBtnPress() {
         try {
+            setWasSubmitBtnPressed(false);
+            setIsReviewingQs(true);
+            setWillFadeOutQuestionPromptPictures(false);
+            setWillFadeOutCorrectAnsPicture(false);
+            setWillFadeOutQuestionTxt(false); 
+            setIsTriviaModeOn(false);
+            setWillRenderQuestionUI(true);
+            setWillRenderCorrectAnsUI(false);
             const _stylePropForQuestionAndPicLayout = await storage.getData('triviaScrnHeight');
-            console.log("_stylePropForQuestionAndPicLayout: ", _stylePropForQuestionAndPicLayout)
             setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout)
             setQuestionsToDisplayOntoUI(questions => questions.map((question, index, arrBeingMapped) => {
                 return {
@@ -37,8 +54,19 @@ function MainPresentation() {
                     isCurrentQDisplayed: index === (arrBeingMapped.length - 1)
                 }
             }));
+            const { selectedAnswer, choices, pictures } = questionsToDisplayOntoUI.at(-1);
+            
+            if (pictures) {
+                setSelectedAnswer({ answer: selectedAnswer })
+                navigationObj.navigate('Trivia');
+                return;
+            }
+
+            const indexOfSelectedChoice = choices.findIndex(choice => choice === selectedAnswer);
+            setSelectedAnswer({ answer: selectedAnswer, letter: MULTIPLE_CHOICE_LETTERS[indexOfSelectedChoice] });
             navigationObj.navigate('Trivia');
-        } catch(error){
+
+        } catch (error) {
             console.error("Something went wrong. Can't bring up your previous questions for review.");
         }
     };

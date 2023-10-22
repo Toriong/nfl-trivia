@@ -3,12 +3,15 @@ import QuestionCompPresentation from './Presentation'
 import { useQuery } from '@tanstack/react-query';
 import { getTriviaQuestions } from '../../../../services/questions/get';
 import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
+import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
 
 function QuestionCompContainer() {
     const [willShowLoadingUI, setWillShowLoadingUI] = useState(true);
     const [willPresentErrorUI, setWillPresentErrorUI] = useState(false);
     const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
-    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI')
+    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext)
+    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
+    const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn')
 
     function handleGetTriviaQuestionsError() {
         setWillPresentErrorUI(true);
@@ -21,13 +24,14 @@ function QuestionCompContainer() {
     }
 
     function handleGetTriviaQuestionsReqSuccess(triviaQuestions) {
-        const triviaQuestionsUpdated = triviaQuestions.map((question, index) => ({
-            ...question,
-            isCurrentQDisplayed: index === 0,
-            wasSelectedAnswerCorrect: null,
-            selectedAnswer: null
-        }));
-        setQuestionsToDisplayOntoUI(triviaQuestionsUpdated);
+        if (isTriviaModeOn) {
+            const triviaQuestionsUpdated = triviaQuestions.map((question, index) => ({
+                ...question,
+                isCurrentQDisplayed: index === 0,
+                selectedAnswer: null
+            }));
+            setQuestionsToDisplayOntoUI(triviaQuestionsUpdated);
+        }
     }
 
     useQuery({
