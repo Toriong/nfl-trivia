@@ -382,7 +382,7 @@ function QuestionChoicesAndAnswerUI() {
 
     let colorForAnswerShownTxts = wasSubmitBtnPressed ? (wasSelectedAnswerCorrect ? 'green' : 'red') : 'white';
 
-    if(isReviewingQs && !wasSubmitBtnPressed){
+    if (isReviewingQs && !wasSubmitBtnPressed) {
         colorForAnswerShownTxts = 'white';
     }
 
@@ -758,6 +758,20 @@ function QuestionChoicesAndAnswerUI() {
                                             color="white"
                                             size={27}
                                         />
+                                    </Button>
+                                    <Button
+                                        handleOnPress={handleOnSubmitBtnPress}
+                                        dynamicStyles={{
+                                            ...CENTER_DEFAULT.center,
+                                            width: 225,
+                                            borderRadius: 15,
+                                            padding: 13,
+                                            backgroundColor: SEAHAWKS_COLORS.home['3rd'],
+                                            flexDirection: 'column'
+                                        }}
+                                        isDisabled={indexOfCurrentQuestionDisplayed === 0}
+                                    >
+                                        <PTxt style={{ width: '100%', textAlign: 'center' }}>Show {willRenderCorrectAnsUI ? 'Question' : 'Answer'}</PTxt>
                                     </Button>
                                     <Button
                                         handleOnPress={() => handleArrowBtnPress(1)}
