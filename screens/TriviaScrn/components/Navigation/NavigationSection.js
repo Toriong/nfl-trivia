@@ -7,9 +7,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { Button } from '../../../../globalComponents/buttons';
 import { PTxt } from '../../../../globalComponents/customTxts';
 
-// GOAL OF THIS COMPONENT: TO DEAL WITH THE USER NAVIGATING THROUGH THE QUESTIONS THAT ARE DISPLAYED TO THEM. 
 
-function NavigationSection({ isTriviaModeOn }) {
+function NavigationSection({
+    isTriviaModeOn,
+    handleNextQuestionBtnPress,
+    wasSubmitBtnPressed
+}) {
     return (
         <View
             style={{
@@ -22,7 +25,10 @@ function NavigationSection({ isTriviaModeOn }) {
         >
             {isTriviaModeOn
                 ?
-                <NextQuestion />
+                <NextQuestion
+                    wasSubmitBtnPressed={wasSubmitBtnPressed}
+                    handleNextQuestionBtnPress={handleNextQuestionBtnPress}
+                />
                 :
                 <>
                     <View style={{

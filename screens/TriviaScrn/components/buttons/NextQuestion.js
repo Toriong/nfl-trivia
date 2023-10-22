@@ -1,4 +1,6 @@
 import React from 'react';
+import { Button } from '../../../../globalComponents/buttons';
+import { PTxt } from '../../../../globalComponents/customTxts';
 
 function NextQuestion({ wasSubmitBtnPressed, handleNextQuestionBtnPress }) {
     return (

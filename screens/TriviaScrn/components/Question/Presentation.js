@@ -1,4 +1,4 @@
-import React, { Suspense, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { IS_TESTING, MULTIPLE_CHOICE_LETTERS } from '../../../../globalVars';
 import { ActivityIndicator } from 'react-native';
@@ -10,8 +10,11 @@ import { useMediaQuery } from "react-responsive";
 import { useNavigation } from '@react-navigation/native';
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
 import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import SelectedUserAnswer from '../UserAnswer/SelectedUserAnswer';
 import CustomLocalStorage from '../../../../globalHelperFns/localStorage';
+import NextQuestion from '../buttons/NextQuestion';
 
 function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFadeOutLoadingQuestionsLayout }) {
     const [willFadeLoadingQuestionsIn, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
@@ -130,9 +133,9 @@ function QuestionChoicesAndAnswerUI() {
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
     const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
     const [, setTriviaScore] = getTargetTriviaViewState("triviaScore")
-    const [isReviewingTriviaQuestions,] = getTargetTriviaViewState('isReviewingTriviaQuestions')
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout');
+    const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn')
     const { text, answer, choices, pictures, explanation } = questionsToDisplayOntoUI.find(({ isCurrentQDisplayed }) => isCurrentQDisplayed) ?? questionsToDisplayOntoUI[0];
     const correctImgUrl = (pictures?.length > 1) ? pictures.find(({ choice }) => choice === answer).picUrl : null;
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
@@ -610,30 +613,63 @@ function QuestionChoicesAndAnswerUI() {
                             <PTxt>Submit</PTxt>
                         </Button>
                     </View>
+                    <View style={{
+                        ...CENTER_DEFAULT.center,
+                        borderWidth: 1,
+                        width: "100%",
+                        bottom: "5%"
+                    }}>
+                        {isTriviaModeOn ?
+                            <NextQuestion
+                                wasSubmitBtnPressed={wasSubmitBtnPressed}
+                                handleNextQuestionBtnPress={handleNextQuestionBtnPress}
+                            />
+                            :
+                            <>
+                                <View style={{
+                                    width: "100%",
+                                    flexDirection: 'row',
+                                    gap: 10,
+                                    ...CENTER_DEFAULT.center
+                                }}>
+                                    <Button dynamicStyles={{ ...CENTER_DEFAULT.center, borderRadius: 15, padding: 13, backgroundColor: SEAHAWKS_COLORS.home['3rd'] }}>
+                                        <FontAwesomeIcon
+                                            icon={faArrowLeft}
+                                            color="white"
+                                            size={27}
+                                        />
+                                    </Button>
+                                    <Button dynamicStyles={{ ...CENTER_DEFAULT.center, borderRadius: 15, padding: 13, backgroundColor: SEAHAWKS_COLORS.home['3rd'] }}>
+                                        <FontAwesomeIcon
+                                            icon={faArrowRight}
+                                            color="white"
+                                            size={27}
+                                        />
+                                    </Button>
+                                </View>
+                                <View style={{
+                                    width: "100%",
+                                    marginTop: 10,
+                                    ...CENTER_DEFAULT.center
+                                }}>
+                                    <Button
+                                        dynamicStyles={{
+                                            ...CENTER_DEFAULT.center,
+                                            borderRadius: 15,
+                                            padding: 13,
+                                            backgroundColor: SEAHAWKS_COLORS.home['2nd']
+                                        }}
+                                    >
+                                        <PTxt txtColor="white" style={{}}>
+                                            Results
+                                        </PTxt>
+                                    </Button>
+                                </View>
+                            </>
+                        }
+                    </View>
                 </View>
             </FadeUpAndOut>
-            <View
-                style={{
-                    width: "100%",
-                    display: 'flex',
-                    justifyContent: 'center', alignItems: 'center', bottom: "5%"
-                }}
-            >
-                <Button
-                    isDisabled={!wasSubmitBtnPressed}
-                    handleOnPress={handleNextQuestionBtnPress}
-                    dynamicStyles={{
-                        backgroundColor: 'grey',
-                        padding: 10,
-                        borderRadius: 10,
-                        opacity: !wasSubmitBtnPressed ? .3 : 1
-                    }}
-                >
-                    <PTxt style={{ textAlign: 'center', fontSize: 18 }}>
-                        Next Q
-                    </PTxt>
-                </Button>
-            </View>
         </>
     )
 }
