@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 
-export function Button({ children, handleOnPress, isDisabled, backgroundColor,dynamicStyles = {} }) {
+export function Button({ children, handleOnPress, isDisabled, backgroundColor, dynamicStyles = {}, disabledOpacity = .3, willShowDisableOpacity }) {
     let defaultStyles = {}
 
     if (backgroundColor) {
@@ -11,7 +11,7 @@ export function Button({ children, handleOnPress, isDisabled, backgroundColor,dy
     return (
         <TouchableOpacity
             disabled={isDisabled}
-            style={{ ...dynamicStyles, ...defaultStyles }}
+            style={{ ...dynamicStyles, ...defaultStyles, opacity: willShowDisableOpacity ? (isDisabled ? disabledOpacity : 1) : 1 }}
             onPress={handleOnPress}
         >
             {children}

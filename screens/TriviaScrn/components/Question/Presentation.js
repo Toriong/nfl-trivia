@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { View, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Image } from 'react-native';
 import { IS_TESTING, MULTIPLE_CHOICE_LETTERS } from '../../../../globalVars';
 import { ActivityIndicator } from 'react-native';
 import { HeadingTxt, PTxt } from '../../../../globalComponents/customTxts';
 import FadeUpAndOut from '../../../../animations/FadeUpAndOut';
-import { SEAHAWKS_COLORS, GLOBAL_ELEMENT_SHADOW_STYLES, CENTER_DEFAULT } from '../../../../styles/globalStylesVars';
+import { SEAHAWKS_COLORS, CENTER_DEFAULT } from '../../../../styles/globalStylesVars';
 import { Button } from '../../../../globalComponents/buttons';
 import { useMediaQuery } from "react-responsive";
 import { useNavigation } from '@react-navigation/native';
@@ -197,7 +197,14 @@ function QuestionChoicesAndAnswerUI() {
         setSelectedAnswer({ answer: answer, letter: letter });
     }
 
-
+    function handleOnShowQuestionBtnPress() {
+        // GOAL: display the question prompt onto the ui
+        setWillFadeOutQuestionPromptPictures(false);
+        setWillFadeOutQuestionTxt(false);
+        setWasSubmitBtnPressed(false);
+        setWillRenderCorrectAnsUI(false);
+        setWillRenderQuestionUI(true);
+    }
 
     function handleOnSubmitBtnPress() {
         setWasSubmitBtnPressed(true);
@@ -325,16 +332,48 @@ function QuestionChoicesAndAnswerUI() {
                 throw new Error('The question does not exist.')
             }
 
-            
+            setWasSubmitBtnPressed(false);
+            setWillRenderCorrectAnsUI(false);
+            setWillRenderQuestionUI(true);
+            setWillFadeOutCorrectAnsPicture(false);
+            setWillFadeOutExplanationTxt(false);
+            setWillFadeOutQuestionPromptPictures(false);
+            setWillFadeOutQuestionTxt(false);
+            const { selectedAnswer, choices } = questionsToDisplayOntoUI[indexOfNewQuestion];
+            const _selectedAnswer = choices ? { answer: selectedAnswer, letter: MULTIPLE_CHOICE_LETTERS[choices.findIndex(choiceTxtStr => choiceTxtStr === selectedAnswer)] } : { answer: selectedAnswer }
+            setSelectedAnswer(_selectedAnswer);
+            setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
+                if (indexOfCurrentQuestionDisplayed === index) {
+                    return {
+                        ...question,
+                        isCurrentQDisplayed: false,
+                    };
+                }
+
+                if (indexOfNewQuestion === index) {
+                    return {
+                        ...question,
+                        isCurrentQDisplayed: true
+                    }
+                }
+
+                return question;
+            }));
         } catch (error) {
             console.error('An errror has occurred in pressing the arrow button: ', error);
         }
+    }
+
+    function handleResultsBtnPress() {
+        storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
+        navigationObj.navigate('Results');
     }
 
     function handleNextQuestionBtnPress() {
         let currentQuestionIndex = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
         currentQuestionIndex = (currentQuestionIndex === -1) ? 0 : currentQuestionIndex
 
+        // put this logic into a different function
         if ((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) {
             const correctQuestionsNum = questionsToDisplayOntoUI.filter(question => question.wasSelectedAnswerCorrect).length;
             setTriviaScore(correctQuestionsNum / questionsToDisplayOntoUI.length)
@@ -355,7 +394,6 @@ function QuestionChoicesAndAnswerUI() {
             const nextQuestionToDisplayIndex = currentQuestionIndex + 1;
             setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
                 if (currentQuestionIndex === index) {
-                    console.log('hey there yo: ')
                     const _updatedQuestion = {
                         ...question,
                         isCurrentQDisplayed: false,
@@ -457,6 +495,7 @@ function QuestionChoicesAndAnswerUI() {
                                                         return (
                                                             <Button
                                                                 key={index}
+                                                                isDisabled={isReviewingQs}
                                                                 handleOnPress={() => handleOnImgPress(pic.choice)}
                                                             >
                                                                 <Image
@@ -529,6 +568,7 @@ function QuestionChoicesAndAnswerUI() {
                                                             }}
                                                         >
                                                             <Button
+                                                                isDisabled={isReviewingQs}
                                                                 dynamicStyles={{ width: "100%" }}
                                                                 handleOnPress={_ => handleOnChoiceBtnPress(choiceTxtStr, letter)}
                                                             >
@@ -579,14 +619,13 @@ function QuestionChoicesAndAnswerUI() {
                                     <PTxt txtColor='green'>Correct Answer: </PTxt>
                                     {pictures?.length
                                         ?
-                                        // if the reviewing, and the answer has not been revealed, then have the text be white
                                         <PTxt txtColor='green'>
                                             {answer}
                                         </PTxt>
                                         :
                                         <View
                                             style={{
-                                                width: "100%",
+                                                width: "80%",
                                                 height: 50,
                                                 backgroundColor: 'green',
                                                 borderRadius: 10,
@@ -751,6 +790,7 @@ function QuestionChoicesAndAnswerUI() {
                                             padding: 13,
                                             backgroundColor: SEAHAWKS_COLORS.home['3rd']
                                         }}
+                                        willShowDisableOpacity
                                         isDisabled={indexOfCurrentQuestionDisplayed === 0}
                                     >
                                         <FontAwesomeIcon
@@ -760,7 +800,7 @@ function QuestionChoicesAndAnswerUI() {
                                         />
                                     </Button>
                                     <Button
-                                        handleOnPress={handleOnSubmitBtnPress}
+                                        handleOnPress={willRenderCorrectAnsUI ? handleOnShowQuestionBtnPress : handleOnSubmitBtnPress}
                                         dynamicStyles={{
                                             ...CENTER_DEFAULT.center,
                                             width: 225,
@@ -769,12 +809,12 @@ function QuestionChoicesAndAnswerUI() {
                                             backgroundColor: SEAHAWKS_COLORS.home['3rd'],
                                             flexDirection: 'column'
                                         }}
-                                        isDisabled={indexOfCurrentQuestionDisplayed === 0}
                                     >
                                         <PTxt style={{ width: '100%', textAlign: 'center' }}>Show {willRenderCorrectAnsUI ? 'Question' : 'Answer'}</PTxt>
                                     </Button>
                                     <Button
                                         handleOnPress={() => handleArrowBtnPress(1)}
+                                        willShowDisableOpacity
                                         dynamicStyles={{
                                             ...CENTER_DEFAULT.center,
                                             borderRadius: 15,
@@ -802,6 +842,7 @@ function QuestionChoicesAndAnswerUI() {
                                             padding: 13,
                                             backgroundColor: SEAHAWKS_COLORS.home['2nd']
                                         }}
+                                        handleOnPress={handleResultsBtnPress}
                                     >
                                         <PTxt txtColor="white" style={{}}>
                                             Results
