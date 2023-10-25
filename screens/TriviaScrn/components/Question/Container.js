@@ -18,7 +18,6 @@ function QuestionCompContainer() {
     }
 
     function handleFinallyBlockofGetTriviaQuestionsFn() {
-        // FOR TESTING PURPOSES ONLY, WILL NEED TO REFACTOR: 
         setTimeout(() => {
             setWillShowLoadingUI(false);
         }, 1_000);
@@ -34,12 +33,13 @@ function QuestionCompContainer() {
             setQuestionsToDisplayOntoUI(triviaQuestionsUpdated);
         }
     }
-
+  
     useQuery({
         queryFn: _ => getTriviaQuestions('',
             handleFinallyBlockofGetTriviaQuestionsFn,
             handleGetTriviaQuestionsError,
-            handleGetTriviaQuestionsReqSuccess
+            handleGetTriviaQuestionsReqSuccess,
+            null
         ),
         queryKey: ['questionsQueryKey']
     })

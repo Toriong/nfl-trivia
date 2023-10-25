@@ -2,18 +2,12 @@ import React, { createContext, useState } from 'react';
 
 export const TriviaViewDataContext = createContext();
 
-// GOAL: when the user is reviewing their questions, show the following on the UI: 
-// the choices:
-// -if pictures, then show the pictures 
-// -if choices, then show the choices
-// -show their selected answer
-
 export const TriviaViewDataProvider = ({ children }) => {
     const [isGettingTriviaQuestions, setIsGettingTriviaQuestions] = useState(true);
     const [isTriviaModeOn, setIsTriviaModeOn] = useState(true);
     const [triviaScore, setTriviaScore] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState({ answer: "", letter: "" });
-    const _willShowLoadingUI = useState(false);
+    const _willShowLoadingUI = useState(true);
     const _willPresentErrorUI = useState(false);
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
     const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);

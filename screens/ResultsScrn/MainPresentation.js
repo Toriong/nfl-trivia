@@ -4,7 +4,6 @@ import { CENTER_DEFAULT, SEAHAWKS_COLORS, getCustomShadowStyles } from "../../st
 import { Button } from "../../globalComponents/buttons";
 import { TriviaViewDataContext } from "../../providers/TriviaViewDataProvider";
 import { useContext, useState } from "react";
-import Fraction from "fraction.js"
 import FadeUpAndOut from "../../animations/FadeUpAndOut";
 import Background from "../../globalComponents/Background";
 import { TriviaBusinessDataContext } from "../../providers/TriviaBusinessDataProvider";
@@ -42,10 +41,25 @@ function MainPresentation() {
         return question.answer === question.selectedAnswer
     }).length;
 
+    function resetStatesOnTriviaScrn() {
+        setWasSubmitBtnPressed(false);
+        setWillFadeOutQuestionPromptPictures(false);
+        setWillFadeOutCorrectAnsPicture(false);
+        setWillFadeOutQuestionTxt(false);
+        setIsTriviaModeOn(false);
+        setWillRenderQuestionUI(true);
+        setWillRenderCorrectAnsUI(false);
+    }
+
     async function handleReviewQsBtnPress() {
         try {
-            setWasSubmitBtnPressed(false);
+            if (!questionsToDisplayOntoUI.some(({ selectedAnswer }) => selectedAnswer !== null)) {
+                customAlert("Looks like you didn't answer a question. Click 'Play Again' to test your Seahawks knowledge!")
+                throw new Error("The user has not answer a question.")
+            }
+
             setIsReviewingQs(true);
+            setWasSubmitBtnPressed(false);
             setWillFadeOutQuestionPromptPictures(false);
             setWillFadeOutCorrectAnsPicture(false);
             setWillFadeOutQuestionTxt(false);
@@ -54,13 +68,18 @@ function MainPresentation() {
             setWillRenderCorrectAnsUI(false);
             const _stylePropForQuestionAndPicLayout = await storage.getData('triviaScrnHeight');
             setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout);
-            setQuestionsToDisplayOntoUI(questions => questions.map((question, index, arrBeingMapped) => {
-                return {
-                    ...question,
-                    isCurrentQDisplayed: index === (arrBeingMapped.length - 1)
-                }
-            }));
-            const { selectedAnswer, choices, pictures } = questionsToDisplayOntoUI.at(-1);
+            let questionsToDisplayUpdated = questionsToDisplayOntoUI.filter(({ selectedAnswer }) => selectedAnswer !== null)
+            questionsToDisplayUpdated = questionsToDisplayUpdated?.length ?
+                questionsToDisplayUpdated.map((question, index, arrBeingMapped) => {
+                    return {
+                        ...question,
+                        isCurrentQDisplayed: index === (arrBeingMapped.length - 1)
+                    }
+                })
+                :
+                questionsToDisplayUpdated
+            setQuestionsToDisplayOntoUI(questionsToDisplayUpdated);
+            const { selectedAnswer, choices, pictures } = questionsToDisplayUpdated.at(-1);
 
             if (pictures) {
                 setSelectedAnswer({ answer: selectedAnswer })
@@ -73,7 +92,7 @@ function MainPresentation() {
             navigationObj.navigate('Trivia');
 
         } catch (error) {
-            console.error("Something went wrong. Can't bring up your previous questions for review.");
+            console.error("Something went wrong. Can't bring up your previous questions for review. Error message: ", error);
         }
     };
 
@@ -95,22 +114,32 @@ function MainPresentation() {
                 handleOnErrorGetTriviaQuestionReq,
             );
 
-            if(!newQuestions){
-                const alertErrorTxt = "Sorry, but something went wrong. Couldn't retrieve new trivia questions. Please restart the app and try again.";
+            if (!newQuestions) {
+                const alertErrorTxt = "Sorry, but something went wrong. We couldn't retrieve the new trivia questions. Please restart the app and try again.";
                 customAlert(alertErrorTxt);
-
                 throw new Error("Failed to get new trivia questions from server.");
             }
 
-            setQuestionsToDisplayOntoUI(newQuestions);
+            resetStatesOnTriviaScrn();
+
             const _stylePropForQuestionAndPicLayout = await storage.getData('triviaScrnHeight');
+
+            setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout);
+            setIsTriviaModeOn(true);
+            setSelectedAnswer({ answer: "", letter: "" })
+            setQuestionsToDisplayOntoUI(newQuestions.map((question, index) => {
+                return {
+                    ...question,
+                    isCurrentQDisplayed: index === 0,
+                    selectedAnswer: null
+                };
+            }));
             setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout);
             setIsReviewQsBtnDisabled(true);
             setTimerMs(60_000);
             navigationObj.navigate('Trivia');
             setTimeout(() => {
                 setWillStartTimer(true);
-                setIsTriviaModeOn(true);
             }, 200);
         } catch (error) {
             console.error('An error has occurred in getting restarting trivia quiz: ', error)

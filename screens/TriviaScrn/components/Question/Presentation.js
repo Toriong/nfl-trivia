@@ -101,11 +101,10 @@ function QuestionsChoicesAndAnswerContainer() {
     const [questionsToDisplayOntoUI,] = _questionsToDisplayOntoUI;
     const [willPresentErrorUI, ] = _willPresentErrorUI;
     const [willShowLoadingUI, setWillShowLoadingUI] = _willShowLoadingUI;
-    const [willFadePresentationIn, setWillFadePresentationIn] = useState(false);
+    const [willFadePresentationIn, setWillFadePresentationIn] = useState(true);
     const [willFadeOutLoadingQuestionsLayout, setWillFadeOutLoadingQuestionLayout] = useState(false);
 
     if (willShowLoadingUI) {
-        console.log('loading screen is displayed...')
         return <TriviaScreenLoadingPresentation
             _willFadeLoadingQuestionsIn={[willFadePresentationIn, setWillFadePresentationIn]}
             willFadeOutLoadingQuestionsLayout={willFadeOutLoadingQuestionsLayout}

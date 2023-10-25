@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, TouchableOpacity } from 'react-native';
 
 export function Button({ children, handleOnPress, isDisabled, backgroundColor, dynamicStyles = {}, disabledOpacity = .3, willShowDisableOpacity }) {
     let defaultStyles = {}
@@ -9,13 +9,13 @@ export function Button({ children, handleOnPress, isDisabled, backgroundColor, d
     }
 
     return (
-        <Pressable
+        <TouchableOpacity
             disabled={isDisabled}
             style={{ ...dynamicStyles, ...defaultStyles, opacity: willShowDisableOpacity ? (isDisabled ? disabledOpacity : 1) : 1 }}
             onPress={handleOnPress}
         >
             {children}
-        </Pressable>
+        </TouchableOpacity>
     );
 }
 
