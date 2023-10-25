@@ -95,13 +95,11 @@ function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFade
     )
 }
 
-function QuestionsChoicesAndAnswerContainer({
-    _willShowLoadingUI,
-    _willPresentErrorUI
-}) {
-    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
-    const [questionsToDisplayOntoUI,] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI')
-    const [willPresentErrorUI, setWillPresentErrorUI] = _willPresentErrorUI;
+function QuestionsChoicesAndAnswerContainer() {
+    const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
+    const { _willShowLoadingUI, _willPresentErrorUI } = useContext(TriviaViewDataContext);
+    const [questionsToDisplayOntoUI,] = _questionsToDisplayOntoUI;
+    const [willPresentErrorUI, ] = _willPresentErrorUI;
     const [willShowLoadingUI, setWillShowLoadingUI] = _willShowLoadingUI;
     const [willFadePresentationIn, setWillFadePresentationIn] = useState(false);
     const [willFadeOutLoadingQuestionsLayout, setWillFadeOutLoadingQuestionLayout] = useState(false);
@@ -121,19 +119,14 @@ function QuestionsChoicesAndAnswerContainer({
     return <QuestionChoicesAndAnswerUI />
 }
 
-// using the selectedAnswer locally: 
-// when the user goes back to the trivia screen from the results screen, you must show the correct answer of the use
-// isReviewing is true, then for the answer field it must be the selected answer from the last question of the state that holds all of the questions 
-// and its corresponding letter
-
 const storage = new CustomLocalStorage();
 
 function QuestionChoicesAndAnswerUI() {
     const navigationObj = useNavigation();
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
-    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
+    const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
     const [selectedAnswer, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');
-    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
+    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout');
     const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
     const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn')
@@ -278,7 +271,7 @@ function QuestionChoicesAndAnswerUI() {
         storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
         navigationObj.navigate('Results');
     }
-    
+
     function handleViewResultsBtn() {
         setIntervalTimer(intervalTimer => {
             clearInterval(intervalTimer);

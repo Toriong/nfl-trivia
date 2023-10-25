@@ -11,20 +11,24 @@ import { TriviaBusinessDataContext } from "../../providers/TriviaBusinessDataPro
 import { useNavigation } from "@react-navigation/native";
 import CustomLocalStorage from "../../globalHelperFns/localStorage";
 import { MULTIPLE_CHOICE_LETTERS } from "../../globalVars";
+import { getTriviaQuestions } from "../../services/questions/get";
+import { customAlert } from "../../globalHelperFns/customAlert";
 
 const seahawksLogo = require('../../assets/seahawks-icon.png');
 const storage = new CustomLocalStorage();
 
 function MainPresentation() {
     const navigationObj = useNavigation();
-    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
-    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
+    const { getTargetTriviaViewState, _willShowLoadingUI, _willPresentErrorUI } = useContext(TriviaViewDataContext);
+    const [, setWillShowLoadingUI] = _willShowLoadingUI;
+    const [, setWillPresentErrorUI] = _willPresentErrorUI;
     const [, setIsTriviaModeOn] = getTargetTriviaViewState('isTriviaModeOn');
     const [, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');;
     const [, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout')
     const [, setWillRenderQuestionUI] = getTargetTriviaViewState('willRenderQuestionUI')
     const [, setWillRenderCorrectAnsUI] = getTargetTriviaViewState('willRenderCorrectAnsUI')
-    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
+    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
     const [, setWillFadeOutQuestionPromptPictures] = getTargetTriviaViewState('willFadeOutQuestionPromptPictures');
     const [, setWillFadeOutCorrectAnsPicture] = getTargetTriviaViewState('willFadeOutCorrectAnsPicture');
     const [, setWillFadeOutQuestionTxt] = getTargetTriviaViewState('willFadeOutQuestionTxt');
@@ -72,14 +76,33 @@ function MainPresentation() {
             console.error("Something went wrong. Can't bring up your previous questions for review.");
         }
     };
-    // GOAL: when the user clicks on the View Results Button on the Trivia screen, reset the timer back to its
-    // default seconds (60 seconds). 
 
+    function handleFinallyBlockofGetTriviaQuestionsFn() {
+        setTimeout(() => {
+            setWillShowLoadingUI(false);
+        }, 1_000);
+    };
 
+    function handleOnErrorGetTriviaQuestionReq() {
+        setWillPresentErrorUI(true);
+    }
 
     async function handlePlayAgainBtnPress() {
         try {
-            // get the new questions here
+            const newQuestions = await getTriviaQuestions(
+                '',
+                handleFinallyBlockofGetTriviaQuestionsFn,
+                handleOnErrorGetTriviaQuestionReq,
+            );
+
+            if(!newQuestions){
+                const alertErrorTxt = "Sorry, but something went wrong. Couldn't retrieve new trivia questions. Please restart the app and try again.";
+                customAlert(alertErrorTxt);
+
+                throw new Error("Failed to get new trivia questions from server.");
+            }
+
+            setQuestionsToDisplayOntoUI(newQuestions);
             const _stylePropForQuestionAndPicLayout = await storage.getData('triviaScrnHeight');
             setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout);
             setIsReviewQsBtnDisabled(true);
@@ -89,7 +112,7 @@ function MainPresentation() {
                 setWillStartTimer(true);
                 setIsTriviaModeOn(true);
             }, 200);
-        } catch(error){
+        } catch (error) {
             console.error('An error has occurred in getting restarting trivia quiz: ', error)
         }
     }

@@ -6,11 +6,11 @@ import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessD
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
 
 function QuestionCompContainer() {
-    const [willShowLoadingUI, setWillShowLoadingUI] = useState(true);
-    const [willPresentErrorUI, setWillPresentErrorUI] = useState(false);
-    const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
-    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext)
-    const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
+    const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
+    const { getTargetTriviaViewState, _willShowLoadingUI, _willPresentErrorUI } = useContext(TriviaViewDataContext)
+    const [willPresentErrorUI, setWillPresentErrorUI] = _willPresentErrorUI;
+    const [, setWillShowLoadingUI] = _willShowLoadingUI;
+    const [, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
     const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn')
 
     function handleGetTriviaQuestionsError() {
@@ -18,6 +18,7 @@ function QuestionCompContainer() {
     }
 
     function handleFinallyBlockofGetTriviaQuestionsFn() {
+        // FOR TESTING PURPOSES ONLY, WILL NEED TO REFACTOR: 
         setTimeout(() => {
             setWillShowLoadingUI(false);
         }, 1_000);
@@ -45,7 +46,6 @@ function QuestionCompContainer() {
 
     return <QuestionCompPresentation
         _willPresentErrorUI={[willPresentErrorUI, setWillPresentErrorUI]}
-        _willShowLoadingUI={[willShowLoadingUI, setWillShowLoadingUI]}
     />;
 };
 

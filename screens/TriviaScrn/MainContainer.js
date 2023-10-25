@@ -20,20 +20,7 @@ const TEST_QUESTIONS = [
     }
 ]
 
-function TriviaScrnMainContainer({ navigation }) {
-    const { updateSpecificGlobalTriviaContextBusinessState, getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
-    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
-    const [questionsToDisplayOntoUI, ] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI')
-    const [, setIsGettingTriviaQuestions] = getTargetTriviaViewState("isGettingTriviaQuestions");
-
-
-    function getQuerriedSetQuestionsFn(questions) {
-        return setQuestions => {
-            setQuestions(questions)
-            setIsGettingTriviaQuestions(false);
-        }
-    }
-
+function TriviaScrnMainContainer() {
     return <TriviaScrnMainPresentation />
 }
 

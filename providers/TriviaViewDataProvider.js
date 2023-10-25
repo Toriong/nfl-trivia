@@ -13,6 +13,8 @@ export const TriviaViewDataProvider = ({ children }) => {
     const [isTriviaModeOn, setIsTriviaModeOn] = useState(true);
     const [triviaScore, setTriviaScore] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState({ answer: "", letter: "" });
+    const _willShowLoadingUI = useState(false);
+    const _willPresentErrorUI = useState(false);
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
     const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);
     const [isReviewingQs, setIsReviewingQs] = useState(false);
@@ -133,7 +135,12 @@ export const TriviaViewDataProvider = ({ children }) => {
     }
 
     return (
-        <TriviaViewDataContext.Provider value={{ getTargetTriviaViewState, updateTargetTriviaViewState }}>
+        <TriviaViewDataContext.Provider value={{ 
+            getTargetTriviaViewState, 
+            updateTargetTriviaViewState,
+            _willShowLoadingUI,
+            _willPresentErrorUI 
+            }}>
             {children}
         </TriviaViewDataContext.Provider>
     );
