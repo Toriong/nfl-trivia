@@ -136,6 +136,7 @@ function QuestionChoicesAndAnswerUI() {
     const [selectedAnswer, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout');
+    const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
     const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn')
     const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
     const { text, answer, choices, pictures, explanation } = questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed] ?? questionsToDisplayOntoUI[0];
@@ -154,7 +155,7 @@ function QuestionChoicesAndAnswerUI() {
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
     const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
     const isBelow575PxViewPortWidth = useMediaQuery({ query: "(max-width: 575px)" });
-    let multipleImgsStyle = { width: 165, height: 165 }
+    let multipleImgsStyle = { width: 155, height: 155 }
     let btnContainerStyle = { marginTop: 20 }
     let questionContainerTxtLayout = { padding: 20 }
     let imageContainerStyle = { gap: 20 }
@@ -169,22 +170,22 @@ function QuestionChoicesAndAnswerUI() {
         selectedAnsContainerStyles = { marginTop: 5 }
         buttonStyle = { marginTop: 10 };
         multipleImgsStyle = {
-            width: 160,
-            height: 160
+            width: 150,
+            height: 150
         }
     }
 
     if (isBelow375PxViewPortWidth) {
         multipleImgsStyle = {
-            width: 145,
-            height: 145
+            width: 135,
+            height: 135
         }
     }
 
     if (isBelow300PxViewPortWidth) {
         multipleImgsStyle = {
-            width: 115,
-            height: 115
+            width: 105,
+            height: 105
         }
         imageContainerStyle = { gap: 10 }
     }
@@ -198,7 +199,6 @@ function QuestionChoicesAndAnswerUI() {
     }
 
     function handleOnShowQuestionBtnPress() {
-        // GOAL: display the question prompt onto the ui
         setWillFadeOutQuestionPromptPictures(false);
         setWillFadeOutQuestionTxt(false);
         setWasSubmitBtnPressed(false);
@@ -211,7 +211,6 @@ function QuestionChoicesAndAnswerUI() {
         setWasSelectedAnswerCorrect(answer === selectedAnswer.answer)
         setWillFadeOutQuestionPromptPictures(true);
         setWillFadeOutQuestionTxt(true);
-        console.log("selectedAnswer.answer: ", selectedAnswer.answer)
         setQuestionsToDisplayOntoUI(questions => questions.map(question => {
             if (question.isCurrentQDisplayed) {
                 return {
@@ -234,95 +233,6 @@ function QuestionChoicesAndAnswerUI() {
     function handleOnLayout(event) {
         setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
     }
-
-
-    function showQuestionToDisplay(indexOfQuestionToDisplay, willDelay, wasSubmitBtnPressed, delayMs = 150) {
-        setWillFadeOutQuestionPromptPictures(false);
-        setWillFadeOutCorrectAnsPicture(false);
-        setWillFadeOutQuestionTxt(false);
-        const { selectedAnswer, choices, pictures } = questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed]
-        console.log("questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed]: ", questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed])
-
-        if (wasSubmitBtnPressed) {
-            setWillRenderCorrectAnsUI(false);
-            setWasSubmitBtnPressed(false);
-            setSelectedAnswer({ answer: "", letter: "" });
-            setWasSelectedAnswerCorrect(false);
-        }
-
-        if (!wasSubmitBtnPressed && choices) {
-            console.log('multiple choice question with no pictures')
-            const indexOfSelectedAnswer = choices.findIndex(txt => txt === selectedAnswer);
-            const letterForSelectedAnswer = MULTIPLE_CHOICE_LETTERS[indexOfSelectedAnswer];
-            setSelectedAnswer({ answer: selectedAnswer, letter: letterForSelectedAnswer });
-        }
-
-        if (!wasSubmitBtnPressed && pictures) {
-            console.log('multiple choice question with pictures')
-            setSelectedAnswer({ answer: selectedAnswer });
-        }
-
-        if (willDelay) {
-            setTimeout(() => {
-                setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
-                    if (indexOfCurrentQuestionDisplayed === index) {
-                        const _updatedQuestion = {
-                            ...question,
-                            isCurrentQDisplayed: false,
-                            selectedAnswer: selectedAnswer
-                        }
-
-                        return _updatedQuestion;
-                    }
-
-                    if (indexOfQuestionToDisplay === index) {
-                        return {
-                            ...question,
-                            isCurrentQDisplayed: true
-                        }
-                    }
-
-                    return question;
-                }))
-
-                if (wasSubmitBtnPressed) {
-                    setTimeout(() => {
-                        setWillRenderQuestionUI(true);
-                    }, delayMs)
-                }
-            }, delayMs);
-            return;
-        }
-
-        console.log("questionsToDisplayOntoUI: ", questionsToDisplayOntoUI)
-        setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
-            if (indexOfCurrentQuestionDisplayed === index) {
-                return {
-                    ...question,
-                    isCurrentQDisplayed: false,
-                };
-            }
-
-            if (indexOfQuestionToDisplay === index) {
-                return {
-                    ...question,
-                    isCurrentQDisplayed: true
-                }
-            }
-
-            return question;
-        }));
-
-        if (wasSubmitBtnPressed) {
-            setWillRenderQuestionUI(true);
-            return;
-        }
-
-        setWillRenderCorrectAnsUI(true);
-    }
-
-
-    // GOAL: display the text of the question onto the UI when the user is reviewing their questions
 
     function handleArrowBtnPress(numToIncreaseOrDecreaseIndexOfCurrentQ) {
         try {
@@ -368,6 +278,19 @@ function QuestionChoicesAndAnswerUI() {
         storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
         navigationObj.navigate('Results');
     }
+
+    function handleViewResultsBtn() {
+        const correctQuestionsNum = questionsToDisplayOntoUI.filter(question => question.wasSelectedAnswerCorrect).length;
+        setTriviaScore(correctQuestionsNum / questionsToDisplayOntoUI.length)
+        storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout);
+        setIntervalTimer(intervalTimer => {
+            clearInterval(intervalTimer);
+            return null;
+        });
+        navigationObj.navigate('Results');
+    }
+
+    const currentQuestionIndex = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
 
     function handleNextQuestionBtnPress() {
         let currentQuestionIndex = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
@@ -425,436 +348,437 @@ function QuestionChoicesAndAnswerUI() {
     }
 
     return (
-        <>
-            <FadeUpAndOut
-                dynamicStyles={{
-                    height: "100%",
+        <FadeUpAndOut
+            dynamicStyles={{
+                height: "100%",
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                top: 10
+
+            }}
+            _willFadeIn={[willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI]}
+            willFadeOut={willFadeOutQuestionChoicesAndAnsUI}
+        >
+            <View
+                style={{
+                    ...questionContainerTxtLayout,
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
+                    height: "80%",
                 }}
-                _willFadeIn={[willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI]}
-                willFadeOut={willFadeOutQuestionChoicesAndAnsUI}
             >
                 <View
                     style={{
-                        ...questionContainerTxtLayout,
+                        width: "100%",
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        height: "80%",
+                        ...stylePropForQuestionAndPicLayout
                     }}
+                    onLayout={handleOnLayout}
                 >
-                    <View
-                        style={{
-                            width: "100%",
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            ...stylePropForQuestionAndPicLayout
-                        }}
-                        onLayout={handleOnLayout}
-                    >
-                        {willRenderQuestionUI &&
-                            <>
+                    {willRenderQuestionUI &&
+                        <>
+                            <FadeUpAndOut
+                                dynamicStyles={{
+                                    heigth: "100%",
+                                    width: "100%",
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                                _willFadeIn={[true, () => { }]}
+                                willFadeOut={willFadeOutQuestionPromptPictures}
+                            >
+                                {pictures?.length && (
+                                    <View
+                                        style={{
+                                            width: "100%",
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <View
+                                            style={{
+                                                ...imageContainerStyle,
+                                                width: "100%",
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                flexDirection: 'row',
+                                                flexWrap: 'wrap'
+                                            }}
+                                        >
+                                            {(pictures.length > 1) ?
+                                                pictures.map((pic, index) => {
+                                                    const props = IS_TESTING ? { source: pic.picUrl } : { src: pic.picUrl };
+
+                                                    return (
+                                                        <Button
+                                                            key={index}
+                                                            isDisabled={isReviewingQs}
+                                                            handleOnPress={() => handleOnImgPress(pic.choice)}
+                                                        >
+                                                            <Image
+                                                                style={{
+                                                                    ...multipleImgsStyle,
+                                                                    borderRadius: 20
+                                                                }}
+                                                                {...props}
+                                                            />
+                                                        </Button>
+                                                    )
+                                                })
+                                                :
+                                                <Image
+                                                    style={{ ...multipleImgsStyle, borderRadius: 20 }}
+                                                    src={pictures[0].picUrl}
+                                                />
+                                            }
+                                        </View>
+                                    </View>
+                                )}
+                                {choices?.length && (
+                                    <View
+                                        style={{
+                                            width: "100%",
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <View
+                                            style={{
+                                                width: "75%",
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                gap: 20,
+                                                paddingStart: 10,
+                                                paddingEnd: 10,
+                                                alignItems: 'center',
+                                                flexDirection: 'row',
+                                                flexWrap: 'wrap',
+                                                bottom: "5%"
+                                            }}
+                                        >
+                                            {choices.map((choiceTxtStr, index) => {
+                                                const letter = MULTIPLE_CHOICE_LETTERS[index];
+                                                let answerBackgroundColor = SEAHAWKS_COLORS.home["3rd"]
+
+                                                if (isTriviaModeOn && ((selectedAnswer.letter === letter) && !wasSubmitBtnPressed)) {
+                                                    answerBackgroundColor = SEAHAWKS_COLORS.home["2nd"]
+                                                } else if (isTriviaModeOn && (wasSubmitBtnPressed && wasSelectedAnswerCorrect && (letter === selectedAnswer.letter))) {
+                                                    answerBackgroundColor = 'green';
+                                                } else if (isTriviaModeOn && (wasSubmitBtnPressed && (letter === selectedAnswer.letter))) {
+                                                    answerBackgroundColor = 'red';
+                                                }
+
+                                                return (
+                                                    <View
+                                                        key={letter}
+                                                        style={{
+                                                            width: "85%",
+                                                            height: 50,
+                                                            backgroundColor: answerBackgroundColor,
+                                                            borderRadius: 10,
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                            paddingLeft: 10,
+                                                            paddingRight: 10
+                                                        }}
+                                                    >
+                                                        <Button
+                                                            isDisabled={isReviewingQs}
+                                                            dynamicStyles={{ width: "100%" }}
+                                                            handleOnPress={_ => handleOnChoiceBtnPress(choiceTxtStr, letter)}
+                                                        >
+                                                            <PTxt style={{ height: "100%", width: "100%", textAlign: 'center' }}>{`${letter}. ${choiceTxtStr}`}</PTxt>
+                                                        </Button>
+                                                    </View>
+                                                )
+                                            })}
+                                        </View>
+                                    </View>
+                                )}
+                            </FadeUpAndOut>
+                            <FadeUpAndOut
+                                _willFadeIn={[true, () => { }]}
+                                dynamicStyles={{
+                                    width: "100%",
+                                    height: "26%",
+                                    marginTop: "3%"
+                                }}
+                                willFadeOut={willFadeOutQuestionTxt}
+                            >
+                                <View
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                    }}
+                                >
+                                    <PTxt style={{ paddingStart: 5, paddingEnd: 5, color: 'white', textAlign: 'center' }}>{text}</PTxt>
+                                </View>
+                            </FadeUpAndOut>
+                        </>
+                    }
+                    {willRenderCorrectAnsUI &&
+                        <View style={{ width: '100%', height: '100%' }}>
+                            <FadeUpAndOut
+                                dynamicStyles={{
+                                    heigth: 20,
+                                    width: "100%",
+                                    width: "100%",
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    bottom: 10,
+                                }}
+                                _willFadeIn={[true, () => { }]}
+                                willFadeOut={willFadeOutCorrectAnsPicture}
+                            >
+                                <PTxt txtColor='green'>Correct Answer: </PTxt>
+                                {pictures?.length
+                                    ?
+                                    <PTxt txtColor='green'>
+                                        {answer}
+                                    </PTxt>
+                                    :
+                                    <View
+                                        style={{
+                                            width: "80%",
+                                            height: 50,
+                                            backgroundColor: 'green',
+                                            borderRadius: 10,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            paddingLeft: 10,
+                                            paddingRight: 10,
+                                            top: 15
+                                        }}
+                                    >
+                                        <PTxt style={{ textAlign: 'center' }}>
+                                            {`${MULTIPLE_CHOICE_LETTERS[choices.findIndex(choiceTxt => choiceTxt === answer)]}. ${answer}`}
+                                        </PTxt>
+                                    </View>
+                                }
+                            </FadeUpAndOut>
+                            {correctImgUrl && (
                                 <FadeUpAndOut
                                     dynamicStyles={{
                                         heigth: "100%",
                                         width: "100%",
                                         display: 'flex',
                                         justifyContent: 'center',
-                                        alignItems: 'center',
-                                    }}
-                                    _willFadeIn={[true, () => { }]}
-                                    willFadeOut={willFadeOutQuestionPromptPictures}
-                                >
-                                    {pictures?.length && (
-                                        <View
-                                            style={{
-                                                width: "100%",
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    ...imageContainerStyle,
-                                                    width: "100%",
-                                                    display: 'flex',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                    flexDirection: 'row',
-                                                    flexWrap: 'wrap'
-                                                }}
-                                            >
-                                                {(pictures.length > 1) ?
-                                                    pictures.map((pic, index) => {
-                                                        const props = IS_TESTING ? { source: pic.picUrl } : { src: pic.picUrl };
-
-                                                        return (
-                                                            <Button
-                                                                key={index}
-                                                                isDisabled={isReviewingQs}
-                                                                handleOnPress={() => handleOnImgPress(pic.choice)}
-                                                            >
-                                                                <Image
-                                                                    style={{
-                                                                        ...multipleImgsStyle,
-                                                                        borderRadius: 20
-                                                                    }}
-                                                                    {...props}
-                                                                />
-                                                            </Button>
-                                                        )
-                                                    })
-                                                    :
-                                                    <Image
-                                                        style={{ ...multipleImgsStyle, borderRadius: 20 }}
-                                                        src={pictures[0].picUrl}
-                                                    />
-                                                }
-                                            </View>
-                                        </View>
-                                    )}
-                                    {choices?.length && (
-                                        <View
-                                            style={{
-                                                width: "100%",
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                            }}
-                                        >
-                                            <View
-                                                style={{
-                                                    width: "75%",
-                                                    display: 'flex',
-                                                    justifyContent: 'center',
-                                                    gap: 20,
-                                                    paddingStart: 10,
-                                                    paddingEnd: 10,
-                                                    alignItems: 'center',
-                                                    flexDirection: 'row',
-                                                    flexWrap: 'wrap',
-                                                    bottom: "5%"
-                                                }}
-                                            >
-                                                {choices.map((choiceTxtStr, index) => {
-                                                    const letter = MULTIPLE_CHOICE_LETTERS[index];
-                                                    let answerBackgroundColor = SEAHAWKS_COLORS.home["3rd"]
-
-                                                    if (isTriviaModeOn && ((selectedAnswer.letter === letter) && !wasSubmitBtnPressed)) {
-                                                        answerBackgroundColor = SEAHAWKS_COLORS.home["2nd"]
-                                                    } else if (isTriviaModeOn && (wasSubmitBtnPressed && wasSelectedAnswerCorrect && (letter === selectedAnswer.letter))) {
-                                                        answerBackgroundColor = 'green';
-                                                    } else if (isTriviaModeOn && (wasSubmitBtnPressed && (letter === selectedAnswer.letter))) {
-                                                        answerBackgroundColor = 'red';
-                                                    }
-
-                                                    return (
-                                                        <View
-                                                            key={letter}
-                                                            style={{
-                                                                width: "85%",
-                                                                height: 50,
-                                                                backgroundColor: answerBackgroundColor,
-                                                                borderRadius: 10,
-                                                                display: 'flex',
-                                                                justifyContent: 'center',
-                                                                alignItems: 'center',
-                                                                paddingLeft: 10,
-                                                                paddingRight: 10
-                                                            }}
-                                                        >
-                                                            <Button
-                                                                isDisabled={isReviewingQs}
-                                                                dynamicStyles={{ width: "100%" }}
-                                                                handleOnPress={_ => handleOnChoiceBtnPress(choiceTxtStr, letter)}
-                                                            >
-                                                                <PTxt style={{ height: "100%", width: "100%", textAlign: 'center' }}>{`${letter}. ${choiceTxtStr}`}</PTxt>
-                                                            </Button>
-                                                        </View>
-                                                    )
-                                                })}
-                                            </View>
-                                        </View>
-                                    )}
-                                </FadeUpAndOut>
-                                <FadeUpAndOut
-                                    _willFadeIn={[true, () => { }]}
-                                    dynamicStyles={{
-                                        width: "100%",
-                                        height: "26%",
-                                        marginTop: "3%"
-                                    }}
-                                    willFadeOut={willFadeOutQuestionTxt}
-                                >
-                                    <View
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                        }}
-                                    >
-                                        <PTxt style={{ paddingStart: 5, paddingEnd: 5, color: 'white', textAlign: 'center' }}>{text}</PTxt>
-                                    </View>
-                                </FadeUpAndOut>
-                            </>
-                        }
-                        {willRenderCorrectAnsUI &&
-                            <View style={{ width: '100%', height: '100%' }}>
-                                <FadeUpAndOut
-                                    dynamicStyles={{
-                                        heigth: 20,
-                                        width: "100%",
-                                        width: "100%",
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        bottom: 10,
                                     }}
                                     _willFadeIn={[true, () => { }]}
                                     willFadeOut={willFadeOutCorrectAnsPicture}
                                 >
-                                    <PTxt txtColor='green'>Correct Answer: </PTxt>
-                                    {pictures?.length
-                                        ?
-                                        <PTxt txtColor='green'>
-                                            {answer}
-                                        </PTxt>
-                                        :
-                                        <View
-                                            style={{
-                                                width: "80%",
-                                                height: 50,
-                                                backgroundColor: 'green',
-                                                borderRadius: 10,
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                                paddingLeft: 10,
-                                                paddingRight: 10,
-                                                top: 15
-                                            }}
-                                        >
-                                            <PTxt style={{ textAlign: 'center' }}>
-                                                {`${MULTIPLE_CHOICE_LETTERS[choices.findIndex(choiceTxt => choiceTxt === answer)]}. ${answer}`}
-                                            </PTxt>
-                                        </View>
-                                    }
-                                </FadeUpAndOut>
-                                {correctImgUrl && (
-                                    <FadeUpAndOut
-                                        dynamicStyles={{
-                                            heigth: "100%",
-                                            width: "100%",
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                        }}
-                                        _willFadeIn={[true, () => { }]}
-                                        willFadeOut={willFadeOutCorrectAnsPicture}
-                                    >
-                                        <View
-                                            style={{
-                                                borderRadius: 20,
-                                                width: "100%",
-                                                height: "100%",
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                            }}
-                                        >
-                                            <Image
-                                                style={{
-                                                    width: 185,
-                                                    height: 185,
-                                                    borderRadius: 20
-                                                }}
-                                                source={correctImgUrl}
-                                            />
-                                        </View>
-                                    </FadeUpAndOut>
-                                )}
-                                <FadeUpAndOut
-                                    _willFadeIn={[true, () => { }]}
-                                    dynamicStyles={{
-                                        width: "100%",
-                                        height: "26%",
-                                        marginBottom: "3%"
-                                    }}
-                                    willFadeOut={willFadeOutExplanationTxt}
-                                >
                                     <View
                                         style={{
+                                            borderRadius: 20,
                                             width: "100%",
                                             height: "100%",
-                                            marginTop: "5%"
-                                        }}
-                                    >
-                                        <PTxt style={{ color: 'white', textAlign: 'center', paddingStart: 5, paddingEnd: 5 }} >{explanation}</PTxt>
-                                    </View>
-                                </FadeUpAndOut>
-                                <FadeUpAndOut
-                                    _willFadeIn={[true, () => { }]}
-                                    dynamicStyles={{
-                                        width: "100%",
-                                    }}
-                                    willFadeOut={willFadeOutExplanationTxt}
-                                >
-                                    <View
-                                        style={{
-                                            width: "100%",
                                             display: 'flex',
                                             justifyContent: 'center',
-                                            alignItems: 'center'
+                                            alignItems: 'center',
                                         }}
                                     >
-
-                                        <PTxt
-                                            txtColor={colorForAnswerShownTxts}
-                                            style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
-                                        >
-                                            {wasSelectedAnswerCorrect ? "Correct" : "Incorrect"}
-                                        </PTxt>
-                                        <PTxt
-                                            txtColor={colorForAnswerShownTxts}
-                                            style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
-                                        >
-                                            {wasSelectedAnswerCorrect ? "👍" : "👎"}
-                                        </PTxt>
+                                        <Image
+                                            style={{
+                                                width: 185,
+                                                height: 185,
+                                                borderRadius: 20
+                                            }}
+                                            source={correctImgUrl}
+                                        />
                                     </View>
                                 </FadeUpAndOut>
-                            </View>
-                        }
-                    </View>
-                    <View
-                        style={{
-                            width: "100%",
-                            height: 'fit-content',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            ...selectedAnswerContainerStyle,
-                        }}
-                    >
-                        <View>
-                            <PTxt txtColor={colorForAnswerShownTxts}>Your answer: </PTxt>
-                        </View>
-                        <SelectedUserAnswer
-                            viewStyles={selectedAnsContainerStyles}
-                            colorForAnswerShownTxts={colorForAnswerShownTxts}
-                        >
-                            {pictures && selectedAnswer.answer}
-                            {!pictures && ((selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : '')}
-                        </SelectedUserAnswer>
-                    </View>
-                    {isTriviaModeOn && <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Button
-                            isDisabled={selectedAnswer.answer === ""}
-                            dynamicStyles={{
-                                opacity: selectedAnswer.answer === "" ? .3 : 1,
-                                backgroundColor: '#69BE28',
-                                padding: 10,
-                                borderRadius: 10,
-                                ...buttonStyle
-                            }}
-                            handleOnPress={handleOnSubmitBtnPress}
-                        >
-                            <PTxt>Submit</PTxt>
-                        </Button>
-                    </View>}
+                            )}
+                            <FadeUpAndOut
+                                _willFadeIn={[true, () => { }]}
+                                dynamicStyles={{
+                                    width: "100%",
+                                    height: "26%",
+                                    marginBottom: "3%"
+                                }}
+                                willFadeOut={willFadeOutExplanationTxt}
+                            >
+                                <View
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        marginTop: "5%"
+                                    }}
+                                >
+                                    <PTxt style={{ color: 'white', textAlign: 'center', paddingStart: 5, paddingEnd: 5 }} >{explanation}</PTxt>
+                                </View>
+                            </FadeUpAndOut>
+                            <FadeUpAndOut
+                                _willFadeIn={[true, () => { }]}
+                                dynamicStyles={{
+                                    width: "100%",
+                                }}
+                                willFadeOut={willFadeOutExplanationTxt}
+                            >
+                                <View
+                                    style={{
+                                        width: "100%",
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }}
+                                >
 
-                    <View style={{
-                        ...CENTER_DEFAULT.center,
-                        width: "100%",
-                        top: "3%"
-                    }}>
-                        {isTriviaModeOn ?
-                            <NextQuestion
-                                wasSubmitBtnPressed={wasSubmitBtnPressed}
-                                handleNextQuestionBtnPress={handleNextQuestionBtnPress}
-                            />
-                            :
-                            <>
-                                <View style={{
-                                    width: "100%",
-                                    flexDirection: 'row',
-                                    gap: 10,
-                                    ...CENTER_DEFAULT.center
-                                }}>
-                                    <Button
-                                        handleOnPress={() => handleArrowBtnPress(-1)}
-                                        dynamicStyles={{
-                                            ...CENTER_DEFAULT.center,
-                                            borderRadius: 15,
-                                            padding: 13,
-                                            backgroundColor: SEAHAWKS_COLORS.home['3rd']
-                                        }}
-                                        willShowDisableOpacity
-                                        isDisabled={indexOfCurrentQuestionDisplayed === 0}
+                                    <PTxt
+                                        txtColor={colorForAnswerShownTxts}
+                                        style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
                                     >
-                                        <FontAwesomeIcon
-                                            icon={faArrowLeft}
-                                            color="white"
-                                            size={27}
-                                        />
-                                    </Button>
-                                    <Button
-                                        handleOnPress={willRenderCorrectAnsUI ? handleOnShowQuestionBtnPress : handleOnSubmitBtnPress}
-                                        dynamicStyles={{
-                                            ...CENTER_DEFAULT.center,
-                                            width: 225,
-                                            borderRadius: 15,
-                                            padding: 13,
-                                            backgroundColor: SEAHAWKS_COLORS.home['3rd'],
-                                            flexDirection: 'column'
-                                        }}
+                                        {wasSelectedAnswerCorrect ? "Correct" : "Incorrect"}
+                                    </PTxt>
+                                    <PTxt
+                                        txtColor={colorForAnswerShownTxts}
+                                        style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
                                     >
-                                        <PTxt style={{ width: '100%', textAlign: 'center' }}>Show {willRenderCorrectAnsUI ? 'Question' : 'Answer'}</PTxt>
-                                    </Button>
-                                    <Button
-                                        handleOnPress={() => handleArrowBtnPress(1)}
-                                        willShowDisableOpacity
-                                        dynamicStyles={{
-                                            ...CENTER_DEFAULT.center,
-                                            borderRadius: 15,
-                                            padding: 13,
-                                            backgroundColor: SEAHAWKS_COLORS.home['3rd']
-                                        }}
-                                        isDisabled={indexOfCurrentQuestionDisplayed === (questionsToDisplayOntoUI.length - 1)}
-                                    >
-                                        <FontAwesomeIcon
-                                            icon={faArrowRight}
-                                            color="white"
-                                            size={27}
-                                        />
-                                    </Button>
+                                        {wasSelectedAnswerCorrect ? "👍" : "👎"}
+                                    </PTxt>
                                 </View>
-                                <View style={{
-                                    width: "100%",
-                                    marginTop: 10,
-                                    ...CENTER_DEFAULT.center
-                                }}>
-                                    <Button
-                                        dynamicStyles={{
-                                            ...CENTER_DEFAULT.center,
-                                            borderRadius: 15,
-                                            padding: 13,
-                                            backgroundColor: SEAHAWKS_COLORS.home['2nd']
-                                        }}
-                                        handleOnPress={handleResultsBtnPress}
-                                    >
-                                        <PTxt txtColor="white" style={{}}>
-                                            Results
-                                        </PTxt>
-                                    </Button>
-                                </View>
-                            </>
-                        }
-                    </View>
+                            </FadeUpAndOut>
+                        </View>
+                    }
                 </View>
-            </FadeUpAndOut>
-        </>
+                <View
+                    style={{
+                        width: "100%",
+                        height: 'fit-content',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        ...selectedAnswerContainerStyle,
+                    }}
+                >
+                    <View>
+                        <PTxt txtColor={colorForAnswerShownTxts}>Your answer: </PTxt>
+                    </View>
+                    <SelectedUserAnswer
+                        viewStyles={selectedAnsContainerStyles}
+                        colorForAnswerShownTxts={colorForAnswerShownTxts}
+                    >
+                        {pictures && selectedAnswer.answer}
+                        {!pictures && ((selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : '')}
+                    </SelectedUserAnswer>
+                </View>
+                {isTriviaModeOn && <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Button
+                        isDisabled={selectedAnswer.answer === ""}
+                        dynamicStyles={{
+                            opacity: selectedAnswer.answer === "" ? .3 : 1,
+                            backgroundColor: '#69BE28',
+                            padding: 10,
+                            borderRadius: 10,
+                            ...buttonStyle
+                        }}
+                        handleOnPress={handleOnSubmitBtnPress}
+                    >
+                        <PTxt>Submit</PTxt>
+                    </Button>
+                </View>}
+
+                <View style={{
+                    ...CENTER_DEFAULT.center,
+                    width: "100%",
+                    top: "3%"
+                }}>
+                    {isTriviaModeOn ?
+                        <NextQuestion
+                            btnTxt={((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) ? "View Results" : "Next"}
+                            wasSubmitBtnPressed={wasSubmitBtnPressed}
+                            handleNextQuestionBtnPress={((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) ? handleViewResultsBtn : handleNextQuestionBtnPress}
+                        />
+                        :
+                        <>
+                            <View style={{
+                                width: "100%",
+                                flexDirection: 'row',
+                                gap: 10,
+                                ...CENTER_DEFAULT.center
+                            }}>
+                                <Button
+                                    handleOnPress={() => handleArrowBtnPress(-1)}
+                                    dynamicStyles={{
+                                        ...CENTER_DEFAULT.center,
+                                        borderRadius: 15,
+                                        padding: 13,
+                                        backgroundColor: SEAHAWKS_COLORS.home['3rd']
+                                    }}
+                                    willShowDisableOpacity
+                                    isDisabled={indexOfCurrentQuestionDisplayed === 0}
+                                >
+                                    <FontAwesomeIcon
+                                        icon={faArrowLeft}
+                                        color="white"
+                                        size={27}
+                                    />
+                                </Button>
+                                <Button
+                                    handleOnPress={willRenderCorrectAnsUI ? handleOnShowQuestionBtnPress : handleOnSubmitBtnPress}
+                                    dynamicStyles={{
+                                        ...CENTER_DEFAULT.center,
+                                        width: 225,
+                                        borderRadius: 15,
+                                        padding: 13,
+                                        backgroundColor: SEAHAWKS_COLORS.home['3rd'],
+                                        flexDirection: 'column'
+                                    }}
+                                >
+                                    <PTxt style={{ width: '100%', textAlign: 'center' }}>Show {willRenderCorrectAnsUI ? 'Question' : 'Answer'}</PTxt>
+                                </Button>
+                                <Button
+                                    handleOnPress={() => handleArrowBtnPress(1)}
+                                    willShowDisableOpacity
+                                    dynamicStyles={{
+                                        ...CENTER_DEFAULT.center,
+                                        borderRadius: 15,
+                                        padding: 13,
+                                        backgroundColor: SEAHAWKS_COLORS.home['3rd']
+                                    }}
+                                    isDisabled={indexOfCurrentQuestionDisplayed === (questionsToDisplayOntoUI.length - 1)}
+                                >
+                                    <FontAwesomeIcon
+                                        icon={faArrowRight}
+                                        color="white"
+                                        size={27}
+                                    />
+                                </Button>
+                            </View>
+                            <View style={{
+                                width: "100%",
+                                marginTop: 10,
+                                ...CENTER_DEFAULT.center
+                            }}>
+                                <Button
+                                    dynamicStyles={{
+                                        ...CENTER_DEFAULT.center,
+                                        borderRadius: 15,
+                                        padding: 13,
+                                        backgroundColor: SEAHAWKS_COLORS.home['2nd']
+                                    }}
+                                    handleOnPress={handleResultsBtnPress}
+                                >
+                                    <PTxt txtColor="white" style={{}}>
+                                        Results
+                                    </PTxt>
+                                </Button>
+                            </View>
+                        </>
+                    }
+                </View>
+            </View>
+        </FadeUpAndOut>
     )
 }
 

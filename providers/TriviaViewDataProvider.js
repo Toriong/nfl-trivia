@@ -21,7 +21,12 @@ export const TriviaViewDataProvider = ({ children }) => {
     const [willFadeOutCorrectAnsPicture, setWillFadeOutCorrectAnsPicture] = useState(false);
     const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = useState(false);
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = useState(false);
+    const [intervalTimer, setIntervalTimer] = useState(null);
     const triviaViewDataArr = [
+        {
+            name: 'intervalTimer',
+            state: [intervalTimer, setIntervalTimer]
+        },
         {
             name: 'wasSubmitBtnPressed',
             state: [wasSubmitBtnPressed, setWasSubmitBtnPressed]

@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '../../../../globalComponents/buttons';
 import { PTxt } from '../../../../globalComponents/customTxts';
 
-function NextQuestion({ wasSubmitBtnPressed, handleNextQuestionBtnPress }) {
+function NextQuestion({ wasSubmitBtnPressed, handleNextQuestionBtnPress, btnTxt }) {
     return (
         <Button
             isDisabled={!wasSubmitBtnPressed}
@@ -15,7 +15,7 @@ function NextQuestion({ wasSubmitBtnPressed, handleNextQuestionBtnPress }) {
             }}
         >
             <PTxt style={{ textAlign: 'center' }}>
-                Next Q
+                {btnTxt}
             </PTxt>
         </Button>
     );
