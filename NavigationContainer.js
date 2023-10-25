@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import TriviaScreen from './screens/TriviaScrn/MainContainer';
 import ResultScreen from './screens/ResultsScrn/MainContainer';
+import HomeScreen from './screens/Home/MainContainer';
 
 const Stack = createNativeStackNavigator()
 
@@ -10,7 +11,7 @@ const AppNavigationContainer = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName='Trivia'
+                initialRouteName='Home'
             >
                 <Stack.Screen
                     name="Trivia"
@@ -20,6 +21,11 @@ const AppNavigationContainer = () => {
                 <Stack.Screen
                     name="Results"
                     component={ResultScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Home"
+                    component={HomeScreen}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
