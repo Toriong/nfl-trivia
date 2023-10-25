@@ -132,7 +132,6 @@ function QuestionChoicesAndAnswerUI() {
     const navigationObj = useNavigation();
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
     const { getTargetTriviaContextBusinessState } = useContext(TriviaBusinessDataContext);
-    const [, setTriviaScore] = getTargetTriviaViewState("triviaScore");
     const [selectedAnswer, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = getTargetTriviaContextBusinessState('questionsToDisplayOntoUI');
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout');
@@ -151,6 +150,7 @@ function QuestionChoicesAndAnswerUI() {
     const [willRenderQuestionUI, setWillRenderQuestionUI] = getTargetTriviaViewState('willRenderQuestionUI');
     const [isReviewingQs, setIsReviewingQs] = getTargetTriviaViewState('isReviewingQs');
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = getTargetTriviaViewState('wasSubmitBtnPressed');
+    const [, setTimerMs] = getTargetTriviaViewState('timerMs');
     const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = useState(false);
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
     const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
@@ -278,15 +278,13 @@ function QuestionChoicesAndAnswerUI() {
         storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
         navigationObj.navigate('Results');
     }
-
+    
     function handleViewResultsBtn() {
-        const correctQuestionsNum = questionsToDisplayOntoUI.filter(question => question.wasSelectedAnswerCorrect).length;
-        setTriviaScore(correctQuestionsNum / questionsToDisplayOntoUI.length)
-        storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout);
         setIntervalTimer(intervalTimer => {
             clearInterval(intervalTimer);
             return null;
         });
+        storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
         navigationObj.navigate('Results');
     }
 
@@ -295,16 +293,6 @@ function QuestionChoicesAndAnswerUI() {
     function handleNextQuestionBtnPress() {
         let currentQuestionIndex = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
         currentQuestionIndex = (currentQuestionIndex === -1) ? 0 : currentQuestionIndex
-
-        // put this logic into a different function
-        if ((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) {
-            const correctQuestionsNum = questionsToDisplayOntoUI.filter(question => question.wasSelectedAnswerCorrect).length;
-            setTriviaScore(correctQuestionsNum / questionsToDisplayOntoUI.length)
-            storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
-            navigationObj.navigate('Results');
-            return;
-        };
-
         setWillRenderCorrectAnsUI(false);
         setWillFadeOutQuestionPromptPictures(false);
         setWillFadeOutCorrectAnsPicture(false);

@@ -4,33 +4,39 @@ import { PTxt } from "../../../../globalComponents/customTxts";
 import { TriviaViewDataContext } from "../../../../providers/TriviaViewDataProvider";
 import { useNavigation } from '@react-navigation/native';
 
-function Timer({ timerMiliseconds = 60_000 }) {
+function Timer() {
     const navigation = useNavigation();
-    const [timerMs, setTimerMs] = useState(timerMiliseconds);
     const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const [timerMs, setTimerMs] = getTargetTriviaViewState('timerMs')
     const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
-    const [isTriviaModeOn, ] = getTargetTriviaViewState('isTriviaModeOn');
+    const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn');
+    const [willStartTimer, setWillStartTimer] = getTargetTriviaViewState('willStartTimer')
     const [isTriviaSessionOver, setIsTriviaSessionOver] = useState(false);
 
     useEffect(() => {
-        setTimeout(() => {
-            const intervalTimer = setInterval(() => {
-                setTimerMs(timerMs => {
-                    if (timerMs === null) {
-                        return null;
-                    }
+        // GOAL: create state, that if true, will execute the code below, and after the execution is done, will make the state false again
+        if (willStartTimer) {
+            setTimeout(() => {
+                const intervalTimer = setInterval(() => {
+                    setTimerMs(timerMs => {
+                        if (timerMs === null) {
+                            return null;
+                        }
 
-                    if (timerMs === 0) {
-                        setIsTriviaSessionOver(true);
-                        return null;
-                    }
+                        if (timerMs === 0) {
+                            setIsTriviaSessionOver(true);
+                            return null;
+                        }
 
-                    return timerMs - 1_000;
-                });
-            }, 1_000)
-            setIntervalTimer(intervalTimer);
-        }, 750);
-    }, []);
+                        return timerMs - 1_000;
+                    });
+                }, 1_000)
+                setIntervalTimer(intervalTimer);
+            }, 750);
+            setWillStartTimer(false);
+        }
+
+    }, [willStartTimer]);
 
     useEffect(() => {
         if (isTriviaSessionOver) {
@@ -40,6 +46,9 @@ function Timer({ timerMiliseconds = 60_000 }) {
             });
             navigation.navigate('Results');
             setIsTriviaSessionOver(false);
+            setTimeout(() => {
+                setTimerMs(60_000);
+            }, 500)
         }
     }, [isTriviaSessionOver]);
 

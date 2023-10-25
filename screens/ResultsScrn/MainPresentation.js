@@ -29,12 +29,14 @@ function MainPresentation() {
     const [, setWillFadeOutCorrectAnsPicture] = getTargetTriviaViewState('willFadeOutCorrectAnsPicture');
     const [, setWillFadeOutQuestionTxt] = getTargetTriviaViewState('willFadeOutQuestionTxt');
     const [, setIsReviewingQs] = getTargetTriviaViewState('isReviewingQs');
-    const [,setWasSubmitBtnPressed] = getTargetTriviaViewState('wasSubmitBtnPressed');
+    const [, setWasSubmitBtnPressed] = getTargetTriviaViewState('wasSubmitBtnPressed');
+    const [, setTimerMs] = getTargetTriviaViewState('timerMs');
+    const [, setWillStartTimer] = getTargetTriviaViewState('willStartTimer')
     const [willFadeOutResultsUi, setWillFadeOutResultsUi] = useState(false);
-    const triviaScore = questionsToDisplayOntoUI.filter(question => {
+    const [isReviewQsBtnDisabled, setIsReviewQsBtnDisabled] = useState(false);
+    const correctAnswersNum = questionsToDisplayOntoUI.filter(question => {
         return question.answer === question.selectedAnswer
     }).length;
-    let triviaScoreFraction = new Fraction(triviaScore / questionsToDisplayOntoUI.length);
 
     async function handleReviewQsBtnPress() {
         try {
@@ -42,12 +44,12 @@ function MainPresentation() {
             setIsReviewingQs(true);
             setWillFadeOutQuestionPromptPictures(false);
             setWillFadeOutCorrectAnsPicture(false);
-            setWillFadeOutQuestionTxt(false); 
+            setWillFadeOutQuestionTxt(false);
             setIsTriviaModeOn(false);
             setWillRenderQuestionUI(true);
             setWillRenderCorrectAnsUI(false);
             const _stylePropForQuestionAndPicLayout = await storage.getData('triviaScrnHeight');
-            setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout)
+            setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout);
             setQuestionsToDisplayOntoUI(questions => questions.map((question, index, arrBeingMapped) => {
                 return {
                     ...question,
@@ -55,7 +57,7 @@ function MainPresentation() {
                 }
             }));
             const { selectedAnswer, choices, pictures } = questionsToDisplayOntoUI.at(-1);
-            
+
             if (pictures) {
                 setSelectedAnswer({ answer: selectedAnswer })
                 navigationObj.navigate('Trivia');
@@ -70,6 +72,27 @@ function MainPresentation() {
             console.error("Something went wrong. Can't bring up your previous questions for review.");
         }
     };
+    // GOAL: when the user clicks on the View Results Button on the Trivia screen, reset the timer back to its
+    // default seconds (60 seconds). 
+
+
+
+    async function handlePlayAgainBtnPress() {
+        try {
+            // get the new questions here
+            const _stylePropForQuestionAndPicLayout = await storage.getData('triviaScrnHeight');
+            setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout);
+            setIsReviewQsBtnDisabled(true);
+            setTimerMs(60_000);
+            navigationObj.navigate('Trivia');
+            setTimeout(() => {
+                setWillStartTimer(true);
+                setIsTriviaModeOn(true);
+            }, 200);
+        } catch(error){
+            console.error('An error has occurred in getting restarting trivia quiz: ', error)
+        }
+    }
 
     return (
         <Background>
@@ -127,7 +150,7 @@ function MainPresentation() {
                     >
                         Your score:
                     </HeadingTxt>
-                    <PTxt>{triviaScoreFraction.n}/{triviaScoreFraction.d}</PTxt>
+                    <PTxt>{correctAnswersNum}/10</PTxt>
                 </View>
                 <View style={{ ...CENTER_DEFAULT.center, flexDirection: 'row', marginTop: 25 }}>
                     <Button
@@ -138,6 +161,7 @@ function MainPresentation() {
                             borderRadius: 10,
                             marginRight: 15
                         }}
+                        isDisabled={isReviewQsBtnDisabled}
                         backgroundColor={SEAHAWKS_COLORS.home["3rd"]}
                         handleOnPress={handleReviewQsBtnPress}
                     >
@@ -156,6 +180,7 @@ function MainPresentation() {
                             width: 150,
                             borderRadius: 10,
                         }}
+                        handleOnPress={handlePlayAgainBtnPress}
                     >
                         <PTxt
                             style={{ textAlign: 'center' }}

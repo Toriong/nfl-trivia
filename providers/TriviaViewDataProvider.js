@@ -22,7 +22,22 @@ export const TriviaViewDataProvider = ({ children }) => {
     const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = useState(false);
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = useState(false);
     const [intervalTimer, setIntervalTimer] = useState(null);
+    const [timerMs, setTimerMs] = useState(60_000);
+    const [willPresentErrorUI, setWillPresentErrorUI] = useState(false);
+    const [willStartTimer, setWillStartTimer] = useState(true);
     const triviaViewDataArr = [
+        {
+            name: 'willPresentErrorUI',
+            state: [willPresentErrorUI, setWillPresentErrorUI]
+        },
+        {
+            name: 'willStartTimer',
+            state: [willStartTimer, setWillStartTimer]
+        },
+        {
+            name: 'timerMs',
+            state: [timerMs, setTimerMs]
+        },
         {
             name: 'intervalTimer',
             state: [intervalTimer, setIntervalTimer]
