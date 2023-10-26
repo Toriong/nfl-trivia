@@ -97,7 +97,7 @@ export const TriviaViewDataProvider = ({ children }) => {
             const stateAndSetter = triviaViewDataArr.find(({ name }) => name === stateName)?.state;
 
             if (!stateAndSetter?.length) {
-                throw new Error("Unable to get the target state. The `stateName` is invalid.")
+                throw new Error(`Unable to get the target state. The ${stateName} is invalid.`)
             }
 
             return stateAndSetter;
@@ -129,12 +129,14 @@ export const TriviaViewDataProvider = ({ children }) => {
     }
 
     return (
-        <TriviaViewDataContext.Provider value={{ 
-            getTargetTriviaViewState, 
-            updateTargetTriviaViewState,
-            _willShowLoadingUI,
-            _willPresentErrorUI 
-            }}>
+        <TriviaViewDataContext.Provider
+            value={{
+                getTargetTriviaViewState,
+                updateTargetTriviaViewState,
+                _willShowLoadingUI,
+                _willPresentErrorUI
+            }}
+        >
             {children}
         </TriviaViewDataContext.Provider>
     );

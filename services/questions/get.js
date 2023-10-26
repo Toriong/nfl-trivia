@@ -36,6 +36,7 @@ export async function getTriviaQuestions(
     handleBeforeReqWasSent
 ) {
     try {
+        console.log('Getting questions from api...')
         if (handleBeforeReqWasSent) {
             handleBeforeReqWasSent();
         }
@@ -59,6 +60,8 @@ export async function getTriviaQuestions(
         if (handleReqSuccessLogic) {
             handleReqSuccessLogic(response.data)
         }
+
+        console.log('Questions received yolo: ', response.data)
 
         return response.data;
     } catch (error) {

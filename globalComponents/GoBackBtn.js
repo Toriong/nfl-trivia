@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { Button } from '../../../../globalComponents/buttons';
+import { Button } from './buttons';
 import { faX } from "@fortawesome/free-solid-svg-icons";
 
 function GoBackBtn({

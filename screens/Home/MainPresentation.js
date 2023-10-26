@@ -7,13 +7,32 @@ import { faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import Logo from "../../globalComponents/Logo";
 import { useNavigation } from "@react-navigation/native";
+import { useContext } from "react";
+import { TriviaViewDataContext } from "../../providers/TriviaViewDataProvider";
+import { TriviaBusinessDataContext } from "../../providers/TriviaBusinessDataProvider";
 
 function MainPresentation() {
+    const { _willShowLoadingUI, getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const { _willGetQuestionsFromServer } = useContext(TriviaBusinessDataContext);
+    const [willShowLoadingUI, setWillShowLoadingUI] = _willShowLoadingUI;
+    const [, setWillGetQuestionsFromServer] = _willGetQuestionsFromServer;
+    const [willStartTimer, setWillStartTimer] = getTargetTriviaViewState('willStartTimer')
     const navigationObj = useNavigation();
 
-    function handlePlayBtnPress(){
+    function handlePlayBtnPress() {
+        setWillGetQuestionsFromServer(true);
+
+        if (!willStartTimer) {
+            setTimeout(() => {
+                setWillStartTimer(true)
+            }, 500);
+        }
+
+        if (!willShowLoadingUI) {
+            setWillShowLoadingUI(true);
+        }
         navigationObj.navigate('Trivia');
-    };
+    }
 
     return (
         <View style={{

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import QuestionCompPresentation from './Presentation'
 import { useQuery } from '@tanstack/react-query';
 import { getTriviaQuestions } from '../../../../services/questions/get';
@@ -6,12 +6,14 @@ import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessD
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
 
 function QuestionCompContainer() {
-    const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
+    const { _questionsToDisplayOntoUI, _willGetQuestionsFromServer } = useContext(TriviaBusinessDataContext);
     const { getTargetTriviaViewState, _willShowLoadingUI, _willPresentErrorUI } = useContext(TriviaViewDataContext)
     const [willPresentErrorUI, setWillPresentErrorUI] = _willPresentErrorUI;
+    const [willGetQuestionsFromServer, setWillGetQuestionsFromServer] = _willGetQuestionsFromServer;
     const [, setWillShowLoadingUI] = _willShowLoadingUI;
-    const [, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
-    const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn')
+    const [questionToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
+    const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn');
+    const didFirstRenderOccur = useRef(false);
 
     function handleGetTriviaQuestionsError() {
         setWillPresentErrorUI(true);
@@ -33,16 +35,30 @@ function QuestionCompContainer() {
             setQuestionsToDisplayOntoUI(triviaQuestionsUpdated);
         }
     }
-  
-    useQuery({
+
+    const { refetch } = useQuery({
         queryFn: _ => getTriviaQuestions('',
             handleFinallyBlockofGetTriviaQuestionsFn,
             handleGetTriviaQuestionsError,
             handleGetTriviaQuestionsReqSuccess,
             null
         ),
-        queryKey: ['questionsQueryKey']
-    })
+        queryKey: ['questionsQueryKey'],
+    });
+
+    useEffect(() => {
+        console.log("questionToDisplayOntoUI: ", questionToDisplayOntoUI)
+        console.log("willGetQuestionsFromServer: ", willGetQuestionsFromServer)
+        if (!didFirstRenderOccur.current) {
+            didFirstRenderOccur.current = true
+        } else if (!questionToDisplayOntoUI.length && willGetQuestionsFromServer) {
+            console.log('Getting questions again swag...')
+            setWillShowLoadingUI(true);
+            refetch();
+            setWillGetQuestionsFromServer(false);
+        };
+    }, [willGetQuestionsFromServer]);
+
 
     return <QuestionCompPresentation
         _willPresentErrorUI={[willPresentErrorUI, setWillPresentErrorUI]}
