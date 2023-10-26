@@ -61,17 +61,16 @@ export async function getTriviaQuestions(
             handleReqSuccessLogic(response.data)
         }
 
-        console.log('Questions received yolo: ', response.data)
 
-        return response.data;
+        return { data: response.data };
     } catch (error) {
-        console.error('Failed to get the questions from the server. Error message: ', error)
+        const errMsg = `Failed to get the questions from the server. Error message: ${error}`;
 
         if (executeErrorHandlerFn) {
             executeErrorHandlerFn()
         }
 
-        return null;
+        return { msg: errMsg };
     } finally {
         if (executeFinallyFnHandler) {
             executeFinallyFnHandler()

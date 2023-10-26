@@ -6,57 +6,68 @@ import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessD
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
 
 function QuestionCompContainer() {
-    const { _questionsToDisplayOntoUI, _willGetQuestionsFromServer } = useContext(TriviaBusinessDataContext);
-    const { getTargetTriviaViewState, _willShowLoadingUI, _willPresentErrorUI } = useContext(TriviaViewDataContext)
+    const {
+        _questionsToDisplayOntoUI,
+        _willGetQuestionsFromServer,
+    } = useContext(TriviaBusinessDataContext);
+    const {
+        _willShowLoadingUI,
+        _willPresentErrorUI,
+        _willFadeOutLoadingQuestionsLayout,
+        _willStartTimer
+    } = useContext(TriviaViewDataContext)
     const [willPresentErrorUI, setWillPresentErrorUI] = _willPresentErrorUI;
     const [willGetQuestionsFromServer, setWillGetQuestionsFromServer] = _willGetQuestionsFromServer;
     const [, setWillShowLoadingUI] = _willShowLoadingUI;
-    const [questionToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
-    const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn');
-    const didFirstRenderOccur = useRef(false);
+    const [, setWillStartTimer] = _willStartTimer;
+    const [, setWillFadeOutLoadingQuestionLayout] = _willFadeOutLoadingQuestionsLayout;
+    const [, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
 
     function handleGetTriviaQuestionsError() {
         setWillPresentErrorUI(true);
     }
 
-    function handleFinallyBlockofGetTriviaQuestionsFn() {
-        setTimeout(() => {
-            setWillShowLoadingUI(false);
-        }, 1_000);
-    }
-
-    function handleGetTriviaQuestionsReqSuccess(triviaQuestions) {
-        if (isTriviaModeOn) {
-            const triviaQuestionsUpdated = triviaQuestions.map((question, index) => ({
-                ...question,
-                isCurrentQDisplayed: index === 0,
-                selectedAnswer: null
-            }));
-            setQuestionsToDisplayOntoUI(triviaQuestionsUpdated);
-        }
-    }
-
-    const { refetch } = useQuery({
-        queryFn: _ => getTriviaQuestions('',
-            handleFinallyBlockofGetTriviaQuestionsFn,
-            handleGetTriviaQuestionsError,
-            handleGetTriviaQuestionsReqSuccess,
-            null
-        ),
-        queryKey: ['questionsQueryKey'],
-    });
+    // GOAL: get the questions in this component within the useEffect below
+    // the questions are rendered onto the DOM
+    // the isLoadingUI state is false
+    // the questions that are received from the server are inserted into the state of questionsToDisplayOntoUI
+    // the questions are received from the function that makes a get request to get the questions from the server 
+    // make a get request (simulated for testing) to get the questions from the server
+    // navigate to the Trivia screen
+    // the state of willGetTriviaQuestions is set true
+    // the user clicks on the PLAY button 
 
     useEffect(() => {
-        console.log("questionToDisplayOntoUI: ", questionToDisplayOntoUI)
-        console.log("willGetQuestionsFromServer: ", willGetQuestionsFromServer)
-        if (!didFirstRenderOccur.current) {
-            didFirstRenderOccur.current = true
-        } else if (!questionToDisplayOntoUI.length && willGetQuestionsFromServer) {
-            console.log('Getting questions again swag...')
-            setWillShowLoadingUI(true);
-            refetch();
+        if (willGetQuestionsFromServer) {
+            (async () => {
+                try {
+                    const { data: questions, msg } = await getTriviaQuestions(
+                        '',
+                        null,
+                        handleGetTriviaQuestionsError,
+                    );
+
+                    if (!questions) {
+                        throw new Error(`No questions were received from the server. Error msg: ${msg}.`)
+                    }
+
+                    setQuestionsToDisplayOntoUI(questions);
+                } catch (error) {
+                    console.error('An error has occurred: ', error);
+                } finally {
+                    setTimeout(() => {
+                        setWillFadeOutLoadingQuestionLayout(true);
+                        setTimeout(() => {
+                            setWillShowLoadingUI(false);
+                            setTimeout(() => {
+                                setWillStartTimer(true);
+                            }, 100);
+                        }, 400);
+                    }, 1_500);
+                }
+            })();
             setWillGetQuestionsFromServer(false);
-        };
+        }
     }, [willGetQuestionsFromServer]);
 
 

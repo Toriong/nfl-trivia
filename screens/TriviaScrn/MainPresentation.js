@@ -9,7 +9,10 @@ import { TriviaViewDataContext } from '../../providers/TriviaViewDataProvider';
 import { TriviaBusinessDataContext } from '../../providers/TriviaBusinessDataProvider';
 
 function TriviaScrnMainPresentation() {
-    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const { 
+        getTargetTriviaViewState,
+        _willStartTimer 
+    } = useContext(TriviaViewDataContext);
     const { _questionsToDisplayOntoUI, _willGetQuestionsFromServer } = useContext(TriviaBusinessDataContext);
     const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
     const [, setTimerMs] = getTargetTriviaViewState('timerMs');
@@ -19,7 +22,7 @@ function TriviaScrnMainPresentation() {
     const [, setWillRenderQuestionUI] = getTargetTriviaViewState('willRenderQuestionUI');
     const [, setWillRenderCorrectAnsUI] = getTargetTriviaViewState("willRenderCorrectAnsUI");
     const [, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');
-    const [, setWillStartTimer] = getTargetTriviaViewState('willStartTimer');
+    const [, setWillStartTimer] = _willStartTimer;
     const [, setWillFadeQuestionPromptPictures] = getTargetTriviaViewState('willFadeOutQuestionPromptPictures');
     const [, setWillFadeOutCorrectAnsPicture] = getTargetTriviaViewState('willFadeOutCorrectAnsPicture');
     const [, setWillFadeOutQuestionTxt] = getTargetTriviaViewState('willFadeOutQuestionTxt');

@@ -9,6 +9,8 @@ export const TriviaViewDataProvider = ({ children }) => {
     const [selectedAnswer, setSelectedAnswer] = useState({ answer: "", letter: "" });
     const _willShowLoadingUI = useState(true);
     const _willPresentErrorUI = useState(false);
+    const _willFadeOutLoadingQuestionsLayout = useState(false);
+    const _willFadeLoadingQuestionsIn = useState(true);
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
     const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);
     const [isReviewingQs, setIsReviewingQs] = useState(false);
@@ -20,15 +22,11 @@ export const TriviaViewDataProvider = ({ children }) => {
     const [intervalTimer, setIntervalTimer] = useState(null);
     const [timerMs, setTimerMs] = useState(60_000);
     const [willPresentErrorUI, setWillPresentErrorUI] = useState(false);
-    const [willStartTimer, setWillStartTimer] = useState(true);
+    const _willStartTimer = useState(false);
     const triviaViewDataArr = [
         {
             name: 'willPresentErrorUI',
             state: [willPresentErrorUI, setWillPresentErrorUI]
-        },
-        {
-            name: 'willStartTimer',
-            state: [willStartTimer, setWillStartTimer]
         },
         {
             name: 'timerMs',
@@ -134,7 +132,10 @@ export const TriviaViewDataProvider = ({ children }) => {
                 getTargetTriviaViewState,
                 updateTargetTriviaViewState,
                 _willShowLoadingUI,
-                _willPresentErrorUI
+                _willPresentErrorUI,
+                _willFadeOutLoadingQuestionsLayout,
+                _willFadeLoadingQuestionsIn,
+                _willStartTimer
             }}
         >
             {children}

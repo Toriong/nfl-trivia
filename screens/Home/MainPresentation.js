@@ -12,25 +12,17 @@ import { TriviaViewDataContext } from "../../providers/TriviaViewDataProvider";
 import { TriviaBusinessDataContext } from "../../providers/TriviaBusinessDataProvider";
 
 function MainPresentation() {
-    const { _willShowLoadingUI, getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const {
+        _willShowLoadingUI,
+    } = useContext(TriviaViewDataContext);
     const { _willGetQuestionsFromServer } = useContext(TriviaBusinessDataContext);
     const [willShowLoadingUI, setWillShowLoadingUI] = _willShowLoadingUI;
     const [, setWillGetQuestionsFromServer] = _willGetQuestionsFromServer;
-    const [willStartTimer, setWillStartTimer] = getTargetTriviaViewState('willStartTimer')
     const navigationObj = useNavigation();
 
     function handlePlayBtnPress() {
         setWillGetQuestionsFromServer(true);
-
-        if (!willStartTimer) {
-            setTimeout(() => {
-                setWillStartTimer(true)
-            }, 500);
-        }
-
-        if (!willShowLoadingUI) {
-            setWillShowLoadingUI(true);
-        }
+        setWillShowLoadingUI(true);
         navigationObj.navigate('Trivia');
     }
 

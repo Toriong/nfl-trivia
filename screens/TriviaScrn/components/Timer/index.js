@@ -6,11 +6,11 @@ import { useNavigation } from '@react-navigation/native';
 
 function Timer() {
     const navigation = useNavigation();
-    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const { getTargetTriviaViewState, _willStartTimer } = useContext(TriviaViewDataContext);
     const [timerMs, setTimerMs] = getTargetTriviaViewState('timerMs')
     const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
     const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn');
-    const [willStartTimer, setWillStartTimer] = getTargetTriviaViewState('willStartTimer')
+    const [willStartTimer, setWillStartTimer] = _willStartTimer
     const [isTriviaSessionOver, setIsTriviaSessionOver] = useState(false);
 
     useEffect(() => {

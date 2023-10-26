@@ -95,24 +95,41 @@ function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFade
     )
 }
 
+// GOAL: get the questions from the server by the useEffect within the questionComp
+// the state of willShowLoa
+// they are stored in the state of questionsToDisplayOntoUI
+// the questions are received from the server in the getTriviaQuestions function
+
 function QuestionsChoicesAndAnswerContainer() {
     const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
-    const { _willShowLoadingUI, _willPresentErrorUI } = useContext(TriviaViewDataContext);
+    const { 
+        _willShowLoadingUI, 
+        _willPresentErrorUI, 
+        _willFadeOutLoadingQuestionsLayout,
+        _willFadeLoadingQuestionsIn 
+    } = useContext(TriviaViewDataContext);
     const [questionsToDisplayOntoUI,] = _questionsToDisplayOntoUI;
-    const [willPresentErrorUI, ] = _willPresentErrorUI;
-    const [willShowLoadingUI, setWillShowLoadingUI] = _willShowLoadingUI;
-    const [willFadePresentationIn, setWillFadePresentationIn] = useState(true);
-    const [willFadeOutLoadingQuestionsLayout, setWillFadeOutLoadingQuestionLayout] = useState(false);
+    const [willPresentErrorUI,] = _willPresentErrorUI;
+    const [willShowLoadingUI, ] = _willShowLoadingUI;
+    const [willFadeOutLoadingQuestionsLayout, ] = _willFadeOutLoadingQuestionsLayout;
 
     if (willShowLoadingUI) {
         return <TriviaScreenLoadingPresentation
-            _willFadeLoadingQuestionsIn={[willFadePresentationIn, setWillFadePresentationIn]}
+            _willFadeLoadingQuestionsIn={_willFadeLoadingQuestionsIn}
             willFadeOutLoadingQuestionsLayout={willFadeOutLoadingQuestionsLayout}
         />
     }
 
-    if (!questionsToDisplayOntoUI?.length && !willShowLoadingUI) {
-        return <PTxt style={{ textAlign: 'center', paddingLeft: 10, paddingRight: 10 }}>An error has occurred in displaying the question. Please restart the app and try again.</PTxt>;
+    if (!questionsToDisplayOntoUI?.length) {
+        return <PTxt
+            style={{
+                textAlign: 'center',
+                paddingLeft: 10,
+                paddingRight: 10
+            }}
+        >
+            An error has occurred in displaying the question. Please restart the app and try again.
+        </PTxt>
     }
 
     return <QuestionChoicesAndAnswerUI />
@@ -762,12 +779,11 @@ function QuestionChoicesAndAnswerUI() {
     )
 }
 
-function QuestionCompPresentation({ _willPresentErrorUI, _willShowLoadingUI }) {
+function QuestionCompPresentation({ _willPresentErrorUI }) {
     return (
         <View style={{ height: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
             <QuestionsChoicesAndAnswerContainer
                 _willPresentErrorUI={_willPresentErrorUI}
-                _willShowLoadingUI={_willShowLoadingUI}
             />
         </View>
     );
