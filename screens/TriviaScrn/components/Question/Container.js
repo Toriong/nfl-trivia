@@ -64,7 +64,7 @@ function QuestionCompContainer() {
                             }, 100);
                         }, 400);
                     }, 1_500);
-                }
+                };
             })();
             setWillGetQuestionsFromServer(false);
         }

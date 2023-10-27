@@ -9,16 +9,21 @@ import { TriviaViewDataContext } from '../../providers/TriviaViewDataProvider';
 import { TriviaBusinessDataContext } from '../../providers/TriviaBusinessDataProvider';
 
 function TriviaScrnMainPresentation() {
-    const { 
+    const {
         getTargetTriviaViewState,
-        _willStartTimer 
+        _willStartTimer,
+        _willFadeLoadingQuestionsIn,
+        _willFadeOutLoadingQuestionsLayout 
     } = useContext(TriviaViewDataContext);
-    const { _questionsToDisplayOntoUI, _willGetQuestionsFromServer } = useContext(TriviaBusinessDataContext);
+    const { 
+        _questionsToDisplayOntoUI, 
+    } = useContext(TriviaBusinessDataContext);
     const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
     const [, setTimerMs] = getTargetTriviaViewState('timerMs');
     const naviagationObj = useNavigation();
-    const [willGetQuestionsFromServer, setWillGetQuestionsFromServer] = _willGetQuestionsFromServer;
+    const [, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
     const [, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
+    const [, setWillFadeOutLoadingQuestionLayout] = _willFadeOutLoadingQuestionsLayout;
     const [, setWillRenderQuestionUI] = getTargetTriviaViewState('willRenderQuestionUI');
     const [, setWillRenderCorrectAnsUI] = getTargetTriviaViewState("willRenderCorrectAnsUI");
     const [, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');
@@ -28,18 +33,20 @@ function TriviaScrnMainPresentation() {
     const [, setWillFadeOutQuestionTxt] = getTargetTriviaViewState('willFadeOutQuestionTxt');
     const [, setIsTriviaModeOn] = getTargetTriviaViewState("isTriviaModeOn");
 
-    function handleGoBackBtnPress(){
+    function handleGoBackBtnPress() {
         naviagationObj.navigate('Home')
         setTimeout(() => {
             setQuestionsToDisplayOntoUI([]);
+            setWillFadeLoadingQuestionsIn(true);
             setWillStartTimer(false);
             setWillFadeOutQuestionTxt(false);
             setWillFadeOutCorrectAnsPicture(false);
             setWillFadeQuestionPromptPictures(false);
+            setWillFadeOutLoadingQuestionLayout(false);
             setTimerMs(60_000);
             setWillRenderQuestionUI(true);
             setWillRenderCorrectAnsUI(false);
-            setIsTriviaModeOn(false);
+            setIsTriviaModeOn(true);
             setSelectedAnswer({ answer: "", letter: "" });
             setIntervalTimer(intervalTimer => {
                 clearInterval(intervalTimer)
@@ -51,7 +58,7 @@ function TriviaScrnMainPresentation() {
     return (
         <View style={{ ...mainViewStyleSheet.mainView, position: 'relative' }}>
             <Timer />
-            <GoBackBtn 
+            <GoBackBtn
                 handleOnPress={handleGoBackBtnPress}
                 zIndex={100}
             />

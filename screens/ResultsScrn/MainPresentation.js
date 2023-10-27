@@ -19,7 +19,7 @@ const storage = new CustomLocalStorage();
 function MainPresentation() {
     const navigationObj = useNavigation();
     const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
-    const { getTargetTriviaViewState, _willShowLoadingUI, _willPresentErrorUI } = useContext(TriviaViewDataContext);
+    const { getTargetTriviaViewState, _willShowLoadingUI, _willPresentErrorUI, _willStartTimer } = useContext(TriviaViewDataContext);
     const [, setWillShowLoadingUI] = _willShowLoadingUI;
     const [, setWillPresentErrorUI] = _willPresentErrorUI;
     const [, setIsTriviaModeOn] = getTargetTriviaViewState('isTriviaModeOn');
@@ -34,7 +34,7 @@ function MainPresentation() {
     const [, setIsReviewingQs] = getTargetTriviaViewState('isReviewingQs');
     const [, setWasSubmitBtnPressed] = getTargetTriviaViewState('wasSubmitBtnPressed');
     const [, setTimerMs] = getTargetTriviaViewState('timerMs');
-    const [, setWillStartTimer] = getTargetTriviaViewState('willStartTimer')
+    const [, setWillStartTimer] = _willStartTimer;
     const [willFadeOutResultsUi, setWillFadeOutResultsUi] = useState(false);
     const [isReviewQsBtnDisabled, setIsReviewQsBtnDisabled] = useState(false);
     const correctAnswersNum = questionsToDisplayOntoUI.filter(question => {
@@ -77,7 +77,7 @@ function MainPresentation() {
                     }
                 })
                 :
-                questionsToDisplayUpdated
+                questionsToDisplayUpdated;
             setQuestionsToDisplayOntoUI(questionsToDisplayUpdated);
             const { selectedAnswer, choices, pictures } = questionsToDisplayUpdated.at(-1);
 
@@ -108,11 +108,15 @@ function MainPresentation() {
 
     async function handlePlayAgainBtnPress() {
         try {
-            const newQuestions = await getTriviaQuestions(
+            const { data: newQuestions, msg } = await getTriviaQuestions(
                 '',
                 handleFinallyBlockofGetTriviaQuestionsFn,
                 handleOnErrorGetTriviaQuestionReq,
             );
+
+            if(!newQuestions?.length){
+                throw new Error(msg);
+            }
 
             if (!newQuestions) {
                 const alertErrorTxt = "Sorry, but something went wrong. We couldn't retrieve the new trivia questions. Please restart the app and try again.";

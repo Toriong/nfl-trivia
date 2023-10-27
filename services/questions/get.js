@@ -25,7 +25,16 @@ const TEST_QUESTIONS = [
         "text": "What year did the Seattle Seahawks win their first Super Bowl?",
         "choices": ["2012", "2013", "2014", "2015"],
         "answer": "2014"
-    }
+    },
+    {
+        "_id": "7b1bfe76-cb95-4562-ab6e-e18a808fd4d9",
+        "text": "When Steve Largent retired, he was the owner of all major career NFL receiving records.",
+        "choices": [
+            true,
+            false
+        ],
+        "answer": true
+    },
 ]
 
 export async function getTriviaQuestions(
