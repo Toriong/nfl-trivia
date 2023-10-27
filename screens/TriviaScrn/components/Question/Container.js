@@ -1,11 +1,15 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import QuestionCompPresentation from './Presentation'
 import { useQuery } from '@tanstack/react-query';
 import { getTriviaQuestions } from '../../../../services/questions/get';
 import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
 
-function QuestionCompContainer() {
+// GOAL: Show the selected answer when the user selects an answer for the true or false prompt 
+
+// CHECK WHAT IS BEING STORED WHEN THE USER CLICKS ON A CHOICE FOR THE STATE OF selectedAnswer 
+
+const QuestionCompContainer = () => {
     const {
         _questionsToDisplayOntoUI,
         _willGetQuestionsFromServer,
@@ -74,6 +78,6 @@ function QuestionCompContainer() {
     return <QuestionCompPresentation
         _willPresentErrorUI={[willPresentErrorUI, setWillPresentErrorUI]}
     />;
-};
+}
 
 export default QuestionCompContainer;

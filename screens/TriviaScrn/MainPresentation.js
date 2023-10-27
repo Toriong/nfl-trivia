@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { mainViewStyleSheet } from './styles'
-import React, { useContext } from 'react';
+import React, { memo, useContext } from 'react';
 import QuestionCompContainer from './components/Question/Container';
 import Timer from './components/Timer';
 import GoBackBtn from '../../globalComponents/GoBackBtn';
@@ -8,15 +8,15 @@ import { useNavigation } from '@react-navigation/native';
 import { TriviaViewDataContext } from '../../providers/TriviaViewDataProvider';
 import { TriviaBusinessDataContext } from '../../providers/TriviaBusinessDataProvider';
 
-function TriviaScrnMainPresentation() {
+const  TriviaScrnMainPresentation = () => {
     const {
         getTargetTriviaViewState,
         _willStartTimer,
         _willFadeLoadingQuestionsIn,
-        _willFadeOutLoadingQuestionsLayout 
+        _willFadeOutLoadingQuestionsLayout
     } = useContext(TriviaViewDataContext);
-    const { 
-        _questionsToDisplayOntoUI, 
+    const {
+        _questionsToDisplayOntoUI,
     } = useContext(TriviaBusinessDataContext);
     const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
     const [, setTimerMs] = getTargetTriviaViewState('timerMs');

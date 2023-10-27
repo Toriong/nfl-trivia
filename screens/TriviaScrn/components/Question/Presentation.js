@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Image } from 'react-native';
 import { IS_TESTING, MULTIPLE_CHOICE_LETTERS } from '../../../../globalVars';
 import { ActivityIndicator } from 'react-native';
@@ -204,7 +204,7 @@ function QuestionChoicesAndAnswerUI() {
     }
 
     function handleOnChoiceBtnPress(answer, letter) {
-        setSelectedAnswer({ answer: answer, letter: letter });
+        setSelectedAnswer({ answer: typeof answer === 'boolean' ? answer.toString() : answer, letter: letter });
     }
 
     function handleOnShowQuestionBtnPress() {
@@ -217,7 +217,8 @@ function QuestionChoicesAndAnswerUI() {
 
     function handleOnSubmitBtnPress() {
         setWasSubmitBtnPressed(true);
-        setWasSelectedAnswerCorrect(answer === selectedAnswer.answer)
+        const _answer = typeof answer === 'boolean' ? answer.toString() : answer;
+        setWasSelectedAnswerCorrect(_answer === selectedAnswer.answer)
         setWillFadeOutQuestionPromptPictures(true);
         setWillFadeOutQuestionTxt(true);
         setQuestionsToDisplayOntoUI(questions => questions.map(question => {
@@ -342,7 +343,11 @@ function QuestionChoicesAndAnswerUI() {
 
     if (isReviewingQs && !wasSubmitBtnPressed) {
         colorForAnswerShownTxts = 'white';
-    }
+    };
+
+    useEffect(() => {
+        console.log("selectedAnswer: ", selectedAnswer)
+    })
 
     return (
         <FadeUpAndOut
