@@ -3,6 +3,8 @@
 # dependencies
 node_modules/
 
+insertQsIntoDb.js
+
 multiple-choice-example.json
 true-or-false-example.json
 
