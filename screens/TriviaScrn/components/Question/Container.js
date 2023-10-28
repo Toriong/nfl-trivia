@@ -31,16 +31,6 @@ const QuestionCompContainer = () => {
         setWillPresentErrorUI(true);
     }
 
-    // GOAL: get the questions in this component within the useEffect below
-    // the questions are rendered onto the DOM
-    // the isLoadingUI state is false
-    // the questions that are received from the server are inserted into the state of questionsToDisplayOntoUI
-    // the questions are received from the function that makes a get request to get the questions from the server 
-    // make a get request (simulated for testing) to get the questions from the server
-    // navigate to the Trivia screen
-    // the state of willGetTriviaQuestions is set true
-    // the user clicks on the PLAY button 
-
     useEffect(() => {
         if (willGetQuestionsFromServer) {
             (async () => {
