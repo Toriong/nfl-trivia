@@ -8,6 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 import { TriviaViewDataContext } from '../../providers/TriviaViewDataProvider';
 import { TriviaBusinessDataContext } from '../../providers/TriviaBusinessDataProvider';
 
+console.log("process.env: ", process.env['SERVER_DOMAIN_DEV'])
+
 const  TriviaScrnMainPresentation = () => {
     const {
         getTargetTriviaViewState,

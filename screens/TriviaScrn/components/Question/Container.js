@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
-import QuestionCompPresentation from './Presentation'
-import { useQuery } from '@tanstack/react-query';
+import QuestionCompPresentation from './Presentation';
+import API_PATHS from '../../../../services/globalServicesVars';
 import { getTriviaQuestions } from '../../../../services/questions/get';
 import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
