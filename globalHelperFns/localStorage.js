@@ -5,22 +5,35 @@ import { Platform } from 'react-native';
 class CustomLocalStorage {
     isOnWeb = false;
     storage = null;
-    
+
     constructor() {
         this.isOnWeb = Platform.OS === 'web';
         this.storage = this.isOnWeb ? localStorage : AsyncStorage;
     }
 
+    async delete(fieldName) {
+        try {
+            if(this.isOnWeb){
+                this.storage.removeItem(fieldName);
+                return;
+            }
+
+            await this.storage.removeItem(fieldName)
+        } catch (error) {
+
+        }
+    }
+
     async getData(fieldName) {
         try {
-            if(!fieldName){
+            if (!fieldName) {
                 throw new Error('`fieldName` must be provided.')
             }
 
             if (this.isOnWeb) {
                 const data = this.storage.getItem(fieldName)
 
-                if(!data){
+                if (!data) {
                     throw new Error(`'${fieldName}' does not exist.`)
                 }
 
@@ -35,9 +48,9 @@ class CustomLocalStorage {
         }
     }
 
-    async setData(fieldName, data){
+    async setData(fieldName, data) {
         try {
-            if(!data){
+            if (!data) {
                 throw new Error('Must have a `fieldName` and a `data` to save into local storage.')
             }
 
@@ -47,7 +60,7 @@ class CustomLocalStorage {
             }
 
             await this.storage.setItem(fieldName, JSON.stringify(data));
-        } catch(error){
+        } catch (error) {
             console.error('An error has occurred saving data into local storage: ', error);
         }
     }

@@ -1,13 +1,9 @@
 import React, { useContext, useEffect } from 'react';
 import QuestionCompPresentation from './Presentation';
-import API_PATHS from '../../../../services/globalServicesVars';
 import { getTriviaQuestions } from '../../../../services/questions/get';
 import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
 import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvider';
 
-// GOAL: Show the selected answer when the user selects an answer for the true or false prompt 
-
-// CHECK WHAT IS BEING STORED WHEN THE USER CLICKS ON A CHOICE FOR THE STATE OF selectedAnswer 
 
 const QuestionCompContainer = () => {
     const {
@@ -36,10 +32,11 @@ const QuestionCompContainer = () => {
             (async () => {
                 try {
                     const { data: questions, msg } = await getTriviaQuestions(
-                        '',
                         null,
                         handleGetTriviaQuestionsError,
                     );
+
+                    console.log("questions from the server: ", questions)
 
                     if (!questions) {
                         throw new Error(`No questions were received from the server. Error msg: ${msg}.`)

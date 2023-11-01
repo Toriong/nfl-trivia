@@ -14,7 +14,6 @@ function Timer() {
     const [isTriviaSessionOver, setIsTriviaSessionOver] = useState(false);
 
     useEffect(() => {
-        // GOAL: create state, that if true, will execute the code below, and after the execution is done, will make the state false again
         if (willStartTimer) {
             setTimeout(() => {
                 const intervalTimer = setInterval(() => {

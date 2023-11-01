@@ -16,7 +16,7 @@ import SelectedUserAnswer from '../UserAnswer/SelectedUserAnswer';
 import CustomLocalStorage from '../../../../globalHelperFns/localStorage';
 import NextQuestion from '../buttons/NextQuestion';
 
-function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFadeOutLoadingQuestionsLayout }) {
+const TriviaScreenLoadingPresentation = ({ _willFadeLoadingQuestionsIn, willFadeOutLoadingQuestionsLayout }) => {
     const [willFadeLoadingQuestionsIn, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
 
     return (
@@ -100,18 +100,18 @@ function TriviaScreenLoadingPresentation({ _willFadeLoadingQuestionsIn, willFade
 // they are stored in the state of questionsToDisplayOntoUI
 // the questions are received from the server in the getTriviaQuestions function
 
-function QuestionsChoicesAndAnswerContainer() {
+const QuestionsChoicesAndAnswerContainer = () => {
     const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
-    const { 
-        _willShowLoadingUI, 
-        _willPresentErrorUI, 
+    const {
+        _willShowLoadingUI,
+        _willPresentErrorUI,
         _willFadeOutLoadingQuestionsLayout,
-        _willFadeLoadingQuestionsIn 
+        _willFadeLoadingQuestionsIn
     } = useContext(TriviaViewDataContext);
     const [questionsToDisplayOntoUI,] = _questionsToDisplayOntoUI;
     const [willPresentErrorUI,] = _willPresentErrorUI;
-    const [willShowLoadingUI, ] = _willShowLoadingUI;
-    const [willFadeOutLoadingQuestionsLayout, ] = _willFadeOutLoadingQuestionsLayout;
+    const [willShowLoadingUI,] = _willShowLoadingUI;
+    const [willFadeOutLoadingQuestionsLayout,] = _willFadeOutLoadingQuestionsLayout;
 
     if (willShowLoadingUI) {
         return <TriviaScreenLoadingPresentation
@@ -160,6 +160,9 @@ function QuestionChoicesAndAnswerUI() {
     const [isReviewingQs, setIsReviewingQs] = getTargetTriviaViewState('isReviewingQs');
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = getTargetTriviaViewState('wasSubmitBtnPressed');
     const [, setTimerMs] = getTargetTriviaViewState('timerMs');
+    // GOAL: 
+    // fix the layout of the trivia screen.
+    // check the layout for the answer ui. Check the layout that contains the answer text.
     const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = useState(false);
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
     const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
@@ -217,7 +220,7 @@ function QuestionChoicesAndAnswerUI() {
 
     function handleOnSubmitBtnPress() {
         setWasSubmitBtnPressed(true);
-        const _answer = typeof answer === 'boolean' ? answer.toString() : answer;
+        const _answer = typeof answer === 'boolean' ? answer.toString() : answer
         setWasSelectedAnswerCorrect(_answer === selectedAnswer.answer)
         setWillFadeOutQuestionPromptPictures(true);
         setWillFadeOutQuestionTxt(true);
@@ -344,10 +347,6 @@ function QuestionChoicesAndAnswerUI() {
     if (isReviewingQs && !wasSubmitBtnPressed) {
         colorForAnswerShownTxts = 'white';
     };
-
-    useEffect(() => {
-        console.log("selectedAnswer: ", selectedAnswer)
-    })
 
     return (
         <FadeUpAndOut
@@ -511,7 +510,7 @@ function QuestionChoicesAndAnswerUI() {
                                 _willFadeIn={[true, () => { }]}
                                 dynamicStyles={{
                                     width: "100%",
-                                    height: "26%",
+                                    // height: "26%",
                                     marginTop: "3%"
                                 }}
                                 willFadeOut={willFadeOutQuestionTxt}
@@ -674,21 +673,24 @@ function QuestionChoicesAndAnswerUI() {
                         {!pictures && ((selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : '')}
                     </SelectedUserAnswer>
                 </View>
-                {isTriviaModeOn && <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Button
-                        isDisabled={selectedAnswer.answer === ""}
-                        dynamicStyles={{
-                            opacity: selectedAnswer.answer === "" ? .3 : 1,
-                            backgroundColor: '#69BE28',
-                            padding: 10,
-                            borderRadius: 10,
-                            ...buttonStyle
-                        }}
-                        handleOnPress={handleOnSubmitBtnPress}
-                    >
-                        <PTxt>Submit</PTxt>
-                    </Button>
-                </View>}
+                {isTriviaModeOn && (
+                    <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <Button
+                            isDisabled={selectedAnswer.answer === ""}
+                            dynamicStyles={{
+                                opacity: selectedAnswer.answer === "" ? .3 : 1,
+                                backgroundColor: '#69BE28',
+                                padding: 10,
+                                borderRadius: 10,
+                                ...buttonStyle
+                            }}
+                            handleOnPress={handleOnSubmitBtnPress}
+                        >
+                            <PTxt>Submit</PTxt>
+                        </Button>
+                    </View>
+                )
+                }
 
                 <View style={{
                     ...CENTER_DEFAULT.center,

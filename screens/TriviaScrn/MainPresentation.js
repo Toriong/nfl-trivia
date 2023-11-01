@@ -8,14 +8,13 @@ import { useNavigation } from '@react-navigation/native';
 import { TriviaViewDataContext } from '../../providers/TriviaViewDataProvider';
 import { TriviaBusinessDataContext } from '../../providers/TriviaBusinessDataProvider';
 
-console.log("process.env: ", process.env['SERVER_DOMAIN_DEV'])
-
 const  TriviaScrnMainPresentation = () => {
     const {
         getTargetTriviaViewState,
         _willStartTimer,
         _willFadeLoadingQuestionsIn,
-        _willFadeOutLoadingQuestionsLayout
+        _willFadeOutLoadingQuestionsLayout,
+        _willPresentErrorUI
     } = useContext(TriviaViewDataContext);
     const {
         _questionsToDisplayOntoUI,
@@ -23,6 +22,7 @@ const  TriviaScrnMainPresentation = () => {
     const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
     const [, setTimerMs] = getTargetTriviaViewState('timerMs');
     const naviagationObj = useNavigation();
+    const [willPresentErrorUI, ] = _willPresentErrorUI;
     const [, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
     const [, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
     const [, setWillFadeOutLoadingQuestionLayout] = _willFadeOutLoadingQuestionsLayout;
@@ -59,7 +59,7 @@ const  TriviaScrnMainPresentation = () => {
 
     return (
         <View style={{ ...mainViewStyleSheet.mainView, position: 'relative' }}>
-            <Timer />
+            {/* {!willPresentErrorUI && <Timer />} */}
             <GoBackBtn
                 handleOnPress={handleGoBackBtnPress}
                 zIndex={100}
