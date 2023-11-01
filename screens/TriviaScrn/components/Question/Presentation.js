@@ -147,7 +147,7 @@ function QuestionChoicesAndAnswerUI() {
     const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
     const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn')
     const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
-    const { text, answer, choices, pictures, explanation } = questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed] ?? questionsToDisplayOntoUI[0];
+    const { text: questionTxt, answer, choices, pictures, explanation } = questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed] ?? questionsToDisplayOntoUI[0];
     const correctImgUrl = (pictures?.length > 1) ? pictures.find(({ choice }) => choice === answer).picUrl : null;
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
     const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = useState(false);
@@ -353,21 +353,18 @@ function QuestionChoicesAndAnswerUI() {
             dynamicStyles={{
                 height: "100%",
                 display: 'flex',
-                justifyContent: 'center',
                 alignItems: 'center',
+                justifyContent: 'center',
                 top: 10
 
             }}
             _willFadeIn={[willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI]}
             willFadeOut={willFadeOutQuestionChoicesAndAnsUI}
         >
+            {/* The question ui */}
             <View
                 style={{
                     ...questionContainerTxtLayout,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: "80%",
                 }}
             >
                 <View
@@ -381,7 +378,7 @@ function QuestionChoicesAndAnswerUI() {
                     onLayout={handleOnLayout}
                 >
                     {willRenderQuestionUI &&
-                        <>
+                        <View style={{ bottom: "7%" }}>
                             <FadeUpAndOut
                                 dynamicStyles={{
                                     heigth: "100%",
@@ -456,7 +453,7 @@ function QuestionChoicesAndAnswerUI() {
                                                 width: "75%",
                                                 display: 'flex',
                                                 justifyContent: 'center',
-                                                gap: 20,
+                                                gap: 10,
                                                 paddingStart: 10,
                                                 paddingEnd: 10,
                                                 alignItems: 'center',
@@ -481,7 +478,7 @@ function QuestionChoicesAndAnswerUI() {
                                                     <View
                                                         key={letter}
                                                         style={{
-                                                            width: "85%",
+                                                            width: "95%",
                                                             height: 50,
                                                             backgroundColor: answerBackgroundColor,
                                                             borderRadius: 10,
@@ -521,10 +518,10 @@ function QuestionChoicesAndAnswerUI() {
                                         height: "100%",
                                     }}
                                 >
-                                    <PTxt style={{ paddingStart: 5, paddingEnd: 5, color: 'white', textAlign: 'center' }}>{text}</PTxt>
+                                    <PTxt style={{ paddingStart: 5, paddingEnd: 5, color: 'white', textAlign: 'center' }}>{questionTxt}</PTxt>
                                 </View>
                             </FadeUpAndOut>
-                        </>
+                        </View>
                     }
                     {willRenderCorrectAnsUI &&
                         <View style={{ width: '100%', height: '100%' }}>
@@ -654,133 +651,142 @@ function QuestionChoicesAndAnswerUI() {
                 </View>
                 <View
                     style={{
-                        width: "100%",
-                        height: 'fit-content',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        ...selectedAnswerContainerStyle,
+                        top: "12%"
                     }}
                 >
-                    <View>
-                        <PTxt txtColor={colorForAnswerShownTxts}>Your answer: </PTxt>
-                    </View>
-                    <SelectedUserAnswer
-                        viewStyles={selectedAnsContainerStyles}
-                        colorForAnswerShownTxts={colorForAnswerShownTxts}
+                    <View
+                        style={{
+                            width: "100%",
+                            height: 'fit-content',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            ...selectedAnswerContainerStyle,
+                        }}
                     >
-                        {pictures && selectedAnswer.answer}
-                        {!pictures && ((selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : '')}
-                    </SelectedUserAnswer>
-                </View>
-                {isTriviaModeOn && (
-                    <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Button
-                            isDisabled={selectedAnswer.answer === ""}
-                            dynamicStyles={{
-                                opacity: selectedAnswer.answer === "" ? .3 : 1,
-                                backgroundColor: '#69BE28',
-                                padding: 10,
-                                borderRadius: 10,
-                                ...buttonStyle
-                            }}
-                            handleOnPress={handleOnSubmitBtnPress}
+                        <View>
+                            <PTxt txtColor={colorForAnswerShownTxts}>Your answer: </PTxt>
+                        </View>
+                        <SelectedUserAnswer
+                            viewStyles={selectedAnsContainerStyles}
+                            colorForAnswerShownTxts={colorForAnswerShownTxts}
                         >
-                            <PTxt>Submit</PTxt>
-                        </Button>
+                            {pictures && selectedAnswer.answer}
+                            {!pictures && ((selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : '')}
+                        </SelectedUserAnswer>
                     </View>
-                )
-                }
-
-                <View style={{
-                    ...CENTER_DEFAULT.center,
-                    width: "100%",
-                    top: "3%"
-                }}>
-                    {isTriviaModeOn ?
-                        <NextQuestion
-                            btnTxt={((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) ? "View Results" : "Next"}
-                            wasSubmitBtnPressed={wasSubmitBtnPressed}
-                            handleNextQuestionBtnPress={((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) ? handleViewResultsBtn : handleNextQuestionBtnPress}
-                        />
-                        :
-                        <>
-                            <View style={{
-                                width: "100%",
-                                flexDirection: 'row',
-                                gap: 10,
-                                ...CENTER_DEFAULT.center
-                            }}>
-                                <Button
-                                    handleOnPress={() => handleArrowBtnPress(-1)}
-                                    dynamicStyles={{
-                                        ...CENTER_DEFAULT.center,
-                                        borderRadius: 15,
-                                        padding: 13,
-                                        backgroundColor: SEAHAWKS_COLORS.home['3rd']
-                                    }}
-                                    willShowDisableOpacity
-                                    isDisabled={indexOfCurrentQuestionDisplayed === 0}
-                                >
-                                    <FontAwesomeIcon
-                                        icon={faArrowLeft}
-                                        color="white"
-                                        size={27}
-                                    />
-                                </Button>
-                                <Button
-                                    handleOnPress={willRenderCorrectAnsUI ? handleOnShowQuestionBtnPress : handleOnSubmitBtnPress}
-                                    dynamicStyles={{
-                                        ...CENTER_DEFAULT.center,
-                                        width: 225,
-                                        borderRadius: 15,
-                                        padding: 13,
-                                        backgroundColor: SEAHAWKS_COLORS.home['3rd'],
-                                        flexDirection: 'column'
-                                    }}
-                                >
-                                    <PTxt style={{ width: '100%', textAlign: 'center' }}>Show {willRenderCorrectAnsUI ? 'Question' : 'Answer'}</PTxt>
-                                </Button>
-                                <Button
-                                    handleOnPress={() => handleArrowBtnPress(1)}
-                                    willShowDisableOpacity
-                                    dynamicStyles={{
-                                        ...CENTER_DEFAULT.center,
-                                        borderRadius: 15,
-                                        padding: 13,
-                                        backgroundColor: SEAHAWKS_COLORS.home['3rd']
-                                    }}
-                                    isDisabled={indexOfCurrentQuestionDisplayed === (questionsToDisplayOntoUI.length - 1)}
-                                >
-                                    <FontAwesomeIcon
-                                        icon={faArrowRight}
-                                        color="white"
-                                        size={27}
-                                    />
-                                </Button>
-                            </View>
-                            <View style={{
-                                width: "100%",
-                                marginTop: 10,
-                                ...CENTER_DEFAULT.center
-                            }}>
-                                <Button
-                                    dynamicStyles={{
-                                        ...CENTER_DEFAULT.center,
-                                        borderRadius: 15,
-                                        padding: 13,
-                                        backgroundColor: SEAHAWKS_COLORS.home['2nd']
-                                    }}
-                                    handleOnPress={handleResultsBtnPress}
-                                >
-                                    <PTxt txtColor="white" style={{}}>
-                                        Results
-                                    </PTxt>
-                                </Button>
-                            </View>
-                        </>
+                    {isTriviaModeOn && (
+                        <View style={{ ...btnContainerStyle, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <Button
+                                isDisabled={selectedAnswer.answer === ""}
+                                dynamicStyles={{
+                                    opacity: selectedAnswer.answer === "" ? .3 : 1,
+                                    backgroundColor: '#69BE28',
+                                    padding: 10,
+                                    borderRadius: 10,
+                                    ...buttonStyle
+                                }}
+                                handleOnPress={handleOnSubmitBtnPress}
+                            >
+                                <PTxt>Submit</PTxt>
+                            </Button>
+                        </View>
+                    )
                     }
+
+                    <View
+                        style={{
+                            ...CENTER_DEFAULT.center,
+                            width: "100%",
+                            top: "3%"
+                        }}
+                    >
+                        {isTriviaModeOn ?
+                            <NextQuestion
+                                btnTxt={((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) ? "View Results" : "Next"}
+                                wasSubmitBtnPressed={wasSubmitBtnPressed}
+                                handleNextQuestionBtnPress={((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) ? handleViewResultsBtn : handleNextQuestionBtnPress}
+                            />
+                            :
+                            <>
+                                <View style={{
+                                    width: "100%",
+                                    flexDirection: 'row',
+                                    gap: 10,
+                                    ...CENTER_DEFAULT.center
+                                }}>
+                                    <Button
+                                        handleOnPress={() => handleArrowBtnPress(-1)}
+                                        dynamicStyles={{
+                                            ...CENTER_DEFAULT.center,
+                                            borderRadius: 15,
+                                            padding: 13,
+                                            backgroundColor: SEAHAWKS_COLORS.home['3rd']
+                                        }}
+                                        willShowDisableOpacity
+                                        isDisabled={indexOfCurrentQuestionDisplayed === 0}
+                                    >
+                                        <FontAwesomeIcon
+                                            icon={faArrowLeft}
+                                            color="white"
+                                            size={27}
+                                        />
+                                    </Button>
+                                    <Button
+                                        handleOnPress={willRenderCorrectAnsUI ? handleOnShowQuestionBtnPress : handleOnSubmitBtnPress}
+                                        dynamicStyles={{
+                                            ...CENTER_DEFAULT.center,
+                                            width: 225,
+                                            borderRadius: 15,
+                                            padding: 13,
+                                            backgroundColor: SEAHAWKS_COLORS.home['3rd'],
+                                            flexDirection: 'column'
+                                        }}
+                                    >
+                                        <PTxt style={{ width: '100%', textAlign: 'center' }}>Show {willRenderCorrectAnsUI ? 'Question' : 'Answer'}</PTxt>
+                                    </Button>
+                                    <Button
+                                        handleOnPress={() => handleArrowBtnPress(1)}
+                                        willShowDisableOpacity
+                                        dynamicStyles={{
+                                            ...CENTER_DEFAULT.center,
+                                            borderRadius: 15,
+                                            padding: 13,
+                                            backgroundColor: SEAHAWKS_COLORS.home['3rd']
+                                        }}
+                                        isDisabled={indexOfCurrentQuestionDisplayed === (questionsToDisplayOntoUI.length - 1)}
+                                    >
+                                        <FontAwesomeIcon
+                                            icon={faArrowRight}
+                                            color="white"
+                                            size={27}
+                                        />
+                                    </Button>
+                                </View>
+                                <View style={{
+                                    width: "100%",
+                                    marginTop: 10,
+                                    ...CENTER_DEFAULT.center
+                                }}>
+                                    <Button
+                                        dynamicStyles={{
+                                            ...CENTER_DEFAULT.center,
+                                            borderRadius: 15,
+                                            padding: 13,
+                                            backgroundColor: SEAHAWKS_COLORS.home['2nd']
+                                        }}
+                                        handleOnPress={handleResultsBtnPress}
+                                    >
+                                        <PTxt txtColor="white" style={{}}>
+                                            Results
+                                        </PTxt>
+                                    </Button>
+                                </View>
+                            </>
+                        }
+                    </View>
                 </View>
+                {/* end of answer response ui for user */}
             </View>
         </FadeUpAndOut>
     )
