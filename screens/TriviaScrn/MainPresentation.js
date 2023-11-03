@@ -58,7 +58,7 @@ const  TriviaScrnMainPresentation = () => {
     };
 
     return (
-        <View style={{ ...mainViewStyleSheet.mainView, position: 'relative' }}>
+        <View style={{ ...mainViewStyleSheet.mainView, position: 'relative', borderWidth: 1, borderColor: 'pink' }}>
             {/* {!willPresentErrorUI && <Timer />} */}
             <GoBackBtn
                 handleOnPress={handleGoBackBtnPress}

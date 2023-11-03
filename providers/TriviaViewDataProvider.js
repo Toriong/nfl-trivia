@@ -18,7 +18,7 @@ export const TriviaViewDataProvider = ({ children }) => {
     const [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures] = useState(false)
     const [willFadeOutCorrectAnsPicture, setWillFadeOutCorrectAnsPicture] = useState(false);
     const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = useState(false);
-    const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = useState(false);
+    const _wasSubmitBtnPressed = useState(false);
     const [intervalTimer, setIntervalTimer] = useState(null);
     const [timerMs, setTimerMs] = useState(60_000);
     const [willPresentErrorUI, setWillPresentErrorUI] = useState(false);
@@ -35,10 +35,6 @@ export const TriviaViewDataProvider = ({ children }) => {
         {
             name: 'intervalTimer',
             state: [intervalTimer, setIntervalTimer]
-        },
-        {
-            name: 'wasSubmitBtnPressed',
-            state: [wasSubmitBtnPressed, setWasSubmitBtnPressed]
         },
         {
             name: 'isReviewingQs',
@@ -131,6 +127,7 @@ export const TriviaViewDataProvider = ({ children }) => {
             value={{
                 getTargetTriviaViewState,
                 updateTargetTriviaViewState,
+                _wasSubmitBtnPressed,
                 _willShowLoadingUI,
                 _willPresentErrorUI,
                 _willFadeOutLoadingQuestionsLayout,
