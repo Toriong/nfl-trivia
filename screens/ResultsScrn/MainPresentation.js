@@ -19,21 +19,36 @@ const storage = new CustomLocalStorage();
 function MainPresentation() {
     const navigationObj = useNavigation();
     const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
-    const { getTargetTriviaViewState, _willShowLoadingUI, _willPresentErrorUI, _willStartTimer } = useContext(TriviaViewDataContext);
+    const {
+        _willShowLoadingUI,
+        _willPresentErrorUI,
+        _willStartTimer,
+        _isTriviaModeOn,
+        _selectedAnswer,
+        _stylePropForQuestionAndPicLayout,
+        _willRenderQuestionUI,
+        _willRenderCorrectAnsUI,
+        _willFadeOutQuestionPromptPictures,
+        _willFadeOutCorrectAnsPicture,
+        _willFadeOutQuestionTxt,
+        _isReviewingQs,
+        _wasSubmitBtnPressed,
+        _timerMs
+    } = useContext(TriviaViewDataContext);
     const [, setWillShowLoadingUI] = _willShowLoadingUI;
     const [, setWillPresentErrorUI] = _willPresentErrorUI;
-    const [, setIsTriviaModeOn] = getTargetTriviaViewState('isTriviaModeOn');
-    const [, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');;
-    const [, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout')
-    const [, setWillRenderQuestionUI] = getTargetTriviaViewState('willRenderQuestionUI')
-    const [, setWillRenderCorrectAnsUI] = getTargetTriviaViewState('willRenderCorrectAnsUI')
+    const [, setIsTriviaModeOn] = _isTriviaModeOn;
+    const [, setSelectedAnswer] = _selectedAnswer;
+    const [, setStylePropForQuestionAndPicLayout] = _stylePropForQuestionAndPicLayout
+    const [, setWillRenderQuestionUI] = _willRenderQuestionUI
+    const [, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
-    const [, setWillFadeOutQuestionPromptPictures] = getTargetTriviaViewState('willFadeOutQuestionPromptPictures');
-    const [, setWillFadeOutCorrectAnsPicture] = getTargetTriviaViewState('willFadeOutCorrectAnsPicture');
-    const [, setWillFadeOutQuestionTxt] = getTargetTriviaViewState('willFadeOutQuestionTxt');
-    const [, setIsReviewingQs] = getTargetTriviaViewState('isReviewingQs');
-    const [, setWasSubmitBtnPressed] = getTargetTriviaViewState('wasSubmitBtnPressed');
-    const [, setTimerMs] = getTargetTriviaViewState('timerMs');
+    const [, setWillFadeOutQuestionPromptPictures] = _willFadeOutQuestionPromptPictures;
+    const [, setWillFadeOutCorrectAnsPicture] = _willFadeOutCorrectAnsPicture;
+    const [, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
+    const [, setIsReviewingQs] = _isReviewingQs;
+    const [, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
+    const [, setTimerMs] = _timerMs;
     const [, setWillStartTimer] = _willStartTimer;
     const [willFadeOutResultsUi, setWillFadeOutResultsUi] = useState(false);
     const [isReviewQsBtnDisabled, setIsReviewQsBtnDisabled] = useState(false);
@@ -114,7 +129,7 @@ function MainPresentation() {
                 handleOnErrorGetTriviaQuestionReq,
             );
 
-            if(!newQuestions?.length){
+            if (!newQuestions?.length) {
                 throw new Error(msg);
             }
 

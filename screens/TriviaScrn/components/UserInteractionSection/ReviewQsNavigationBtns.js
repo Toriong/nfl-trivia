@@ -8,6 +8,7 @@ import { useMediaQuery } from "react-responsive";
 const storage = new CustomLocalStorage();
 
 const ReviewQsNavigationBtns = ({ handleOnSubmitBtnPress }) => {
+    console.log("sup boi")
     const navigationObj = useNavigation();
     const isBelow575PxViewPortWidth = useMediaQuery({ query: "(max-width: 575px)" });
     const {
@@ -24,7 +25,7 @@ const ReviewQsNavigationBtns = ({ handleOnSubmitBtnPress }) => {
     const [, setSelectedAnswer] = _selectedAnswer;
     const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI;
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = _stylePropForQuestionAndPicLayout;
-    const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
+    const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI?.length ? questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed) : -1;
     let selectedAnswerContainerStyle = { top: 30 };
     let btnContainerStyle = { marginTop: 20 }
 

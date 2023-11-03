@@ -1,6 +1,8 @@
 import { useContext } from "react";
 import { TriviaViewDataContext } from "../../../../providers/TriviaViewDataProvider";
 import { useMediaQuery } from "react-responsive";
+import { Button } from "../../../../globalComponents/buttons";
+import { PTxt } from "../../../../globalComponents/customTxts";
 
 
 const SubmitAnswerBtn = ({ handleOnPress }) => {

@@ -6,11 +6,13 @@ import { TriviaViewDataContext } from '../../../../providers/TriviaViewDataProvi
 import { CENTER_DEFAULT } from '../../../../styles/globalStylesVars';
 import SubmitAnswerBtn from '../buttons/SubmitAnswerBtn';
 import ReviewQsNavigationBtns from './ReviewQsNavigationBtns';
+import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessDataProvider';
+import FadeUpAndOut from '../../../../animations/FadeUpAndOut';
+import NextQuestion from '../buttons/NextQuestion';
 
 const UserInteractionSection = () => {
     const isBelow575PxViewPortWidth = useMediaQuery({ query: "(max-width: 575px)" });
     const {
-        _questionsToDisplayOntoUI,
         _wasSubmitBtnPressed,
         _selectedAnswer,
         _isTriviaModeOn,
@@ -18,7 +20,13 @@ const UserInteractionSection = () => {
         _willFadeOutQuestionTxt,
         _willRenderCorrectAnsUI,
         _isReviewingQs,
+        _willFadeInQuestionChoicesAndAnsUI,
+        _willFadeOutQuestionChoicesAndAnsUI
     } = useContext(TriviaViewDataContext);
+    const {
+        _questionsToDisplayOntoUI
+    } = useContext(TriviaBusinessDataContext);
+    const [willFadeOutQuestionChoicesAndAnsUI,] = _willFadeOutQuestionChoicesAndAnsUI;
     const [isReviewingQs,] = _isReviewingQs;
     const [, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
     const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = _wasSelectedAnswerCorrect;
@@ -26,9 +34,12 @@ const UserInteractionSection = () => {
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
     const [isTriviaModeOn,] = _isTriviaModeOn;
     const [selectedAnswer,] = _selectedAnswer;
+    const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = _willFadeInQuestionChoicesAndAnsUI;
     const [, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI;
-    const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
-    const { answer } = questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed] ?? questionsToDisplayOntoUI[0];
+    console.log("sup")
+    console.log("questionsToDisplayOntoUI: ", questionsToDisplayOntoUI)
+    const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI?.length ? questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed) : -1;
+    const { answer } = questionsToDisplayOntoUI?.length ? (questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed] ?? questionsToDisplayOntoUI[0]) : {};
     let selectedAnswerContainerStyle = { top: 30 };
     let btnContainerStyle = { marginTop: 20 }
     let colorForAnswerShownTxts = wasSubmitBtnPressed ? (wasSelectedAnswerCorrect ? 'green' : 'red') : 'white';
@@ -65,66 +76,75 @@ const UserInteractionSection = () => {
                 setWillRenderCorrectAnsUI(true);
             }, 250)
         }, 450);
-    }
+    };
+
+    console.log('will render jsx...')
 
     return (
-        <View
-            style={{
-                top: "12%",
-            }
-            }
+        <FadeUpAndOut
+            dynamicStyles={{ width: "100%" }}
+            _willFadeIn={[willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI]}
+            willFadeOut={willFadeOutQuestionChoicesAndAnsUI}
         >
             <View
                 style={{
-                    width: "100%",
-                    height: 70,
-                    borderWidth: 1,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    ...selectedAnswerContainerStyle,
+                    bottom: 0,
+                    position: 'fixed',
+                    width: "100%"
                 }}
             >
-                <View>
-                    <PTxt txtColor={colorForAnswerShownTxts}>Your answer: </PTxt>
-                </View>
                 <View
                     style={{
-                        ...selectedAnsContainerStyles,
                         width: "100%",
+                        height: 70,
+                        borderWidth: 1,
                         display: 'flex',
                         justifyContent: 'center',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        ...selectedAnswerContainerStyle,
                     }}
-                    colorForAnswerShownTxts={colorForAnswerShownTxts}
                 >
-                    <PTxt style={{ color: 'white', textAlign: 'center' }}>
-                        {(selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : ''}
-                    </PTxt>
+                    <View>
+                        <PTxt txtColor={colorForAnswerShownTxts}>Your answer: </PTxt>
+                    </View>
+                    <View
+                        style={{
+                            ...selectedAnsContainerStyles,
+                            width: "100%",
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                        colorForAnswerShownTxts={colorForAnswerShownTxts}
+                    >
+                        <PTxt style={{ color: 'white', textAlign: 'center' }}>
+                            {(selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : ''}
+                        </PTxt>
+                    </View>
+                </View>
+                {
+                    isTriviaModeOn && (
+                        <View style={{ ...btnContainerStyle, top: 3, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <SubmitAnswerBtn handleOnPress={handleOnSubmitBtnPress} />
+                        </View>
+                    )
+                }
+
+                <View
+                    style={{
+                        ...CENTER_DEFAULT.center,
+                        width: "100%",
+                        top: "5%"
+                    }}
+                >
+                    {isTriviaModeOn ?
+                        <NextQuestion />
+                        :
+                        <ReviewQsNavigationBtns handleOnSubmitBtnPress={handleOnSubmitBtnPress} />
+                    }
                 </View>
             </View>
-            {
-                isTriviaModeOn && (
-                    <View style={{ ...btnContainerStyle, top: 3, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <SubmitAnswerBtn handleOnPress={handleOnSubmitBtnPress} />
-                    </View>
-                )
-            }
-
-            <View
-                style={{
-                    ...CENTER_DEFAULT.center,
-                    width: "100%",
-                    top: "5%"
-                }}
-            >
-                {isTriviaModeOn ?
-                    <NextQuestion />
-                    :
-                    <ReviewQsNavigationBtns handleOnSubmitBtnPress={handleOnSubmitBtnPress} />
-                }
-            </View>
-        </View >
+        </FadeUpAndOut>
     );
 };
 

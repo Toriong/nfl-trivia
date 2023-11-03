@@ -9,6 +9,7 @@ import { TriviaBusinessDataContext } from '../../../../providers/TriviaBusinessD
 const storage = new CustomLocalStorage();
 
 const NextQuestion = () => {
+    console.log("what is up there...")
     const navigationObj = useNavigation();
     const {
         _intervalTimer,
@@ -28,9 +29,10 @@ const NextQuestion = () => {
     const [selectedAnswer, setSelectedAnswer] = _selectedAnswer;
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = _stylePropForQuestionAndPicLayout;
-    let currentQuestionIndex = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
+    let currentQuestionIndex = questionsToDisplayOntoUI?.length ? questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed) : -1;
     currentQuestionIndex = currentQuestionIndex === -1 ? 0 : currentQuestionIndex;
     const btnTxt = ((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) ? "View Results" : "Next";
+    console.log("hey there yo")
 
     function handleNextQuestionBtnPress() {
         setWillRenderCorrectAnsUI(false);

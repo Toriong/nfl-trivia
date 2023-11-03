@@ -130,6 +130,7 @@ const QuestionsChoicesAndAnswerContainer = () => {
         </PTxt>
     }
 
+    console.log('Displaying question onto ui...')
     return <QuestionChoicesAndAnswerUI />
 }
 
@@ -137,30 +138,40 @@ const storage = new CustomLocalStorage();
 
 function QuestionChoicesAndAnswerUI() {
     const navigationObj = useNavigation();
-    const { getTargetTriviaViewState, _wasSelectedAnswerCorrect } = useContext(TriviaViewDataContext);
+    const {
+        _wasSelectedAnswerCorrect,
+        _selectedAnswer,
+        _stylePropForQuestionAndPicLayout,
+        _intervalTimer,
+        _isTriviaModeOn,
+        _willFadeOutQuestionPromptPictures,
+        _willFadeOutQuestionTxt,
+        _willRenderCorrectAnsUI,
+        _willRenderQuestionUI,
+        _isReviewingQs,
+        _wasSubmitBtnPressed,
+        _timerMs,
+        _willFadeInQuestionChoicesAndAnsUI,
+        _willFadeOutQuestionChoicesAndAnsUI
+    } = useContext(TriviaViewDataContext);
     const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
-    const [selectedAnswer, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');
+    const [selectedAnswer, setSelectedAnswer] = _selectedAnswer;
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
-    const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = getTargetTriviaViewState('stylePropForQuestionAndPicLayout');
-    const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
-    const [isTriviaModeOn,] = getTargetTriviaViewState('isTriviaModeOn')
+    const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = _stylePropForQuestionAndPicLayout;
+    const [, setIntervalTimer] = _intervalTimer;
+    const [isTriviaModeOn,] = _isTriviaModeOn
     const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
     const { text: questionTxt, answer, choices, pictures, explanation } = questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed] ?? questionsToDisplayOntoUI[0];
     const correctImgUrl = (pictures?.length > 1) ? pictures.find(({ choice }) => choice === answer).picUrl : null;
-    const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = useState(true);
-    const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = useState(false);
+    const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = _willFadeInQuestionChoicesAndAnsUI;
+    const [willFadeOutQuestionChoicesAndAnsUI, setWillFadeOutQuestionChoicesAndAnsUI] = _willFadeOutQuestionChoicesAndAnsUI;
     const [willFadeOutExplanationTxt, setWillFadeOutExplanationTxt] = useState(false);
-    const [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures] = getTargetTriviaViewState('willFadeOutQuestionPromptPictures');
-    const [willFadeOutCorrectAnsPicture, setWillFadeOutCorrectAnsPicture] = getTargetTriviaViewState('willFadeOutCorrectAnsPicture');
-    const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = getTargetTriviaViewState('willFadeOutQuestionTxt');
-    const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = getTargetTriviaViewState('willRenderCorrectAnsUI');
-    const [willRenderQuestionUI, setWillRenderQuestionUI] = getTargetTriviaViewState('willRenderQuestionUI');
-    const [isReviewingQs, setIsReviewingQs] = getTargetTriviaViewState('isReviewingQs');
-    const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = getTargetTriviaViewState('wasSubmitBtnPressed');
-    const [, setTimerMs] = getTargetTriviaViewState('timerMs');
-    // GOAL: 
-    // fix the layout of the trivia screen.
-    // check the layout for the answer ui. Check the layout that contains the answer text.
+    const [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures] = _willFadeOutQuestionPromptPictures;
+    const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
+    const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI;
+    const [willRenderQuestionUI, setWillRenderQuestionUI] = _willRenderQuestionUI;
+    const [isReviewingQs, setIsReviewingQs] = _isReviewingQs;
+    const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
     const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = _wasSelectedAnswerCorrect;
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
     const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
@@ -208,97 +219,9 @@ function QuestionChoicesAndAnswerUI() {
         setSelectedAnswer({ answer: typeof answer === 'boolean' ? answer.toString() : answer, letter: letter });
     }
 
-    function handleOnShowQuestionBtnPress() {
-        setWillFadeOutQuestionPromptPictures(false);
-        setWillFadeOutQuestionTxt(false);
-        setWasSubmitBtnPressed(false);
-        setWillRenderCorrectAnsUI(false);
-        setWillRenderQuestionUI(true);
-    }
-
-    function handleOnSubmitBtnPress() {
-        setWasSubmitBtnPressed(true);
-        const _answer = typeof answer === 'boolean' ? answer.toString() : answer
-        setWasSelectedAnswerCorrect(_answer === selectedAnswer.answer)
-        setWillFadeOutQuestionPromptPictures(true);
-        setWillFadeOutQuestionTxt(true);
-        setQuestionsToDisplayOntoUI(questions => questions.map(question => {
-            if (question.isCurrentQDisplayed) {
-                return {
-                    ...question,
-                    selectedAnswer: selectedAnswer.answer
-                };
-            };
-
-            return question;
-        }));
-
-        setTimeout(() => {
-            setWillRenderQuestionUI(false);
-            setTimeout(() => {
-                setWillRenderCorrectAnsUI(true);
-            }, 250)
-        }, 450);
-    }
-
     function handleOnLayout(event) {
         setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
     }
-
-    function handleResultsBtnPress() {
-        storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
-        navigationObj.navigate('Results');
-    }
-
-    function handleViewResultsBtn() {
-        setIntervalTimer(intervalTimer => {
-            clearInterval(intervalTimer);
-            return null;
-        });
-        storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
-        navigationObj.navigate('Results');
-    }
-
-    const currentQuestionIndex = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
-
-    function handleNextQuestionBtnPress() {
-        let currentQuestionIndex = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
-        currentQuestionIndex = (currentQuestionIndex === -1) ? 0 : currentQuestionIndex
-        setWillRenderCorrectAnsUI(false);
-        setWillFadeOutQuestionPromptPictures(false);
-        setWillFadeOutCorrectAnsPicture(false);
-        setWillFadeOutQuestionTxt(false);
-        setWasSubmitBtnPressed(false);
-        setWasSelectedAnswerCorrect(false);
-        const selectedAnswerClone = structuredClone(selectedAnswer);
-        setSelectedAnswer({ answer: "", letter: "" });
-        setTimeout(() => {
-            const nextQuestionToDisplayIndex = currentQuestionIndex + 1;
-            setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
-                if (currentQuestionIndex === index) {
-                    const _updatedQuestion = {
-                        ...question,
-                        isCurrentQDisplayed: false,
-                        selectedAnswer: selectedAnswerClone.answer
-                    }
-
-                    return _updatedQuestion;
-                }
-
-                if (nextQuestionToDisplayIndex === index) {
-                    return {
-                        ...question,
-                        isCurrentQDisplayed: true
-                    }
-                }
-
-                return question;
-            }))
-            setTimeout(() => {
-                setWillRenderQuestionUI(true);
-            }, 150)
-        }, 150)
-    };
 
     let colorForAnswerShownTxts = wasSubmitBtnPressed ? (wasSelectedAnswerCorrect ? 'green' : 'red') : 'white';
 
@@ -319,7 +242,6 @@ function QuestionChoicesAndAnswerUI() {
             _willFadeIn={[willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI]}
             willFadeOut={willFadeOutQuestionChoicesAndAnsUI}
         >
-            {/* The question ui */}
             <View
                 style={{
                     ...questionContainerTxtLayout,
@@ -432,7 +354,9 @@ function QuestionChoicesAndAnswerUI() {
                                                     answerBackgroundColor = 'green';
                                                 } else if (isTriviaModeOn && (wasSubmitBtnPressed && (letter === selectedAnswer.letter))) {
                                                     answerBackgroundColor = 'red';
-                                                }
+                                                };
+
+                                                console.log('rendering choice: ', choiceTxtStr)
 
                                                 return (
                                                     <View

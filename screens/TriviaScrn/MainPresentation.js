@@ -7,33 +7,40 @@ import GoBackBtn from '../../globalComponents/GoBackBtn';
 import { useNavigation } from '@react-navigation/native';
 import { TriviaViewDataContext } from '../../providers/TriviaViewDataProvider';
 import { TriviaBusinessDataContext } from '../../providers/TriviaBusinessDataProvider';
+import UserInteractionSection from './components/UserInteractionSection/UserInteractionSection';
 
-const  TriviaScrnMainPresentation = () => {
+const TriviaScrnMainPresentation = () => {
     const {
-        getTargetTriviaViewState,
+        _intervalTimer,
+        _timerMs,
+        _willRenderQuestionUI,
+        _willRenderCorrectAnsUI,
+        _selectedAnswer,
+        _willFadeOutQuestionPromptPictures,
+        _willFadeOutQuestionTxt,
+        _isTriviaModeOn,
         _willStartTimer,
         _willFadeLoadingQuestionsIn,
         _willFadeOutLoadingQuestionsLayout,
-        _willPresentErrorUI
+        _willShowLoadingUI
     } = useContext(TriviaViewDataContext);
     const {
         _questionsToDisplayOntoUI,
     } = useContext(TriviaBusinessDataContext);
-    const [, setIntervalTimer] = getTargetTriviaViewState('intervalTimer');
-    const [, setTimerMs] = getTargetTriviaViewState('timerMs');
+    const [willShowLoadingUI,] = _willShowLoadingUI;
+    const [, setIntervalTimer] = _intervalTimer
+    const [, setTimerMs] = _timerMs
     const naviagationObj = useNavigation();
-    const [willPresentErrorUI, ] = _willPresentErrorUI;
     const [, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
     const [, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
     const [, setWillFadeOutLoadingQuestionLayout] = _willFadeOutLoadingQuestionsLayout;
-    const [, setWillRenderQuestionUI] = getTargetTriviaViewState('willRenderQuestionUI');
-    const [, setWillRenderCorrectAnsUI] = getTargetTriviaViewState("willRenderCorrectAnsUI");
-    const [, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');
+    const [, setWillRenderQuestionUI] = _willRenderQuestionUI
+    const [, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI
+    const [, setSelectedAnswer] = _selectedAnswer
     const [, setWillStartTimer] = _willStartTimer;
-    const [, setWillFadeQuestionPromptPictures] = getTargetTriviaViewState('willFadeOutQuestionPromptPictures');
-    const [, setWillFadeOutCorrectAnsPicture] = getTargetTriviaViewState('willFadeOutCorrectAnsPicture');
-    const [, setWillFadeOutQuestionTxt] = getTargetTriviaViewState('willFadeOutQuestionTxt');
-    const [, setIsTriviaModeOn] = getTargetTriviaViewState("isTriviaModeOn");
+    const [, setWillFadeQuestionPromptPictures] = _willFadeOutQuestionPromptPictures
+    const [, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt
+    const [, setIsTriviaModeOn] = _isTriviaModeOn
 
     function handleGoBackBtnPress() {
         naviagationObj.navigate('Home')
@@ -65,6 +72,11 @@ const  TriviaScrnMainPresentation = () => {
                 zIndex={100}
             />
             <QuestionCompContainer />
+            {!willShowLoadingUI &&
+                <View style={{ height: "20%", width: "100%" }}>
+                    <UserInteractionSection />
+                </View>
+            }
         </View>
     );
 }
