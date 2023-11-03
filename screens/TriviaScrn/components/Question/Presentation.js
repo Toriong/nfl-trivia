@@ -168,9 +168,9 @@ function QuestionChoicesAndAnswerUI() {
     const [willFadeOutExplanationTxt, setWillFadeOutExplanationTxt] = useState(false);
     const [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures] = _willFadeOutQuestionPromptPictures;
     const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
-    const [willRenderCorrectAnsUI, ] = _willRenderCorrectAnsUI;
-    const [willRenderQuestionUI, ] = _willRenderQuestionUI;
-    const [isReviewingQs, ] = _isReviewingQs;
+    const [willRenderCorrectAnsUI,] = _willRenderCorrectAnsUI;
+    const [willRenderQuestionUI,] = _willRenderQuestionUI;
+    const [isReviewingQs,] = _isReviewingQs;
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
     const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = _wasSelectedAnswerCorrect;
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
@@ -417,24 +417,57 @@ function QuestionChoicesAndAnswerUI() {
                                 <View
                                     style={{
                                         width: "100%",
+                                        height: "100%",
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }}
                                 >
-
-                                    <PTxt
-                                        txtColor={colorForAnswerShownTxts}
-                                        style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
+                                    <PTxt txtColor='green'>Correct Answer: </PTxt>
+                                    <View
+                                        style={{
+                                            width: "80%",
+                                            height: 50,
+                                            backgroundColor: 'green',
+                                            borderRadius: 10,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            paddingLeft: 10,
+                                            paddingRight: 10,
+                                            top: 15
+                                        }}
                                     >
-                                        {wasSelectedAnswerCorrect ? "Correct" : "Incorrect"}
-                                    </PTxt>
-                                    <PTxt
-                                        txtColor={colorForAnswerShownTxts}
-                                        style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
+                                        <PTxt style={{ textAlign: 'center' }}>
+                                            {`${MULTIPLE_CHOICE_LETTERS[choices.findIndex(choiceTxt => choiceTxt === answer)]}. ${answer}`}
+                                        </PTxt>
+                                    </View>
+                                    <View
+                                        style={{
+                                            width: "80%",
+                                            height: 50,
+                                            borderRadius: 10,
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            paddingLeft: 10,
+                                            paddingRight: 10,
+                                            top: 40
+                                        }}
                                     >
-                                        {wasSelectedAnswerCorrect ? "👍" : "👎"}
-                                    </PTxt>
+                                        <PTxt
+                                            txtColor={colorForAnswerShownTxts}
+                                            style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
+                                        >
+                                            {wasSelectedAnswerCorrect ? "Correct" : "Incorrect"}
+                                        </PTxt>
+                                        <PTxt
+                                            txtColor={colorForAnswerShownTxts}
+                                            style={{ color: 'white', textAlign: 'center', paddingStart: 25, paddingEnd: 25 }}
+                                        >
+                                            {wasSelectedAnswerCorrect ? "👍" : "👎"}
+                                        </PTxt>
+                                    </View>
                                 </View>
                             </FadeUpAndOut>
                         </View>
