@@ -21,11 +21,15 @@ const UserInteractionSection = () => {
         _willRenderCorrectAnsUI,
         _isReviewingQs,
         _willFadeInQuestionChoicesAndAnsUI,
-        _willFadeOutQuestionChoicesAndAnsUI
+        _willFadeOutQuestionChoicesAndAnsUI,
+        _willFadeOutQuestionPromptPictures,
+        _willRenderQuestionUI
     } = useContext(TriviaViewDataContext);
     const {
         _questionsToDisplayOntoUI
     } = useContext(TriviaBusinessDataContext);
+    const [, setWillRenderQuestionUI] = _willRenderQuestionUI;
+    const [, setWillFadeOutQuestionsPromptsPictures] = _willFadeOutQuestionPromptPictures;
     const [willFadeOutQuestionChoicesAndAnsUI,] = _willFadeOutQuestionChoicesAndAnsUI;
     const [isReviewingQs,] = _isReviewingQs;
     const [, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
@@ -36,8 +40,6 @@ const UserInteractionSection = () => {
     const [selectedAnswer,] = _selectedAnswer;
     const [willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI] = _willFadeInQuestionChoicesAndAnsUI;
     const [, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI;
-    console.log("sup")
-    console.log("questionsToDisplayOntoUI: ", questionsToDisplayOntoUI)
     const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI?.length ? questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed) : -1;
     const { answer } = questionsToDisplayOntoUI?.length ? (questionsToDisplayOntoUI[indexOfCurrentQuestionDisplayed] ?? questionsToDisplayOntoUI[0]) : {};
     let selectedAnswerContainerStyle = { top: 30 };
@@ -54,11 +56,14 @@ const UserInteractionSection = () => {
         btnContainerStyle = {};
     }
 
+    
+
     function handleOnSubmitBtnPress() {
         setWasSubmitBtnPressed(true);
         const _answer = typeof answer === 'boolean' ? answer.toString() : answer
         setWasSelectedAnswerCorrect(_answer === selectedAnswer.answer)
         setWillFadeOutQuestionTxt(true);
+        setWillFadeOutQuestionsPromptsPictures(true);
         setQuestionsToDisplayOntoUI(questions => questions.map(question => {
             if (question.isCurrentQDisplayed) {
                 return {
@@ -77,8 +82,6 @@ const UserInteractionSection = () => {
             }, 250)
         }, 450);
     };
-
-    console.log('will render jsx...')
 
     return (
         <FadeUpAndOut
@@ -117,7 +120,7 @@ const UserInteractionSection = () => {
                         }}
                         colorForAnswerShownTxts={colorForAnswerShownTxts}
                     >
-                        <PTxt style={{ color: 'white', textAlign: 'center' }}>
+                        <PTxt txtColor={colorForAnswerShownTxts} style={{ textAlign: 'center' }}>
                             {(selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : ''}
                         </PTxt>
                     </View>

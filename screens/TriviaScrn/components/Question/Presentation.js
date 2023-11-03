@@ -168,9 +168,9 @@ function QuestionChoicesAndAnswerUI() {
     const [willFadeOutExplanationTxt, setWillFadeOutExplanationTxt] = useState(false);
     const [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures] = _willFadeOutQuestionPromptPictures;
     const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
-    const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI;
-    const [willRenderQuestionUI, setWillRenderQuestionUI] = _willRenderQuestionUI;
-    const [isReviewingQs, setIsReviewingQs] = _isReviewingQs;
+    const [willRenderCorrectAnsUI, ] = _willRenderCorrectAnsUI;
+    const [willRenderQuestionUI, ] = _willRenderQuestionUI;
+    const [isReviewingQs, ] = _isReviewingQs;
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
     const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = _wasSelectedAnswerCorrect;
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
@@ -235,9 +235,7 @@ function QuestionChoicesAndAnswerUI() {
                 height: "100%",
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                top: 10
-
+                top: "10%"
             }}
             _willFadeIn={[willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI]}
             willFadeOut={willFadeOutQuestionChoicesAndAnsUI}
@@ -449,7 +447,7 @@ function QuestionChoicesAndAnswerUI() {
 
 function QuestionCompPresentation({ _willPresentErrorUI }) {
     return (
-        <View style={{ height: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+        <View style={{ height: "100%", position: 'relative' }}>
             <QuestionsChoicesAndAnswerContainer
                 _willPresentErrorUI={_willPresentErrorUI}
             />
