@@ -137,7 +137,7 @@ const storage = new CustomLocalStorage();
 
 function QuestionChoicesAndAnswerUI() {
     const navigationObj = useNavigation();
-    const { getTargetTriviaViewState } = useContext(TriviaViewDataContext);
+    const { getTargetTriviaViewState, _wasSelectedAnswerCorrect } = useContext(TriviaViewDataContext);
     const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
     const [selectedAnswer, setSelectedAnswer] = getTargetTriviaViewState('selectedAnswer');
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
@@ -161,7 +161,7 @@ function QuestionChoicesAndAnswerUI() {
     // GOAL: 
     // fix the layout of the trivia screen.
     // check the layout for the answer ui. Check the layout that contains the answer text.
-    const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = useState(false);
+    const [wasSelectedAnswerCorrect, setWasSelectedAnswerCorrect] = _wasSelectedAnswerCorrect;
     const isBelow375PxViewPortWidth = useMediaQuery({ query: "(max-width: 375px)" });
     const isBelow300PxViewPortWidth = useMediaQuery({ query: "(max-width: 300px)" });
     const isBelow575PxViewPortWidth = useMediaQuery({ query: "(max-width: 575px)" });
@@ -245,46 +245,6 @@ function QuestionChoicesAndAnswerUI() {
         setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
     }
 
-    function handleArrowBtnPress(numToIncreaseOrDecreaseIndexOfCurrentQ) {
-        try {
-            const indexOfNewQuestion = indexOfCurrentQuestionDisplayed + (numToIncreaseOrDecreaseIndexOfCurrentQ);
-
-            if (!questionsToDisplayOntoUI[indexOfNewQuestion]) {
-                throw new Error('The question does not exist.')
-            }
-
-            setWasSubmitBtnPressed(false);
-            setWillRenderCorrectAnsUI(false);
-            setWillRenderQuestionUI(true);
-            setWillFadeOutCorrectAnsPicture(false);
-            setWillFadeOutExplanationTxt(false);
-            setWillFadeOutQuestionPromptPictures(false);
-            setWillFadeOutQuestionTxt(false);
-            const { selectedAnswer, choices } = questionsToDisplayOntoUI[indexOfNewQuestion];
-            const _selectedAnswer = choices ? { answer: selectedAnswer, letter: MULTIPLE_CHOICE_LETTERS[choices.findIndex(choiceTxtStr => choiceTxtStr === selectedAnswer)] } : { answer: selectedAnswer }
-            setSelectedAnswer(_selectedAnswer);
-            setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
-                if (indexOfCurrentQuestionDisplayed === index) {
-                    return {
-                        ...question,
-                        isCurrentQDisplayed: false,
-                    };
-                }
-
-                if (indexOfNewQuestion === index) {
-                    return {
-                        ...question,
-                        isCurrentQDisplayed: true
-                    }
-                }
-
-                return question;
-            }));
-        } catch (error) {
-            console.error('An errror has occurred in pressing the arrow button: ', error);
-        }
-    }
-
     function handleResultsBtnPress() {
         storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
         navigationObj.navigate('Results');
@@ -338,7 +298,7 @@ function QuestionChoicesAndAnswerUI() {
                 setWillRenderQuestionUI(true);
             }, 150)
         }, 150)
-    }
+    };
 
     let colorForAnswerShownTxts = wasSubmitBtnPressed ? (wasSelectedAnswerCorrect ? 'green' : 'red') : 'white';
 
@@ -525,97 +485,6 @@ function QuestionChoicesAndAnswerUI() {
                     }
                     {willRenderCorrectAnsUI &&
                         <View style={{ width: '100%', height: '100%' }}>
-                            <FadeUpAndOut
-                                dynamicStyles={{
-                                    heigth: 20,
-                                    width: "100%",
-                                    width: "100%",
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    bottom: 10,
-                                }}
-                                _willFadeIn={[true, () => { }]}
-                                willFadeOut={willFadeOutCorrectAnsPicture}
-                            >
-                                <PTxt txtColor='green'>Correct Answer: </PTxt>
-                                {pictures?.length
-                                    ?
-                                    <PTxt txtColor='green'>
-                                        {answer}
-                                    </PTxt>
-                                    :
-                                    <View
-                                        style={{
-                                            width: "80%",
-                                            height: 50,
-                                            backgroundColor: 'green',
-                                            borderRadius: 10,
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            paddingLeft: 10,
-                                            paddingRight: 10,
-                                            top: 15
-                                        }}
-                                    >
-                                        <PTxt style={{ textAlign: 'center' }}>
-                                            {`${MULTIPLE_CHOICE_LETTERS[choices.findIndex(choiceTxt => choiceTxt === answer)]}. ${answer}`}
-                                        </PTxt>
-                                    </View>
-                                }
-                            </FadeUpAndOut>
-                            {correctImgUrl && (
-                                <FadeUpAndOut
-                                    dynamicStyles={{
-                                        heigth: "100%",
-                                        width: "100%",
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                    }}
-                                    _willFadeIn={[true, () => { }]}
-                                    willFadeOut={willFadeOutCorrectAnsPicture}
-                                >
-                                    <View
-                                        style={{
-                                            borderRadius: 20,
-                                            width: "100%",
-                                            height: "100%",
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                        }}
-                                    >
-                                        <Image
-                                            style={{
-                                                width: 185,
-                                                height: 185,
-                                                borderRadius: 20
-                                            }}
-                                            source={correctImgUrl}
-                                        />
-                                    </View>
-                                </FadeUpAndOut>
-                            )}
-                            <FadeUpAndOut
-                                _willFadeIn={[true, () => { }]}
-                                dynamicStyles={{
-                                    width: "100%",
-                                    height: "26%",
-                                    marginBottom: "3%"
-                                }}
-                                willFadeOut={willFadeOutExplanationTxt}
-                            >
-                                <View
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        marginTop: "5%"
-                                    }}
-                                >
-                                    <PTxt style={{ color: 'white', textAlign: 'center', paddingStart: 5, paddingEnd: 5 }} >{explanation}</PTxt>
-                                </View>
-                            </FadeUpAndOut>
                             <FadeUpAndOut
                                 _willFadeIn={[true, () => { }]}
                                 dynamicStyles={{

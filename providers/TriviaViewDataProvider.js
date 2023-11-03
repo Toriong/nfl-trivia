@@ -4,22 +4,23 @@ export const TriviaViewDataContext = createContext();
 
 export const TriviaViewDataProvider = ({ children }) => {
     const [isGettingTriviaQuestions, setIsGettingTriviaQuestions] = useState(true);
-    const [isTriviaModeOn, setIsTriviaModeOn] = useState(true);
     const [triviaScore, setTriviaScore] = useState(0);
-    const [selectedAnswer, setSelectedAnswer] = useState({ answer: "", letter: "" });
+    const _isTriviaModeOn = useState(true);
+    const _selectedAnswer = useState({ answer: "", letter: "" });
     const _willShowLoadingUI = useState(true);
     const _willPresentErrorUI = useState(false);
     const _willFadeOutLoadingQuestionsLayout = useState(false);
     const _willFadeLoadingQuestionsIn = useState(true);
-    const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = useState({});
-    const [willRenderQuestionUI, setWillRenderQuestionUI] = useState(true);
-    const [isReviewingQs, setIsReviewingQs] = useState(false);
-    const [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI] = useState(false);
-    const [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures] = useState(false)
+    const _willFadeOutQuestionPromptPictures = useState(false)
+    const _wasSelectedAnswerCorrect = useState(false);
+    const _willRenderQuestionUI = useState(true);
+    const _willRenderCorrectAnsUI = useState(false);
+    const _stylePropForQuestionAndPicLayout = useState({});
+    const _isReviewingQs = useState(false);
     const [willFadeOutCorrectAnsPicture, setWillFadeOutCorrectAnsPicture] = useState(false);
-    const [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt] = useState(false);
+    const _willFadeOutQuestionTxt = useState(false);
     const _wasSubmitBtnPressed = useState(false);
-    const [intervalTimer, setIntervalTimer] = useState(null);
+    const _intervalTimer = useState(null);
     const [timerMs, setTimerMs] = useState(60_000);
     const [willPresentErrorUI, setWillPresentErrorUI] = useState(false);
     const _willStartTimer = useState(false);
@@ -33,53 +34,17 @@ export const TriviaViewDataProvider = ({ children }) => {
             state: [timerMs, setTimerMs]
         },
         {
-            name: 'intervalTimer',
-            state: [intervalTimer, setIntervalTimer]
-        },
-        {
-            name: 'isReviewingQs',
-            state: [isReviewingQs, setIsReviewingQs]
-        },
-        {
-            name: 'willFadeOutQuestionTxt',
-            state: [willFadeOutQuestionTxt, setWillFadeOutQuestionTxt]
-        },
-        {
-            name: 'willFadeOutQuestionPromptPictures',
-            state: [willFadeOutQuestionPromptPictures, setWillFadeOutQuestionPromptPictures]
-        },
-        {
             name: 'willFadeOutCorrectAnsPicture',
             state: [willFadeOutCorrectAnsPicture, setWillFadeOutCorrectAnsPicture]
-        },
-        {
-            name: "willRenderCorrectAnsUI",
-            state: [willRenderCorrectAnsUI, setWillRenderCorrectAnsUI]
-        },
-        {
-            name: 'willRenderQuestionUI',
-            state: [willRenderQuestionUI, setWillRenderQuestionUI]
-        },
-        {
-            name: 'selectedAnswer',
-            state: [selectedAnswer, setSelectedAnswer]
         },
         {
             name: "isGettingTriviaQuestions",
             state: [isGettingTriviaQuestions, setIsGettingTriviaQuestions]
         },
         {
-            name: 'stylePropForQuestionAndPicLayout',
-            state: [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout]
-        },
-        {
             name: "triviaScore",
             state: [triviaScore, setTriviaScore]
         },
-        {
-            name: 'isTriviaModeOn',
-            state: [isTriviaModeOn, setIsTriviaModeOn]
-        }
     ]
 
     function getTargetTriviaViewState(stateName) {
@@ -127,12 +92,22 @@ export const TriviaViewDataProvider = ({ children }) => {
             value={{
                 getTargetTriviaViewState,
                 updateTargetTriviaViewState,
+                _isReviewingQs,
+                _stylePropForQuestionAndPicLayout,
+                _willRenderCorrectAnsUI,
                 _wasSubmitBtnPressed,
+                _willFadeOutQuestionTxt,
                 _willShowLoadingUI,
+                _selectedAnswer,
                 _willPresentErrorUI,
                 _willFadeOutLoadingQuestionsLayout,
                 _willFadeLoadingQuestionsIn,
-                _willStartTimer
+                _willFadeOutQuestionPromptPictures,
+                _wasSelectedAnswerCorrect,
+                _willRenderQuestionUI,
+                _willStartTimer,
+                _isTriviaModeOn,
+                _intervalTimer
             }}
         >
             {children}
