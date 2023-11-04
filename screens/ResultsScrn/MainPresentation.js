@@ -18,8 +18,8 @@ const storage = new CustomLocalStorage();
 
 function MainPresentation() {
     const navigationObj = useNavigation();
-    const { 
-        _questionsToDisplayOntoUI 
+    const {
+        _questionsToDisplayOntoUI
     } = useContext(TriviaBusinessDataContext);
     const {
         _willShowLoadingUI,
@@ -65,6 +65,7 @@ function MainPresentation() {
         setWillRenderCorrectAnsUI(false);
     }
 
+
     async function handleReviewQsBtnPress() {
         try {
             if (!questionsToDisplayOntoUI.some(({ selectedAnswer }) => selectedAnswer !== null)) {
@@ -81,7 +82,8 @@ function MainPresentation() {
             setWillRenderCorrectAnsUI(false);
             const _stylePropForQuestionAndPicLayout = await storage.getData('triviaScrnHeight');
             setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout);
-            let questionsToDisplayUpdated = questionsToDisplayOntoUI.filter(({ selectedAnswer }) => selectedAnswer !== null)
+            console.log('review qs button pressed: ', questionsToDisplayOntoUI);
+            let questionsToDisplayUpdated = questionsToDisplayOntoUI.filter(({ selectedAnswer }) => !!selectedAnswer)
             questionsToDisplayUpdated = questionsToDisplayUpdated?.length ?
                 questionsToDisplayUpdated.map((question, index, arrBeingMapped) => {
                     return {
@@ -91,15 +93,9 @@ function MainPresentation() {
                 })
                 :
                 questionsToDisplayUpdated;
+            console.log("questionsToDisplayUpdated: ", questionsToDisplayUpdated)
             setQuestionsToDisplayOntoUI(questionsToDisplayUpdated);
-            const { selectedAnswer, choices, pictures } = questionsToDisplayUpdated.at(-1);
-
-            if (pictures) {
-                setSelectedAnswer({ answer: selectedAnswer })
-                navigationObj.navigate('Trivia');
-                return;
-            }
-
+            const { selectedAnswer, choices } = questionsToDisplayUpdated.at(-1);
             const indexOfSelectedChoice = choices.findIndex(choice => choice === selectedAnswer);
             setSelectedAnswer({ answer: selectedAnswer, letter: MULTIPLE_CHOICE_LETTERS[indexOfSelectedChoice] });
             navigationObj.navigate('Trivia');

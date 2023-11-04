@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { View } from 'react-native'
 import CustomLocalStorage from "../../../../globalHelperFns/localStorage";
 import { TriviaViewDataContext } from "../../../../providers/TriviaViewDataProvider";
@@ -10,6 +10,7 @@ import { Button } from "../../../../globalComponents/buttons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { PTxt } from "../../../../globalComponents/customTxts";
+import { MULTIPLE_CHOICE_LETTERS } from "../../../../globalVars";
 
 const storage = new CustomLocalStorage();
 
@@ -23,11 +24,13 @@ const ReviewQsNavigationBtns = ({ handleShowAnswerBtnPress }) => {
         _selectedAnswer,
         _willFadeOutQuestionTxt,
         _willRenderCorrectAnsUI,
-        _willRenderQuestionUI
+        _willRenderQuestionUI,
+        _willFadeOutQuestionPromptPictures
     } = useContext(TriviaViewDataContext);
     const {
         _questionsToDisplayOntoUI
     } = useContext(TriviaBusinessDataContext)
+    const [, setWillFadeOutQuestionPromptPictures] = _willFadeOutQuestionPromptPictures;
     const [, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
     const [, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
@@ -37,7 +40,7 @@ const ReviewQsNavigationBtns = ({ handleShowAnswerBtnPress }) => {
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = _stylePropForQuestionAndPicLayout;
     let indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
     indexOfCurrentQuestionDisplayed = (indexOfCurrentQuestionDisplayed === -1) ? (questionsToDisplayOntoUI.length - 1) : indexOfCurrentQuestionDisplayed;
-    console.log("indexOfCurrentQuestionDisplayed: ", indexOfCurrentQuestionDisplayed) 
+    console.log("indexOfCurrentQuestionDisplayed: ", indexOfCurrentQuestionDisplayed)
     let selectedAnswerContainerStyle = { top: 30 };
     let btnContainerStyle = { marginTop: 20 }
 
@@ -56,6 +59,7 @@ const ReviewQsNavigationBtns = ({ handleShowAnswerBtnPress }) => {
         setWasSubmitBtnPressed(false);
         setWillRenderCorrectAnsUI(false);
         setWillRenderQuestionUI(true);
+        setWillFadeOutQuestionPromptPictures(false);
     };
 
     function handleArrowBtnPress(numToIncreaseOrDecreaseIndexOfCurrentQ) {
@@ -64,8 +68,9 @@ const ReviewQsNavigationBtns = ({ handleShowAnswerBtnPress }) => {
 
             if (!questionsToDisplayOntoUI[indexOfNewQuestion]) {
                 throw new Error('The question does not exist.')
-            }
+            };
 
+            setWillFadeOutQuestionPromptPictures(false);
             setWasSubmitBtnPressed(false);
             setWillRenderCorrectAnsUI(false);
             setWillRenderQuestionUI(true);
@@ -94,6 +99,10 @@ const ReviewQsNavigationBtns = ({ handleShowAnswerBtnPress }) => {
             console.error('An errror has occurred in pressing the arrow button: ', error);
         }
     }
+
+    useEffect(() => {
+        console.log("questionsToDisplayOntoUI: ", questionsToDisplayOntoUI)
+    })
 
     return (
         <>

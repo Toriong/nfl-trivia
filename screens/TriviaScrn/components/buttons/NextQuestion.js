@@ -54,6 +54,7 @@ const NextQuestion = () => {
             setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
                 if (currentQuestionIndex === index) {
                     const _updatedQuestion = {
+                        ...question,
                         isCurrentQDisplayed: false,
                         selectedAnswer: selectedAnswerClone.answer
                     }
