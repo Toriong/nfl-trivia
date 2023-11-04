@@ -22,11 +22,13 @@ const TriviaScrnMainPresentation = () => {
         _willStartTimer,
         _willFadeLoadingQuestionsIn,
         _willFadeOutLoadingQuestionsLayout,
-        _willShowLoadingUI
+        _willShowLoadingUI,
+        _willPresentErrorUI
     } = useContext(TriviaViewDataContext);
     const {
         _questionsToDisplayOntoUI,
     } = useContext(TriviaBusinessDataContext);
+    const [willPresentErrorUI,] = _willPresentErrorUI
     const [willShowLoadingUI,] = _willShowLoadingUI;
     const [, setIntervalTimer] = _intervalTimer
     const [, setTimerMs] = _timerMs
@@ -49,7 +51,6 @@ const TriviaScrnMainPresentation = () => {
             setWillFadeLoadingQuestionsIn(true);
             setWillStartTimer(false);
             setWillFadeOutQuestionTxt(false);
-            setWillFadeOutCorrectAnsPicture(false);
             setWillFadeQuestionPromptPictures(false);
             setWillFadeOutLoadingQuestionLayout(false);
             setTimerMs(60_000);
@@ -65,7 +66,7 @@ const TriviaScrnMainPresentation = () => {
     };
 
     return (
-        <View style={{ ...mainViewStyleSheet.mainView, position: 'relative', borderWidth: 1, borderColor: 'pink' }}>
+        <View style={{ ...mainViewStyleSheet.mainView, position: 'relative' }}>
             {/* {!willPresentErrorUI && <Timer />} */}
             <GoBackBtn
                 handleOnPress={handleGoBackBtnPress}

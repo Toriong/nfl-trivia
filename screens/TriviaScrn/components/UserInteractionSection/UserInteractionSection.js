@@ -56,7 +56,7 @@ const UserInteractionSection = () => {
         btnContainerStyle = {};
     }
 
-    
+
 
     function handleOnSubmitBtnPress() {
         setWasSubmitBtnPressed(true);
@@ -93,18 +93,16 @@ const UserInteractionSection = () => {
                 style={{
                     bottom: 0,
                     position: 'fixed',
-                    width: "100%"
+                    width: "100%",
                 }}
             >
                 <View
                     style={{
                         width: "100%",
-                        height: 70,
-                        borderWidth: 1,
+                        paddingBottom: 3,
                         display: 'flex',
-                        justifyContent: 'center',
                         alignItems: 'center',
-                        ...selectedAnswerContainerStyle,
+                        height: 120
                     }}
                 >
                     <View>
@@ -113,38 +111,64 @@ const UserInteractionSection = () => {
                     <View
                         style={{
                             ...selectedAnsContainerStyles,
-                            width: "100%",
+                            width: "80%",
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center'
                         }}
-                        colorForAnswerShownTxts={colorForAnswerShownTxts}
                     >
-                        <PTxt txtColor={colorForAnswerShownTxts} style={{ textAlign: 'center' }}>
-                            {(selectedAnswer.letter && selectedAnswer.answer) ? `${selectedAnswer.letter}. ${selectedAnswer.answer}` : ''}
+                        <PTxt
+                            txtColor={colorForAnswerShownTxts}
+                            style={{ textAlign: 'center' }}
+                        >
+                            {
+                                (selectedAnswer.letter && selectedAnswer.answer)
+                                    ?
+                                    `${selectedAnswer.letter}. ${selectedAnswer.answer}`
+                                    :
+                                    ''
+                            }
                         </PTxt>
                     </View>
                 </View>
-                {
-                    isTriviaModeOn && (
-                        <View style={{ ...btnContainerStyle, top: 3, width: "100%", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <SubmitAnswerBtn handleOnPress={handleOnSubmitBtnPress} />
-                        </View>
-                    )
-                }
-
                 <View
                     style={{
-                        ...CENTER_DEFAULT.center,
-                        width: "100%",
-                        top: "5%"
+                        borderTopWidth: .5,
+                        borderTopColor: 'rgb(165, 172, 175)',
+                        paddingTop: "2%"
                     }}
                 >
-                    {isTriviaModeOn ?
-                        <NextQuestion />
-                        :
-                        <ReviewQsNavigationBtns handleOnSubmitBtnPress={handleOnSubmitBtnPress} />
+                    {
+                        isTriviaModeOn && (
+                            <View
+                                style={{
+                                    marginBottom: "5%",
+                                    width: "100%",
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <SubmitAnswerBtn handleOnPress={handleOnSubmitBtnPress} />
+                            </View>
+                        )
                     }
+
+                    <View
+                        style={{
+                            ...CENTER_DEFAULT.center,
+                            width: "100%",
+                            marginBottom: "5%",
+                        }}
+                    >
+                        {isTriviaModeOn ?
+                            <NextQuestion />
+                            :
+                            <ReviewQsNavigationBtns
+                                handleShowAnswerBtnPress={handleOnSubmitBtnPress}
+                            />
+                        }
+                    </View>
                 </View>
             </View>
         </FadeUpAndOut>

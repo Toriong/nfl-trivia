@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "insertQs": "node insertQsIntoDb.js"
   },
   "dependencies": {
     "@expo/match-media": "^0.4.0",
@@ -21,6 +22,7 @@
     "expo": "~49.0.13",
     "expo-status-bar": "~1.6.0",
     "fraction.js": "^4.3.7",
+    "https": "^1.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.72.5",

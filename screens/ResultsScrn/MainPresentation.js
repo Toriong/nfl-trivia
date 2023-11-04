@@ -18,7 +18,9 @@ const storage = new CustomLocalStorage();
 
 function MainPresentation() {
     const navigationObj = useNavigation();
-    const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
+    const { 
+        _questionsToDisplayOntoUI 
+    } = useContext(TriviaBusinessDataContext);
     const {
         _willShowLoadingUI,
         _willPresentErrorUI,
@@ -29,7 +31,6 @@ function MainPresentation() {
         _willRenderQuestionUI,
         _willRenderCorrectAnsUI,
         _willFadeOutQuestionPromptPictures,
-        _willFadeOutCorrectAnsPicture,
         _willFadeOutQuestionTxt,
         _isReviewingQs,
         _wasSubmitBtnPressed,
@@ -44,7 +45,6 @@ function MainPresentation() {
     const [, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
     const [, setWillFadeOutQuestionPromptPictures] = _willFadeOutQuestionPromptPictures;
-    const [, setWillFadeOutCorrectAnsPicture] = _willFadeOutCorrectAnsPicture;
     const [, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
     const [, setIsReviewingQs] = _isReviewingQs;
     const [, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
@@ -59,7 +59,6 @@ function MainPresentation() {
     function resetStatesOnTriviaScrn() {
         setWasSubmitBtnPressed(false);
         setWillFadeOutQuestionPromptPictures(false);
-        setWillFadeOutCorrectAnsPicture(false);
         setWillFadeOutQuestionTxt(false);
         setIsTriviaModeOn(false);
         setWillRenderQuestionUI(true);
@@ -76,7 +75,6 @@ function MainPresentation() {
             setIsReviewingQs(true);
             setWasSubmitBtnPressed(false);
             setWillFadeOutQuestionPromptPictures(false);
-            setWillFadeOutCorrectAnsPicture(false);
             setWillFadeOutQuestionTxt(false);
             setIsTriviaModeOn(false);
             setWillRenderQuestionUI(true);
@@ -223,7 +221,13 @@ function MainPresentation() {
                     </HeadingTxt>
                     <PTxt>{correctAnswersNum}/10</PTxt>
                 </View>
-                <View style={{ ...CENTER_DEFAULT.center, flexDirection: 'row', marginTop: 25 }}>
+                <View
+                    style={{
+                        ...CENTER_DEFAULT.center,
+                        flexDirection: 'row',
+                        marginTop: 25
+                    }}
+                >
                     <Button
                         dynamicStyles={{
                             ...getCustomShadowStyles('main', SEAHAWKS_COLORS.home["3rd"]),

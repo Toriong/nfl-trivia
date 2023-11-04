@@ -24,7 +24,6 @@ const SubmitAnswerBtn = ({ handleOnPress }) => {
             backgroundColor: '#69BE28',
             padding: 10,
             borderRadius: 10,
-            ...buttonStyle
         }}
         handleOnPress={handleOnPress}
     >

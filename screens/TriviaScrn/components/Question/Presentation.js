@@ -136,8 +136,7 @@ const QuestionsChoicesAndAnswerContainer = () => {
 
 const storage = new CustomLocalStorage();
 
-function QuestionChoicesAndAnswerUI() {
-    const navigationObj = useNavigation();
+const QuestionChoicesAndAnswerUI = () => {
     const {
         _wasSelectedAnswerCorrect,
         _selectedAnswer,
@@ -158,6 +157,7 @@ function QuestionChoicesAndAnswerUI() {
     const [selectedAnswer, setSelectedAnswer] = _selectedAnswer;
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = _stylePropForQuestionAndPicLayout;
+    const [stylesPropForCorrectAnsDisplay, setStylesPropForCorrectAnsDisplay] = useState({})
     const [, setIntervalTimer] = _intervalTimer;
     const [isTriviaModeOn,] = _isTriviaModeOn
     const indexOfCurrentQuestionDisplayed = questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed);
@@ -219,8 +219,12 @@ function QuestionChoicesAndAnswerUI() {
         setSelectedAnswer({ answer: typeof answer === 'boolean' ? answer.toString() : answer, letter: letter });
     }
 
-    function handleOnLayout(event) {
+    function handleOnQuestionLayout(event) {
         setStylePropForQuestionAndPicLayout({ height: event?.nativeEvent?.layout?.height })
+    }
+
+    function handleOnChoiceLayout(event) {
+        setStylesPropForCorrectAnsDisplay({ width: event?.nativeEvent?.layout?.width });
     }
 
     let colorForAnswerShownTxts = wasSubmitBtnPressed ? (wasSelectedAnswerCorrect ? 'green' : 'red') : 'white';
@@ -235,7 +239,8 @@ function QuestionChoicesAndAnswerUI() {
                 height: "100%",
                 display: 'flex',
                 alignItems: 'center',
-                top: "10%"
+                justifyContent: 'center',
+                bottom: "10%"
             }}
             _willFadeIn={[willFadeInQuestionChoicesAndAnsUI, setWillFadeInQuestionChoicesAndAnsUI]}
             willFadeOut={willFadeOutQuestionChoicesAndAnsUI}
@@ -253,9 +258,10 @@ function QuestionChoicesAndAnswerUI() {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
+                        marginBottom: "5%",
                         ...stylePropForQuestionAndPicLayout
                     }}
-                    onLayout={handleOnLayout}
+                    onLayout={handleOnQuestionLayout}
                 >
                     {willRenderQuestionUI &&
                         <View style={{ bottom: "7%" }}>
@@ -360,16 +366,16 @@ function QuestionChoicesAndAnswerUI() {
                                                     <View
                                                         key={letter}
                                                         style={{
-                                                            width: "95%",
+                                                            width: "100%",
                                                             height: 50,
                                                             backgroundColor: answerBackgroundColor,
                                                             borderRadius: 10,
                                                             display: 'flex',
                                                             justifyContent: 'center',
                                                             alignItems: 'center',
-                                                            paddingLeft: 10,
-                                                            paddingRight: 10
+                                                            padding: 17
                                                         }}
+                                                        onLayout={handleOnChoiceLayout}
                                                     >
                                                         <Button
                                                             isDisabled={isReviewingQs}
@@ -400,7 +406,16 @@ function QuestionChoicesAndAnswerUI() {
                                         height: "100%",
                                     }}
                                 >
-                                    <PTxt style={{ paddingStart: 5, paddingEnd: 5, color: 'white', textAlign: 'center' }}>{questionTxt}</PTxt>
+                                    <PTxt
+                                        style={{
+                                            paddingStart: 10,
+                                            paddingEnd: 10,
+                                            color: 'white',
+                                            textAlign: 'center'
+                                        }}
+                                    >
+                                        {questionTxt}
+                                    </PTxt>
                                 </View>
                             </FadeUpAndOut>
                         </View>
@@ -419,6 +434,7 @@ function QuestionChoicesAndAnswerUI() {
                                         width: "100%",
                                         height: "100%",
                                         display: 'flex',
+                                        paddingHorizontal: 10,
                                         justifyContent: 'center',
                                         alignItems: 'center'
                                     }}
@@ -426,15 +442,14 @@ function QuestionChoicesAndAnswerUI() {
                                     <PTxt txtColor='green'>Correct Answer: </PTxt>
                                     <View
                                         style={{
-                                            width: "80%",
+                                            ...stylesPropForCorrectAnsDisplay,
                                             height: 50,
                                             backgroundColor: 'green',
                                             borderRadius: 10,
                                             display: 'flex',
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            paddingLeft: 10,
-                                            paddingRight: 10,
+                                            padding: 10,
                                             top: 15
                                         }}
                                     >
@@ -444,7 +459,7 @@ function QuestionChoicesAndAnswerUI() {
                                     </View>
                                     <View
                                         style={{
-                                            width: "80%",
+                                            width: "100%",
                                             height: 50,
                                             borderRadius: 10,
                                             display: 'flex',

@@ -17,16 +17,22 @@ const NextQuestion = () => {
         _wasSubmitBtnPressed,
         _selectedAnswer,
         _wasSelectedAnswerCorrect,
-        _willRenderQuestionUI
+        _willRenderQuestionUI,
+        _willRenderCorrectAnsUI,
+        _willFadeOutQuestionPromptPictures,
+        _willFadeOutQuestionTxt
     } = useContext(TriviaViewDataContext);
     const {
         _questionsToDisplayOntoUI
     } = useContext(TriviaBusinessDataContext);
+    const [, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI;
     const [, setWillRenderQuestionUI] = _willRenderQuestionUI;
     const [, setWasSelectedAnswerCorrect] = _wasSelectedAnswerCorrect;
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
+    const [, setWillFadeOutQuestionPromptPictures] = _willFadeOutQuestionPromptPictures;
     const [, setIntervalTimer] = _intervalTimer;
     const [selectedAnswer, setSelectedAnswer] = _selectedAnswer;
+    const [,setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
     const [wasSubmitBtnPressed, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
     const [stylePropForQuestionAndPicLayout, setStylePropForQuestionAndPicLayout] = _stylePropForQuestionAndPicLayout;
     let currentQuestionIndex = questionsToDisplayOntoUI?.length ? questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed) : -1;
@@ -35,9 +41,9 @@ const NextQuestion = () => {
     console.log("hey there yo")
 
     function handleNextQuestionBtnPress() {
+        console.log("what is up yo")
         setWillRenderCorrectAnsUI(false);
         setWillFadeOutQuestionPromptPictures(false);
-        setWillFadeOutCorrectAnsPicture(false);
         setWillFadeOutQuestionTxt(false);
         setWasSubmitBtnPressed(false);
         setWasSelectedAnswerCorrect(false);
@@ -48,7 +54,6 @@ const NextQuestion = () => {
             setQuestionsToDisplayOntoUI(questions => questions.map((question, index) => {
                 if (currentQuestionIndex === index) {
                     const _updatedQuestion = {
-                        ...question,
                         isCurrentQDisplayed: false,
                         selectedAnswer: selectedAnswerClone.answer
                     }
@@ -81,7 +86,7 @@ const NextQuestion = () => {
     };
 
     function handleOnPress() {
-        ((currentQuestionIndex + 1) > questionsToDisplayOntoUI.length) ? handleViewResultsBtn() : handleNextQuestionBtnPress();
+        ((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) ? handleViewResultsBtn() : handleNextQuestionBtnPress();
     };
 
     return (
