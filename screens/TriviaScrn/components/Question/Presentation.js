@@ -96,8 +96,8 @@ const TriviaScreenLoadingPresentation = () => {
 }
 
 const QuestionsChoicesAndAnswerContainer = () => {
-    const { 
-        _questionsToDisplayOntoUI 
+    const {
+        _questionsToDisplayOntoUI
     } = useContext(TriviaBusinessDataContext);
     const {
         _willShowLoadingUI,
@@ -110,15 +110,27 @@ const QuestionsChoicesAndAnswerContainer = () => {
     }
 
     if (!questionsToDisplayOntoUI?.length) {
-        return <PTxt
-            style={{
-                textAlign: 'center',
-                paddingLeft: 10,
-                paddingRight: 10
-            }}
-        >
-            An error has occurred in displaying the question. Please restart the app and try again.
-        </PTxt>
+        return (
+            <FadeUpAndOut
+                dynamicStyles={{ 
+                    width: "100%", 
+                    height: "100%",
+                    ...CENTER_DEFAULT.center 
+                }}
+                _willFadeIn={[true, () => {}]}
+                willFadeOut={false}
+            >
+                <PTxt
+                    style={{
+                        textAlign: 'center',
+                        paddingLeft: 10,
+                        paddingRight: 10
+                    }}
+                >
+                    An error has occurred in displaying the question. Please restart the app and try again.
+                </PTxt>
+            </FadeUpAndOut>
+        )
     }
 
     return <QuestionChoicesAndAnswerUI />
@@ -382,7 +394,6 @@ const QuestionChoicesAndAnswerUI = () => {
                                 _willFadeIn={[true, () => { }]}
                                 dynamicStyles={{
                                     width: "100%",
-                                    // height: "26%",
                                     marginTop: "3%"
                                 }}
                                 willFadeOut={willFadeOutQuestionTxt}
@@ -391,6 +402,7 @@ const QuestionChoicesAndAnswerUI = () => {
                                     style={{
                                         width: "100%",
                                         height: "100%",
+                                        
                                     }}
                                 >
                                     <PTxt
@@ -398,7 +410,9 @@ const QuestionChoicesAndAnswerUI = () => {
                                             paddingStart: 10,
                                             paddingEnd: 10,
                                             color: 'white',
-                                            textAlign: 'center'
+                                            textAlign: 'center',
+                                            lineHeight: 22
+                                            
                                         }}
                                     >
                                         {questionTxt}

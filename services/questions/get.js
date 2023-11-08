@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GET_QUESTIONS_PATH, IS_TESTING, QUESTIONS_API_DOMAIN }  from "../../globalVars";
+import { GET_QUESTIONS_PATH, IS_TESTING, QUESTIONS_API_DOMAIN } from "../../globalVars";
 import CustomLocalStorage from "../../globalHelperFns/localStorage";
 import uuid from 'react-native-uuid';
 
@@ -53,7 +53,7 @@ export async function getTriviaQuestions(
         const getQuestionsApiUrlObj = new URL(`${QUESTIONS_API_DOMAIN}/${GET_QUESTIONS_PATH}`);
         let demoUserId = await customLocalStorage.getData('demoUserId');
         const userId = await customLocalStorage.getData('userId');
-        
+
         if (userId && demoUserId) {
             customLocalStorage.delete('demoUserId')
         }
@@ -82,6 +82,9 @@ export async function getTriviaQuestions(
             handleReqSuccessLogic(response.data.questions)
         }
 
+        const questionIds = response.data.questions.map(({ _id }) => _id);
+
+        console.log('questionIds: ', questionIds);
 
         return { data: response.data.questions };
     } catch (error) {

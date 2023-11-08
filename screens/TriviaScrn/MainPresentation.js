@@ -85,7 +85,7 @@ const TriviaScrnMainPresentation = () => {
                 zIndex={100}
             />
             <QuestionCompContainer />
-            {!willShowLoadingUI &&
+            {(!willShowLoadingUI && !willPresentErrorUI) &&
                 <View style={{ width: "100%" }}>
                     <UserInteractionSection />
                 </View>

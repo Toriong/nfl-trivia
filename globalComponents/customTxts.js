@@ -15,7 +15,7 @@ export function PTxt({ children: txt, fontSize = 21, style, _testID = "", txtCol
     const _style = style ? { ...globalStyles.main, ...style } : globalStyles.main
 
     return (
-        <Text testID={_testID} style={{ ..._style, color: txtColor }}>
+        <Text testID={_testID} style={{ ..._style, color: txtColor,  }}>
             {willAddQuotes ? `"${txt}"` : txt}
         </Text>
     )
