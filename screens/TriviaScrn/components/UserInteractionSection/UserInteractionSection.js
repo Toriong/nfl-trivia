@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { PTxt } from '../../../../globalComponents/customTxts';
 import { View } from 'react-native';
 import { useMediaQuery } from "react-responsive";
@@ -55,8 +55,6 @@ const UserInteractionSection = () => {
         selectedAnswerContainerStyle = {};
         btnContainerStyle = {};
     }
-
-
 
     function handleOnSubmitBtnPress() {
         setWasSubmitBtnPressed(true);
@@ -161,7 +159,8 @@ const UserInteractionSection = () => {
                             marginBottom: "5%",
                         }}
                     >
-                        {isTriviaModeOn ?
+                        {isTriviaModeOn
+                            ?
                             <NextQuestion />
                             :
                             <ReviewQsNavigationBtns

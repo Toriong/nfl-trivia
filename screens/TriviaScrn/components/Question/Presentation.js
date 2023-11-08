@@ -15,8 +15,10 @@ import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import CustomLocalStorage from '../../../../globalHelperFns/localStorage';
 import NextQuestion from '../buttons/NextQuestion';
 
-const TriviaScreenLoadingPresentation = ({ _willFadeLoadingQuestionsIn, willFadeOutLoadingQuestionsLayout }) => {
+const TriviaScreenLoadingPresentation = () => {
+    const { _willFadeLoadingQuestionsIn, _willFadeOutLoadingQuestionsLayout } = useContext(TriviaViewDataContext);
     const [willFadeLoadingQuestionsIn, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn;
+    const [willFadeOutLoadingQuestionsLayout,] = _willFadeOutLoadingQuestionsLayout;
 
     return (
         <FadeUpAndOut
@@ -93,29 +95,18 @@ const TriviaScreenLoadingPresentation = ({ _willFadeLoadingQuestionsIn, willFade
     )
 }
 
-// GOAL: get the questions from the server by the useEffect within the questionComp
-// the state of willShowLoa
-// they are stored in the state of questionsToDisplayOntoUI
-// the questions are received from the server in the getTriviaQuestions function
-
 const QuestionsChoicesAndAnswerContainer = () => {
-    const { _questionsToDisplayOntoUI } = useContext(TriviaBusinessDataContext);
+    const { 
+        _questionsToDisplayOntoUI 
+    } = useContext(TriviaBusinessDataContext);
     const {
         _willShowLoadingUI,
-        _willPresentErrorUI,
-        _willFadeOutLoadingQuestionsLayout,
-        _willFadeLoadingQuestionsIn
     } = useContext(TriviaViewDataContext);
     const [questionsToDisplayOntoUI,] = _questionsToDisplayOntoUI;
-    const [willPresentErrorUI,] = _willPresentErrorUI;
     const [willShowLoadingUI,] = _willShowLoadingUI;
-    const [willFadeOutLoadingQuestionsLayout,] = _willFadeOutLoadingQuestionsLayout;
 
     if (willShowLoadingUI) {
-        return <TriviaScreenLoadingPresentation
-            _willFadeLoadingQuestionsIn={_willFadeLoadingQuestionsIn}
-            willFadeOutLoadingQuestionsLayout={willFadeOutLoadingQuestionsLayout}
-        />
+        return <TriviaScreenLoadingPresentation />
     }
 
     if (!questionsToDisplayOntoUI?.length) {
@@ -130,11 +121,8 @@ const QuestionsChoicesAndAnswerContainer = () => {
         </PTxt>
     }
 
-    console.log('Displaying question onto ui...')
     return <QuestionChoicesAndAnswerUI />
 }
-
-const storage = new CustomLocalStorage();
 
 const QuestionChoicesAndAnswerUI = () => {
     const {
@@ -149,7 +137,6 @@ const QuestionChoicesAndAnswerUI = () => {
         _willRenderQuestionUI,
         _isReviewingQs,
         _wasSubmitBtnPressed,
-        _timerMs,
         _willFadeInQuestionChoicesAndAnsUI,
         _willFadeOutQuestionChoicesAndAnsUI
     } = useContext(TriviaViewDataContext);

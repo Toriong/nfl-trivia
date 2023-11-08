@@ -20,7 +20,7 @@ export const TriviaViewDataProvider = ({ children }) => {
     const _willFadeOutQuestionChoicesAndAnsUI = useState(false);
     const _willFadeInQuestionChoicesAndAnsUI = useState(true);
     const _intervalTimer = useState(null);
-    const _timerMs = useState(60_000);
+    const _timerMs = useState(90_000);
     const _willStartTimer = useState(false);
 
 

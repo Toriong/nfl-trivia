@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 import { mainViewStyleSheet } from './styles'
-import React, { memo, useContext } from 'react';
+import React, { useContext } from 'react';
 import QuestionCompContainer from './components/Question/Container';
 import Timer from './components/Timer';
 import GoBackBtn from '../../globalComponents/GoBackBtn';
@@ -23,11 +23,19 @@ const TriviaScrnMainPresentation = () => {
         _willFadeLoadingQuestionsIn,
         _willFadeOutLoadingQuestionsLayout,
         _willShowLoadingUI,
-        _willPresentErrorUI
+        _willPresentErrorUI,
+        _willFadeInQuestionChoicesAndAnsUI,
+        _willFadeOutQuestionChoicesAndAnsUI,
+        _wasSubmitBtnPressed,
+        _wasSelectedAnswerCorrect
     } = useContext(TriviaViewDataContext);
     const {
         _questionsToDisplayOntoUI,
     } = useContext(TriviaBusinessDataContext);
+    const [, setWasSelectedAnswerCorrect] = _wasSelectedAnswerCorrect;
+    const [, setWasSubmitBtnPressed] = _wasSubmitBtnPressed;
+    const [, setWillFadeInQuestionChoicesAndAnsUI] = _willFadeInQuestionChoicesAndAnsUI;
+    const [, setWillFadeOutQuestionChoicesAndAnsUI] = _willFadeOutQuestionChoicesAndAnsUI;
     const [willPresentErrorUI,] = _willPresentErrorUI
     const [willShowLoadingUI,] = _willShowLoadingUI;
     const [, setIntervalTimer] = _intervalTimer
@@ -48,12 +56,16 @@ const TriviaScrnMainPresentation = () => {
         naviagationObj.navigate('Home')
         setTimeout(() => {
             setQuestionsToDisplayOntoUI([]);
+            setWasSelectedAnswerCorrect(false);
+            setWasSubmitBtnPressed(false);
+            setWillFadeInQuestionChoicesAndAnsUI(true);
+            setWillFadeOutQuestionChoicesAndAnsUI(false);
             setWillFadeLoadingQuestionsIn(true);
             setWillStartTimer(false);
             setWillFadeOutQuestionTxt(false);
             setWillFadeQuestionPromptPictures(false);
             setWillFadeOutLoadingQuestionLayout(false);
-            setTimerMs(60_000);
+            setTimerMs(90_000);
             setWillRenderQuestionUI(true);
             setWillRenderCorrectAnsUI(false);
             setIsTriviaModeOn(true);
@@ -67,14 +79,14 @@ const TriviaScrnMainPresentation = () => {
 
     return (
         <View style={{ ...mainViewStyleSheet.mainView, position: 'relative' }}>
-            {/* {!willPresentErrorUI && <Timer />} */}
+            {!willPresentErrorUI && <Timer />}
             <GoBackBtn
                 handleOnPress={handleGoBackBtnPress}
                 zIndex={100}
             />
             <QuestionCompContainer />
             {!willShowLoadingUI &&
-                <View style={{ height: "20%", width: "100%" }}>
+                <View style={{ width: "100%" }}>
                     <UserInteractionSection />
                 </View>
             }

@@ -34,8 +34,16 @@ function MainPresentation() {
         _willFadeOutQuestionTxt,
         _isReviewingQs,
         _wasSubmitBtnPressed,
-        _timerMs
+        _timerMs,
+        _willFadeOutQuestionChoicesAndAnsUI,
+        _willFadeInQuestionChoicesAndAnsUI,
+        _willFadeOutLoadingQuestionsLayout,
+        _willFadeLoadingQuestionsIn
     } = useContext(TriviaViewDataContext);
+    const [, setWillFadeLoadingQuestionsIn] = _willFadeLoadingQuestionsIn
+    const [, setWillFadeOutLoadingQuestionsLayout] = _willFadeOutLoadingQuestionsLayout;
+    const [, setWillFadeInQuestionChoicesAndAnsUI] = _willFadeInQuestionChoicesAndAnsUI;
+    const [, setWillFadeOutQuestionChoicesAndAnsUI] = _willFadeOutQuestionChoicesAndAnsUI;
     const [, setWillShowLoadingUI] = _willShowLoadingUI;
     const [, setWillPresentErrorUI] = _willPresentErrorUI;
     const [, setIsTriviaModeOn] = _isTriviaModeOn;
@@ -107,53 +115,57 @@ function MainPresentation() {
 
     function handleFinallyBlockofGetTriviaQuestionsFn() {
         setTimeout(() => {
-            setWillShowLoadingUI(false);
+            setWillFadeOutLoadingQuestionsLayout(true);
+            setTimeout(() => {
+                setWillShowLoadingUI(false);
+            }, 1_000)
         }, 1_000);
     };
 
     function handleOnErrorGetTriviaQuestionReq() {
+        const alertErrorTxt = "Sorry, but something went wrong. We couldn't retrieve the new trivia questions. Please restart the app and try again.";
+        customAlert(alertErrorTxt);
         setWillPresentErrorUI(true);
     }
 
+    function handleOnReqSuccessLogic(newQuestions) {
+        setQuestionsToDisplayOntoUI(newQuestions.map((question, index) => {
+            return {
+                ...question,
+                isCurrentQDisplayed: index === 0,
+                selectedAnswer: null
+            };
+        }))
+    }
+
+    // WHAT IS HAPPENING:
+    // unable to show the trivia screen after the user clicks on the play again button
+
     async function handlePlayAgainBtnPress() {
         try {
-            const { data: newQuestions, msg } = await getTriviaQuestions(
-                '',
+            getTriviaQuestions(
                 handleFinallyBlockofGetTriviaQuestionsFn,
                 handleOnErrorGetTriviaQuestionReq,
+                handleOnReqSuccessLogic
             );
-
-            if (!newQuestions?.length) {
-                throw new Error(msg);
-            }
-
-            if (!newQuestions) {
-                const alertErrorTxt = "Sorry, but something went wrong. We couldn't retrieve the new trivia questions. Please restart the app and try again.";
-                customAlert(alertErrorTxt);
-                throw new Error("Failed to get new trivia questions from server.");
-            }
-
             resetStatesOnTriviaScrn();
-
+            setWillShowLoadingUI(true);
+            setWillFadeInQuestionChoicesAndAnsUI(true);
+            setWillFadeOutQuestionChoicesAndAnsUI(false);
+            setWillFadeOutLoadingQuestionsLayout(false);
             const _stylePropForQuestionAndPicLayout = await storage.getData('triviaScrnHeight');
-
             setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout);
+            setWillFadeLoadingQuestionsIn(true);
             setIsTriviaModeOn(true);
             setSelectedAnswer({ answer: "", letter: "" })
-            setQuestionsToDisplayOntoUI(newQuestions.map((question, index) => {
-                return {
-                    ...question,
-                    isCurrentQDisplayed: index === 0,
-                    selectedAnswer: null
-                };
-            }));
-            setStylePropForQuestionAndPicLayout(_stylePropForQuestionAndPicLayout);
             setIsReviewQsBtnDisabled(true);
-            setTimerMs(60_000);
-            navigationObj.navigate('Trivia');
+            setTimerMs(90_000);
             setTimeout(() => {
                 setWillStartTimer(true);
             }, 200);
+            navigationObj.navigate('Trivia');
+
+
         } catch (error) {
             console.error('An error has occurred in getting restarting trivia quiz: ', error)
         }

@@ -50,15 +50,6 @@ export async function getTriviaQuestions(
             handleBeforeReqWasSent();
         };
 
-        // CASE: the user does not have an account, this is the first time that the user has used the app. 
-        // GOAL: generate a uuid for the user and attach it to 'demoUserId' field for the getQuestionsApiUrlObj field
-
-        // CASE: the user does not have an account, this is not the first time that the user has used the app
-        // GOAL: get the demoUserId field located in localStorage for the 'demoUserId' field 
-
-        // CASE: the user does have an account
-        // GOAL: get the id of the user in localStorage for the 'userId' field
-
         const getQuestionsApiUrlObj = new URL(`${QUESTIONS_API_DOMAIN}/${GET_QUESTIONS_PATH}`);
         let demoUserId = await customLocalStorage.getData('demoUserId');
         const userId = await customLocalStorage.getData('userId');
@@ -73,13 +64,11 @@ export async function getTriviaQuestions(
             getQuestionsApiUrlObj.searchParams.append('demoUserId', demoUserId);
         } else if (!demoUserId) {
             demoUserId = uuid.v4();
+            customLocalStorage.setData('demoUserId', demoUserId)
             getQuestionsApiUrlObj.searchParams.append('demoUserId', demoUserId);
         };
-        console.log('get questions getQuestionsApiUrlObj: ', getQuestionsApiUrlObj.href);
 
         const response = IS_TESTING ? { status: 200, data: structuredClone(new Array(2).fill(TEST_QUESTIONS).flat()) } : await axios.get(getQuestionsApiUrlObj.href);
-
-        console.log("response: ", response)
 
         if (response.status !== 200) {
             throw new Error('Failed to get the response from the server.')

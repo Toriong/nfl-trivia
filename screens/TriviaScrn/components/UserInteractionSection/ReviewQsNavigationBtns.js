@@ -25,11 +25,11 @@ const ReviewQsNavigationBtns = ({ handleShowAnswerBtnPress }) => {
         _willFadeOutQuestionTxt,
         _willRenderCorrectAnsUI,
         _willRenderQuestionUI,
-        _willFadeOutQuestionPromptPictures
+        _willFadeOutQuestionPromptPictures,
     } = useContext(TriviaViewDataContext);
     const {
         _questionsToDisplayOntoUI
-    } = useContext(TriviaBusinessDataContext)
+    } = useContext(TriviaBusinessDataContext);
     const [, setWillFadeOutQuestionPromptPictures] = _willFadeOutQuestionPromptPictures;
     const [, setWillFadeOutQuestionTxt] = _willFadeOutQuestionTxt;
     const [questionsToDisplayOntoUI, setQuestionsToDisplayOntoUI] = _questionsToDisplayOntoUI;
