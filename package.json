@@ -7,7 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "insertQs": "node insertQsIntoDb.js"
+    "insertqs": "node insertQsIntoDb.js"
   },
   "dependencies": {
     "@expo/match-media": "^0.4.0",

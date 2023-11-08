@@ -20,11 +20,13 @@ const NextQuestion = () => {
         _willRenderQuestionUI,
         _willRenderCorrectAnsUI,
         _willFadeOutQuestionPromptPictures,
-        _willFadeOutQuestionTxt
+        _willFadeOutQuestionTxt,
     } = useContext(TriviaViewDataContext);
     const {
+        _willSendReqToServerToSaveAnsweredQs,
         _questionsToDisplayOntoUI
     } = useContext(TriviaBusinessDataContext);
+    const [, setWillSendReqToServerToSaveAnweredQs] = _willSendReqToServerToSaveAnsweredQs;
     const [, setWillRenderCorrectAnsUI] = _willRenderCorrectAnsUI;
     const [, setWillRenderQuestionUI] = _willRenderQuestionUI;
     const [, setWasSelectedAnswerCorrect] = _wasSelectedAnswerCorrect;
@@ -38,10 +40,8 @@ const NextQuestion = () => {
     let currentQuestionIndex = questionsToDisplayOntoUI?.length ? questionsToDisplayOntoUI.findIndex(({ isCurrentQDisplayed }) => isCurrentQDisplayed) : -1;
     currentQuestionIndex = currentQuestionIndex === -1 ? 0 : currentQuestionIndex;
     const btnTxt = ((currentQuestionIndex + 1) > (questionsToDisplayOntoUI.length - 1)) ? "View Results" : "Next";
-    console.log("hey there yo")
 
     function handleNextQuestionBtnPress() {
-        console.log("what is up yo")
         setWillRenderCorrectAnsUI(false);
         setWillFadeOutQuestionPromptPictures(false);
         setWillFadeOutQuestionTxt(false);
@@ -82,7 +82,8 @@ const NextQuestion = () => {
             clearInterval(intervalTimer);
             return null;
         });
-        storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout)
+        storage.setData('triviaScrnHeight', stylePropForQuestionAndPicLayout);
+        setWillSendReqToServerToSaveAnweredQs(true);
         navigationObj.navigate('Results');
     };
 

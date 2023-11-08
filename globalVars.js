@@ -3,4 +3,5 @@ export const IS_ON_DEV = true;
 export const MULTIPLE_CHOICE_LETTERS = ["A", "B", "C", "D"];
 export const QUESTIONS_API_DOMAIN = IS_ON_DEV ? 'http://localhost:5000' : ''
 export const GET_QUESTIONS_PATH = 'get-questions'
+export const CACHE_ANSWERED_QUESTION_IDS_PATH = 'cache-answered-qs'
 
